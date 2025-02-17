@@ -6,6 +6,7 @@
   --background: hsl(183, 100%, 75%);
   --foreground: #171717;
   --primary: hsl(0, 100%, 71%);
+  --destructive: hsl(0, 100%, 27%);
 }
 
 body {
