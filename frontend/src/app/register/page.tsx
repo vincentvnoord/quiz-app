@@ -13,7 +13,6 @@ export default function RegisterPage() {
     return (
         <div className="w-full h-dvh">
             <main className="w-full h-full flex flex-col items-center pt-12 p-3 sm:justify-center md:pt-3">
-                <h1 className="text-5xl pb-8 font-semibold justify-self-start">Register an account</h1>
                 <RegisterForm />
             </main>
         </div>
