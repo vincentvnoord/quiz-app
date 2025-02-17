@@ -7,7 +7,7 @@ import { z } from "zod";
 import { registerSchema } from "@/controllers/users/register-controller";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
-import { Eye, EyeClosed, EyeOffIcon, ShieldCheck, ShieldX } from "lucide-react";
+import { Check, Eye, EyeClosed, EyeOffIcon, ShieldCheck, ShieldX, XIcon } from "lucide-react";
 
 type FormData = z.infer<typeof registerSchema>;
 
@@ -51,13 +51,14 @@ const PrivacyAgreement = () => {
 
 const PasswordInput = () => {
     const [showPassword, setShowPassword] = React.useState(false);
-    const { register, formState: { errors } } = useFormContext();
+    const { watch, register, formState: { errors } } = useFormContext();
     const error = errors.password;
     const errorMessage = error?.message;
-    console.log(errorMessage);
+
+    const pw = watch("password");
 
     return (
-        <div className="w-full flex flex-col">
+        <div className="w-full flex flex-col gap-1">
             <Input className="z-50" valid={false} error={errorMessage !== undefined} {...register("password")} label="Password" type={showPassword ? "text" : "password"}>
                 <div onClick={() => setShowPassword(!showPassword)} className="pr-3 opacity-50">
                     {
@@ -68,7 +69,10 @@ const PasswordInput = () => {
                     }
                 </div>
             </Input>
-            <p className="text-sm p-2 opacity-80">Minimum 12 characters</p>
+            <div className="flex items-center">
+                <PasswordCorrectness isCorrect={pw?.length > 12} />
+                <p className="text-sm p-2 opacity-80">Minimum 12 characters</p>
+            </div>
         </div>
     )
 }
@@ -92,7 +96,7 @@ Input.displayName = "Input";
 const PasswordCorrectness = ({ isCorrect }: { isCorrect: boolean }) => {
     return (
         <div className="flex items-center">
-            {isCorrect ? <ShieldCheck className="text-green-500 w-10 h-10 pr-2" /> : <ShieldX className="text-destructive w-10 h-10 pr-2" />}
+            {isCorrect ? <Check size={32} className="text-green-500 pr-2" /> : <XIcon size={28} className="text-destructive" />}
         </div>
     )
 }
