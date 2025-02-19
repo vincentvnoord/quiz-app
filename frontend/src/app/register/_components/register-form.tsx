@@ -10,6 +10,7 @@ import React from "react";
 import { EmailInput } from "./email";
 import { PasswordInput } from "./password";
 import { PrivacyAgreement } from "./privacy";
+import { Info } from "lucide-react";
 
 type FormData = z.infer<typeof registerSchema>;
 
@@ -19,11 +20,24 @@ export const RegisterForm = () => {
     });
 
     const { handleSubmit, formState: { isSubmitting, errors, isSubmitSuccessful } } = methods;
+    const [submitError, setSubmitError] = React.useState<string | null>(null);
+    const [showError, setShowError] = React.useState<boolean>(false);
 
     const onSubmit = async (data: FormData) => {
-        console.log("Registering: " + JSON.stringify(data));
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        console.log("Registered!");
+        try {
+            setShowError(false);
+            console.log("Registering: " + JSON.stringify(data));
+            // Call server action to process register
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            throw new Error("Something went wrong, please try again later.");
+        } catch (e) {
+            if (e instanceof Error) {
+                setSubmitError(e.message);
+            } else {
+                setSubmitError("An unknown error occurred.");
+            }
+            setShowError(true);
+        }
     }
 
     return (
@@ -50,6 +64,10 @@ export const RegisterForm = () => {
                                 "REGISTER"
                         }
                     </button>
+                </motion.div>
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={showError ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }} className="flex justify-center items-center text-destructive gap-2 overflow-hidden">
+                    <Info className="flex-grow-0 flex-shrink-0" strokeWidth={2.3} size={28} />
+                    {submitError && <p className="text-destructive text-sm">{submitError}</p>}
                 </motion.div>
             </form>
         </FormProvider >
