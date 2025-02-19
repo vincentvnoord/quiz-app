@@ -1,6 +1,7 @@
 import React from 'react'
 import { useFormContext } from 'react-hook-form';
 import { Check, XIcon, Eye, EyeOffIcon } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { Input } from './shared';
 
 export const PasswordInput = () => {
@@ -23,17 +24,17 @@ export const PasswordInput = () => {
                     }
                 </div>
             </Input>
-            <div className="flex items-center">
+            <motion.div initial={{ height: 0 }} transition={errorMessage ? { delay: 0 } : { delay: 0.5 }} animate={errorMessage ? { height: "auto" } : { height: 0 }} className="flex items-center overflow-hidden">
                 <PasswordCorrectness isCorrect={pw?.length > 12} />
                 <p className="text-sm p-2 opacity-80">Minimum 12 characters</p>
-            </div>
+            </motion.div>
         </div>
     )
 }
 
 const PasswordCorrectness = ({ isCorrect }: { isCorrect: boolean }) => {
     return (
-        <div className="flex items-center">
+        <div className="flex items-center w-8 h-8">
             {isCorrect ? <Check size={32} className="text-positive pr-2" /> : <XIcon size={28} className="text-destructive" />}
         </div>
     )
