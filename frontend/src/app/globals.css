@@ -3,15 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
+  --background: hsl(183, 100%, 75%);
   --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --primary: hsl(0, 100%, 71%);
+  --destructive: hsl(0, 100%, 27%);
+  --positive: hsl(111, 100%, 33%);
 }
 
 body {

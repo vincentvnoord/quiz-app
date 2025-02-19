@@ -11,6 +11,9 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        primary: "var(--primary)",
+        destructive: "var(--destructive)",
+        positive: "var(--positive)",
       },
     },
   },
