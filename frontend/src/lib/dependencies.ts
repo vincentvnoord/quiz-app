@@ -4,7 +4,9 @@ import { DependencyContainer } from "./container";
 
 const container = new DependencyContainer();
 
-container.register<IUserRepository>(IUserRepositoryToken, new UserRepository());
+container.register<IUserRepository>(IUserRepositoryToken, new UserRepository(process.env.API_URL || ''));
 
 if (process.env.NODE_ENV === "development") {
 }
+
+export default container;

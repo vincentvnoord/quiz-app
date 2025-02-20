@@ -1,7 +1,7 @@
 using Business.UserService;
 using Business.Models;
 
-namespace DataAccess
+namespace DataAccess.Repositories
 {
     public class UserRepository : IUserRepository
     {

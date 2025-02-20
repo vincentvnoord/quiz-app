@@ -2,7 +2,7 @@
 using Business.Models;
 using Business.UserService;
 
-namespace DataAccess
+namespace DataAccess.Mocks
 {
     public class UserRepositoryMock : IUserRepository
     {

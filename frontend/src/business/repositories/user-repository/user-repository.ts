@@ -1,13 +1,32 @@
 import { UserDto } from "@/business/entities/user";
 import { IUserRepository } from "./user-repository-interface";
+import { RegistrationError, RegistrationErrorType } from "@/business/entities/errors/RegistrationError";
 
 export class UserRepository implements IUserRepository {
+    private url: string;
+
+    constructor(url: string) {
+        this.url = url;
+    }
+
     async createUser(user: UserDto): Promise<void> {
         try {
-            // Call API to create user
+            const res = await fetch(`${this.url}/register`, {
+                method: "post",
+                body: JSON.stringify(user),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
 
+            if (res.status === 409) {
+                throw new RegistrationError("User already exists", RegistrationErrorType.EMAIL_EXISTS);
+            } else if (!res.ok) {
+                throw new Error("Unknown server error while creating user, check API logs");
+            }
         } catch (e) {
-            throw new Error("Error creating user");
+            console.error("Error creating user: ", e);
+            throw e;
         }
     }
 }
