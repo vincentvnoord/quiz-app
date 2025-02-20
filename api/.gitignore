@@ -1,0 +1,39 @@
+# Ignore build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Dd]ist/
+[Dd]ebug/
+[Dd]ist/
+obj/
+bin/
+
+# User-specific files
+.idea/
+.vscode/
+
+# ASP.NET Core / .NET Core files
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Npm packages
+node_modules/
+
+# JetBrains Rider
+.idea/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Windows Installer files for Visual Studio for Mac
+.vs/
+.vscode/
+
+# Windows Installer files for Visual Studio for Mac
+.vscode/
+
+# .NET Core SDK toolchains
+.dotnet/
