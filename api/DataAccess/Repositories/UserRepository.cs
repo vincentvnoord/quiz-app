@@ -1,25 +1,27 @@
 using Business.UserService;
 using Business.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private readonly ApiDbContext _context;
+        private readonly QuizDbContext _context;
 
-        public UserRepository(ApiDbContext context)
+        public UserRepository(QuizDbContext context)
         {
             _context = context;
         }
 
-        public Task CreateUserAsync(User user)
+        public async Task CreateUserAsync(User user)
         {
-            throw new NotImplementedException();
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
         }
 
-        public Task<User?> GetUserByEmailAsync(string email)
+        public async Task<User?> GetUserByEmailAsync(string email)
         {
-            return null;
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         }
     }
 }

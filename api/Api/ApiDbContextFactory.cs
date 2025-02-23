@@ -5,11 +5,11 @@ using System.IO;
 
 namespace DataAccess
 {
-    public class ApiDbContextFactory : IDesignTimeDbContextFactory<ApiDbContext>
+    public class ApiDbContextFactory : IDesignTimeDbContextFactory<QuizDbContext>
     {
-        public ApiDbContext CreateDbContext(string[] args)
+        public QuizDbContext CreateDbContext(string[] args)
         {
-            var optionsBuilder = new DbContextOptionsBuilder<ApiDbContext>();
+            var optionsBuilder = new DbContextOptionsBuilder<QuizDbContext>();
             // Load the configuration from your appsettings or environment variables
             var config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -20,7 +20,7 @@ namespace DataAccess
 
             optionsBuilder.UseNpgsql(connectionString);
 
-            return new ApiDbContext(optionsBuilder.Options);
+            return new QuizDbContext(optionsBuilder.Options);
         }
     }
 }

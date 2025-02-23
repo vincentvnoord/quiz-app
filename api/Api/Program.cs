@@ -12,7 +12,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
-builder.Services.AddDbContext<ApiDbContext>(options =>
+builder.Services.AddDbContext<QuizDbContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
@@ -26,7 +26,7 @@ builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 if (builder.Environment.IsDevelopment())
 {
     // Register mock services
-    builder.Services.AddScoped<IUserRepository, UserRepositoryMock>();
+    //builder.Services.AddScoped<IUserRepository, UserRepositoryMock>();
 }
 
 var app = builder.Build();
