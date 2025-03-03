@@ -1,4 +1,5 @@
-import { Input, ErrorMessage } from "./shared";
+import { Input } from "@/components/Input";
+import { ErrorMessage } from "./shared";
 import { useFormContext } from "react-hook-form";
 
 export const EmailInput = () => {
