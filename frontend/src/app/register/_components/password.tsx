@@ -2,7 +2,7 @@ import React from 'react'
 import { useFormContext } from 'react-hook-form';
 import { Check, XIcon, Eye, EyeOffIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Input } from './shared';
+import { Input } from '@/components/Input';
 
 export const PasswordInput = () => {
     const [showPassword, setShowPassword] = React.useState(false);

@@ -2,16 +2,10 @@ using Business.Models;
 
 namespace Business.UserService
 {
-    public class UserService
+    public class UserService(IUserRepository userRepository, IPasswordHasher passwordHasher)
     {
-        private readonly IUserRepository _userRepository;
-        private readonly IPasswordHasher _passwordHasher;
-
-        public UserService(IUserRepository userRepository, IPasswordHasher passwordHasher)
-        {
-            _userRepository = userRepository;
-            _passwordHasher = passwordHasher;
-        }
+        private readonly IUserRepository _userRepository = userRepository;
+        private readonly IPasswordHasher _passwordHasher = passwordHasher;
 
         public async Task CreateUserAsync(UserDto userDto)
         {
@@ -30,6 +24,17 @@ namespace Business.UserService
             };
 
             await _userRepository.CreateUserAsync(user);
+        }
+
+        public async Task<bool> AuthenticateUserAsync(UserDto userDto)
+        {
+            User? user = await _userRepository.GetUserByEmailAsync(userDto.Email);
+            if (user == null)
+            {
+                return false;
+            }
+
+            return _passwordHasher.VerifyHashedPassword(user.Password, userDto.Password);
         }
     }
 }

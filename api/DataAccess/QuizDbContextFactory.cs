@@ -11,9 +11,11 @@ namespace DataAccess
         {
             var optionsBuilder = new DbContextOptionsBuilder<QuizDbContext>();
 
+            var basePath = Path.Join([Directory.GetCurrentDirectory(), "../", "Api"]);
+
             // Set up configuration to read from appsettings.Development.json
             var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())  // Path where the app is running
+                .SetBasePath(basePath)  // Path where the app is running
                 .AddJsonFile("appsettings.Development.json", optional: true)
                 .Build();
 
