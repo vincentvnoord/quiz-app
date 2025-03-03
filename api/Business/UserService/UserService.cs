@@ -26,15 +26,21 @@ namespace Business.UserService
             await _userRepository.CreateUserAsync(user);
         }
 
-        public async Task<bool> AuthenticateUserAsync(UserDto userDto)
+        public async Task<User?> AuthenticateUserAsync(UserDto userDto)
         {
             User? user = await _userRepository.GetUserByEmailAsync(userDto.Email);
             if (user == null)
             {
-                return false;
+                return null;
             }
 
-            return _passwordHasher.VerifyHashedPassword(user.Password, userDto.Password);
+            bool correctPassword = _passwordHasher.VerifyPassword(user.Password, userDto.Password);
+            if (!correctPassword)
+            {
+                return null;
+            }
+
+            return user;
         }
     }
 }

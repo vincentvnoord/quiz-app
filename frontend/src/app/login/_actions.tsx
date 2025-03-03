@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { FieldValues } from "react-hook-form";
 
-const login = async (fieldValues: FieldValues) => {
+export const login = async (fieldValues: FieldValues) => {
     try {
         const cookie = await loginController(fieldValues);
         if (!cookie) {
@@ -17,12 +17,15 @@ const login = async (fieldValues: FieldValues) => {
             httpOnly: true,
             sameSite: "strict",
             path: "/",
+            domain: "." + process.env.NEXT_PUBLIC_DOMAIN
         })
-        
-        return { success: true, message: "Authenticated" };
+
+        return { success: true };
     } catch (e) {
         if (e instanceof UnAuthorizedError) {
-            return { success: false, errorMessage: "Invalid credentials" };
+            return { success: false, errorMessage: "Incorrect email or password. Please try again." };
+        } else {
+            return { success: false, errorMessage: "Something went wrong. Please try again later." };
         }
     }
 }

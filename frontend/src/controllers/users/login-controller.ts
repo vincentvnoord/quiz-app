@@ -16,11 +16,11 @@ export const loginController = async (fieldValues: FieldValues) => {
     if (!success) {
         throw new InputParseError("Error parsing input", error);
     }
-    
+
     const userLoginDto: UserLoginDto = {
         email: data.email,
         password: data.password,
     }
-
+    
     return await authService.login(userLoginDto);
 };

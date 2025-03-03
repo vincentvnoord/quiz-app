@@ -10,11 +10,6 @@ namespace Business.UserService
             return BCrypt.Net.BCrypt.HashPassword(password);
         }
 
-        public bool VerifyHashedPassword(string hashedPassword, string password)
-        {
-            throw new NotImplementedException();
-        }
-
         public bool VerifyPassword(string hashedPassword, string inputPassword)
         {
             return BCrypt.Net.BCrypt.Verify(inputPassword, hashedPassword);
