@@ -3,15 +3,9 @@ import { IUserRepository } from "./user-repository-interface";
 import { RegistrationError, RegistrationErrorType } from "@/business/entities/errors/RegistrationError";
 
 export class UserRepository implements IUserRepository {
-    private url: string;
-
-    constructor(url: string) {
-        this.url = url;
-    }
-
     async createUser(user: UserDto): Promise<void> {
         try {
-            const res = await fetch(`${this.url}/register`, {
+            const res = await fetch(`${process.env.URL}/api/register`, {
                 method: "post",
                 body: JSON.stringify(user),
                 headers: {

@@ -12,7 +12,7 @@ export default function RegisterPage() {
 
     return (
         <div className="w-full h-dvh">
-            <main className="w-full h-full flex flex-col items-center pt-12 p-3 sm:justify-center md:pt-3">
+            <main className="w-full h-full flex flex-col items-center pt-12 p-3 justify-center md:pt-3">
                 <RegisterForm />
             </main>
         </div>
