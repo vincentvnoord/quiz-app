@@ -22,7 +22,7 @@ export default async function DashBoardPage() {
     const { id, email } = res;
 
     return (
-        <div>
+        <div className="flex items-center justify-center h-dvh">
             <h1>Welcome back {email}, ur id is {id}</h1>
         </div>
     )

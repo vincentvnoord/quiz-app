@@ -1,3 +1,5 @@
+"use server";
+
 import { getUserController } from "@/controllers/users/get-user-controller";
 import { UnAuthorizedError } from "@/business/entities/errors/common";
 import { redirect } from "next/navigation";

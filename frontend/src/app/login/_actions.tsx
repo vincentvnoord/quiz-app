@@ -3,7 +3,6 @@
 import { UnAuthorizedError } from "@/business/entities/errors/common";
 import { loginController } from "@/controllers/users/login-controller";
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
 import { FieldValues } from "react-hook-form";
 
 export const login = async (fieldValues: FieldValues) => {
@@ -17,7 +16,6 @@ export const login = async (fieldValues: FieldValues) => {
             httpOnly: true,
             sameSite: "strict",
             path: "/",
-            domain: "." + process.env.NEXT_PUBLIC_DOMAIN
         })
 
         return { success: true };
