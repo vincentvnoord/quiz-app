@@ -6,14 +6,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("/[controller]")]
     [Authorize]
     public class UserController : Controller
     {
-        private ILogger _logger;
+        private ILogger<UserController> _logger;
         private UserService _userService;
 
-        public UserController(UserService userService, ILogger logger)
+        public UserController(UserService userService, ILogger<UserController> logger)
         {
             _userService = userService;
             _logger = logger;
@@ -22,12 +22,14 @@ namespace Api.Controllers
         [HttpGet]
         public async Task<ActionResult> Index()
         {
+            _logger.LogInformation("Fetching user data");
             try
             {
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (userId == null)
                 {
-                    return Unauthorized("User not found");
+                    _logger.LogWarning("User id not found in JWT");
+                    return Unauthorized("Invalid token");
                 }
 
                 int parsedId = int.Parse(userId);
@@ -35,6 +37,7 @@ namespace Api.Controllers
                 var user = await _userService.GetUserByIdAsync(parsedId);
                 if (user == null)
                 {
+                    _logger.LogWarning("User not found");
                     return NotFound("User not found");
                 }
 

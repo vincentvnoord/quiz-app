@@ -32,12 +32,12 @@ namespace Api.Controllers
                 Email = model.Email,
                 Password = model.Password
             };
-
+            
             UserModel? authenticateResult = await _userService.AuthenticateUserAsync(user);
             if (authenticateResult == null)
                 return Unauthorized();
 
-            var token = _jwtService.GenerateJwtToken(user.Email, user.Email);
+            var token = _jwtService.GenerateJwtToken(authenticateResult.Id.ToString(), user.Email);
             return Ok(new { Token = token });
         }
     }
