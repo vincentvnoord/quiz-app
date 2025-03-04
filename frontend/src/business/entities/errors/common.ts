@@ -14,3 +14,9 @@ export class InputParseError extends Error {
             : [];
     }
 }
+
+export class UnAuthorizedError extends Error {
+    constructor(message: string) {
+        super(message);
+    }
+}
