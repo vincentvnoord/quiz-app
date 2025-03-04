@@ -6,8 +6,8 @@ namespace DataAccess.Mocks
 {
     public class UserRepositoryMock : IUserRepository
     {
-        private static Dictionary<string, User> _users = new Dictionary<string, User>();
-        
+        private static Dictionary<string, UserModel> _users = new Dictionary<string, UserModel>();
+
         public UserRepositoryMock()
         {
             Console.WriteLine("--------------------------");
@@ -15,7 +15,7 @@ namespace DataAccess.Mocks
             Console.WriteLine("--------------------------");
         }
 
-        public Task CreateUserAsync(User user)
+        public Task CreateUserAsync(UserModel user)
         {
             Console.WriteLine("Adding user to mock repository:" + user.Email);
             Console.WriteLine("Email: " + user.Email);
@@ -25,17 +25,22 @@ namespace DataAccess.Mocks
             return Task.CompletedTask;
         }
 
-        public Task<User?> GetUserByEmailAsync(string email)
+        public Task<UserModel?> GetUserByEmailAsync(string email)
         {
             if (_users.ContainsKey(email))
             {
-                User user = _users[email];
-                return Task.FromResult<User?>(user);
+                UserModel user = _users[email];
+                return Task.FromResult<UserModel?>(user);
             }
             else
             {
-                return Task.FromResult<User?>(null);
+                return Task.FromResult<UserModel?>(null);
             }
+        }
+
+        public Task<UserModel?> GetUserByIdAsync(int userId)
+        {
+            return Task.FromResult<UserModel?>(_users.Values.FirstOrDefault(u => u.Id == userId));
         }
     }
 }

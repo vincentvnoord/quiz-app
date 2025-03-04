@@ -4,7 +4,8 @@ namespace Business.UserService
 {
     public interface IUserRepository
     {
-        public Task CreateUserAsync(User user);
-        public Task<User?> GetUserByEmailAsync(string email);
+        public Task CreateUserAsync(UserModel user);
+        public Task<UserModel?> GetUserByEmailAsync(string email);
+        public Task<UserModel?> GetUserByIdAsync(int userId);
     }
 }

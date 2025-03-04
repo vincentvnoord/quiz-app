@@ -33,7 +33,7 @@ namespace Api.Controllers
                 Password = model.Password
             };
 
-            User? authenticateResult = await _userService.AuthenticateUserAsync(user);
+            UserModel? authenticateResult = await _userService.AuthenticateUserAsync(user);
             if (authenticateResult == null)
                 return Unauthorized();
 

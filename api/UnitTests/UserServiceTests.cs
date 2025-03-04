@@ -27,12 +27,12 @@ public class UserServiceTests
 
         // Remove checking if user exists
         mockRepository.Setup(repo => repo.GetUserByEmailAsync(userDto.Email))
-                      .ReturnsAsync((User?)null);
+                      .ReturnsAsync((UserModel?)null);
 
         // Capture the hashed password that is passed to the repository
         string? capturedHashedPassword = null;
-        mockRepository.Setup(repo => repo.CreateUserAsync(It.IsAny<User>()))
-                      .Callback<User>(user => capturedHashedPassword = user.Password)
+        mockRepository.Setup(repo => repo.CreateUserAsync(It.IsAny<UserModel>()))
+                      .Callback<UserModel>(user => capturedHashedPassword = user.Password)
                       .Returns(Task.CompletedTask);
 
         await userService.CreateUserAsync(userDto);

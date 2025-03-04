@@ -5,6 +5,7 @@ namespace Api.Models
     public class LoginForm
     {
         [Required]
+        [EmailAddress]
         public required string Email { get; set; }
 
         [Required]

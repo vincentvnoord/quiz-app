@@ -9,7 +9,7 @@ namespace Business.UserService
 
         public async Task CreateUserAsync(UserDto userDto)
         {
-            User? existingUser = await _userRepository.GetUserByEmailAsync(userDto.Email);
+            UserModel? existingUser = await _userRepository.GetUserByEmailAsync(userDto.Email);
             if (existingUser != null)
             {
                 throw new RegistrationException("Email already exists", RegistrationExceptionType.EmailAlreadyExists);
@@ -17,7 +17,7 @@ namespace Business.UserService
 
             string hashedPassword = _passwordHasher.HashPassword(userDto.Password);
 
-            var user = new User
+            var user = new UserModel
             {
                 Email = userDto.Email,
                 Password = hashedPassword,
@@ -26,12 +26,17 @@ namespace Business.UserService
             await _userRepository.CreateUserAsync(user);
         }
 
-        public async Task<User?> AuthenticateUserAsync(UserDto userDto)
+        public async Task<UserModel?> AuthenticateUserAsync(UserDto userDto)
         {
-            User? user = await _userRepository.GetUserByEmailAsync(userDto.Email);
+            UserModel? user = await _userRepository.GetUserByEmailAsync(userDto.Email);
             if (user == null)
             {
                 return null;
+            }
+
+            if (user.Password == null)
+            {
+                throw new ArgumentNullException("Password cannot be null");
             }
 
             bool correctPassword = _passwordHasher.VerifyPassword(user.Password, userDto.Password);
@@ -41,6 +46,11 @@ namespace Business.UserService
             }
 
             return user;
+        }
+
+        public async Task<UserModel?> GetUserByIdAsync(int userId)
+        {
+            return await _userRepository.GetUserByIdAsync(userId);
         }
     }
 }
