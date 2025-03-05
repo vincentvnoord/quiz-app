@@ -2,6 +2,8 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getUserData } from "./_actions";
 import { ChevronRight, PlusIcon, UserIcon } from "lucide-react";
+import { Input } from "@/components/Input";
+import { CreateQuiz } from "./_components/create-quiz";
 
 export default async function DashBoardPage() {
     const cookieStore = await cookies();
@@ -24,7 +26,7 @@ export default async function DashBoardPage() {
 
     return (
         <div className="flex flex-col h-dvh relative">
-            <header className="bg-primary top-0 left-0 z-20 sticky text-white p-3 px-6 flex justify-between items-center rounded-b-[30px]">
+            <header className="bg-primary top-0 left-0 z-10 sticky text-white p-3 px-6 flex justify-between items-center rounded-b-[30px]">
                 <h1 className="font-bold text-2xl">Your Quizzes</h1>
                 <UserIcon size={28} />
             </header>
@@ -61,10 +63,9 @@ export default async function DashBoardPage() {
                 <ListedQuiz />
             </div>
 
-            <div className="fixed bottom-0 right-0 p-3 pb-6">
-                <button className="bg-primary p-3 rounded-xl shadow-lg">
-                    <PlusIcon className="text-white" size={32} strokeWidth={1} />
-                </button>
+            <div className="inset-0 z-20 fixed bg-black/50"></div>
+            <div className="fixed flex flex-end w-full bottom-0 z-20 right-0 p-3 pb-6">
+                <CreateQuiz />
             </div>
         </div>
     )
