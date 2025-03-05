@@ -61,12 +61,10 @@ export default async function DashBoardPage() {
                 <ListedQuiz />
                 <ListedQuiz />
                 <ListedQuiz />
+
             </div>
 
-            <div className="inset-0 z-20 fixed bg-black/50"></div>
-            <div className="fixed flex flex-end w-full bottom-0 z-20 right-0 p-3 pb-6">
-                <CreateQuiz />
-            </div>
+            <CreateQuiz />
         </div>
     )
 }
