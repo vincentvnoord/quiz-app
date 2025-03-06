@@ -31,7 +31,7 @@ export const CreateQuiz = () => {
                     >
                         <div className="pb-6 flex flex-col">
                             <h2 className="text-xl font-bold">New quiz</h2>
-                            <Input className="border-b-2 border-black/20" placeholder="Title" label="" error={true} valid={false} />
+                            <Input className="border-b-2 border-black/40" placeholder="Title" label="" error={false} valid={false} />
                         </div>
                     </motion.div>
 

@@ -8,7 +8,6 @@ import { CreateQuiz } from "./_components/create-quiz";
 export default async function DashBoardPage() {
     const cookieStore = await cookies();
     const authToken = cookieStore.get("authToken");
-    console.log("AUTH TOKEN:" + authToken?.value);
     if (!authToken) {
         redirect("/login");
     }
