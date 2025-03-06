@@ -8,7 +8,7 @@ const robotoCondensed = Roboto_Condensed({
 });
 
 const roboto = Roboto({
-  weight: "400",
+  weight: ["100", "400", "300", "500", "700", "900"],
   variable: "--font-roboto-condensed",
   subsets: ["latin"],
 });
