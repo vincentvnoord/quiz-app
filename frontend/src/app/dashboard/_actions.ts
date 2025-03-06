@@ -10,6 +10,7 @@ export async function getUserData(authToken: string) {
         return { id: user.id, email: user.email };
     } catch (e) {
         if (e instanceof UnAuthorizedError) {
+            console.error(e.message);
             redirect("/login");
         }
 
