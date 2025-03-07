@@ -20,7 +20,7 @@ export const Lobby = () => {
 
                 <div className="flex justify-end items-center gap-2">
                     <QuitLobbyButton />
-                    <button className="flex items-center gap-2 flex-grow justify-center sm:flex-grow-0 sm:text-xl sm:p-6 sm:px-8 rounded-lg bg-primary text-white p-3 text-lg font-bold">
+                    <button className="flex items-center gap-2 flex-grow justify-center sm:flex-grow-0 sm:text-xl rounded-lg bg-primary text-white p-3 text-lg font-bold">
                         <PlayIcon fill="currentColor" strokeWidth={2} size={32} />
                         <span>
                             Start quiz

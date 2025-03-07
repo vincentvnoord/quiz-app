@@ -29,8 +29,9 @@ export async function createGame() {
             redirect("/login");
         }
 
-        const res = await createGameController(authToken.value);
-        return res.code;
+        // Replace "1" with the actual quiz ID in future for custom quizzes
+        const code = await createGameController(authToken.value, "1");
+        return code;
     } catch (e) {
         if (e instanceof UnAuthorizedError) {
             console.error(e.message);

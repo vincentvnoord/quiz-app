@@ -1,4 +1,6 @@
 using System.Text;
+using Business.GameService;
+using Business.QuizService;
 using Business.UserService;
 using DataAccess;
 using DataAccess.Mocks;
@@ -20,7 +22,7 @@ builder.Services.AddDbContext<QuizDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-var jwtSecretKey = builder.Configuration["Jwt:Key"];
+var jwtSecretKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is missing in appsettings.json");
 
 builder.Services.AddAuthentication(options =>
 {
@@ -43,10 +45,17 @@ builder.Services.AddAuthentication(options =>
 
 // Register production services
 builder.Services.AddScoped<JwtService>();
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<UserService>();
-
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+
+builder.Services.AddScoped<QuizService>();
+builder.Services.AddScoped<IQuizRepository, QuizRepositoryMock>();
+
+builder.Services.AddSingleton<GameService>();
+builder.Services.AddSignalR();
+
 
 if (builder.Environment.IsDevelopment())
 {

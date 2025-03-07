@@ -5,13 +5,13 @@ import { IUserRepository, IUserRepositoryToken } from "@/business/repositories/u
 import { IAuthService, IAuthServiceToken } from "@/business/services/auth-service/auth-service-interface";
 import AuthService from "@/business/services/auth-service/auth-service";
 import { IGameService, IGameServiceToken } from "@/business/services/game-service/game-service-interface";
-import { GameServiceMock } from "@/business/services/game-service/game-service-mock";
+import { GameService } from "@/business/services/game-service/game-service";
 
 const container = new DependencyContainer();
 
 container.register<IUserRepository>(IUserRepositoryToken, new UserRepository());
 container.register<IAuthService>(IAuthServiceToken, new AuthService());
-container.register<IGameService>(IGameServiceToken, new GameServiceMock());
+container.register<IGameService>(IGameServiceToken, new GameService());
 
 if (process.env.NODE_ENV === "development") {
 }
