@@ -1,6 +1,4 @@
-import { barriecieto } from "@/lib/fonts";
 import { Metadata } from "next";
-import Link from "next/link";
 import { RegisterForm } from "./_components/register-form";
 
 export const metadata: Metadata = {

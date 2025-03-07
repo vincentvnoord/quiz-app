@@ -1,9 +1,9 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getUserData } from "./_actions";
-import { ChevronRight, PlusIcon, UserIcon } from "lucide-react";
-import { Input } from "@/components/Input";
+import { ChevronRight, UserIcon } from "lucide-react";
 import { CreateQuiz } from "./_components/create-quiz";
+import { CreateGame } from "./_components/create-game";
 
 export default async function DashBoardPage() {
     const cookieStore = await cookies();
@@ -22,8 +22,6 @@ export default async function DashBoardPage() {
         )
     }
 
-    const { id, email } = res;
-
     return (
         <div className="flex flex-col h-dvh relative">
             <header className="bg-primary top-0 left-0 z-10 sticky text-white p-3 px-6 flex justify-between items-center rounded-b-[30px]">
@@ -31,37 +29,9 @@ export default async function DashBoardPage() {
                 <UserIcon size={28} />
             </header>
 
-            <div className="flex flex-col p-4 gap-2">
+            <div className="flex flex-col items-center p-4 gap-2">
                 <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-                <ListedQuiz />
-
+                <CreateGame />
             </div>
 
             <CreateQuiz />
@@ -72,7 +42,7 @@ export default async function DashBoardPage() {
 const ListedQuiz = () => {
 
     return (
-        <div className="bg-white rounded-xl p-3 flex justify-between items-center">
+        <div className="bg-white w-full rounded-xl p-3 flex justify-between items-center">
             <div className="flex flex-col">
                 <p className="font-semibold">Quiz Title</p>
                 <p className="text-sm opacity-50">10 questions</p>

@@ -1,4 +1,8 @@
+"use client";
+
+import { PlayIcon } from "lucide-react";
 import { GameCodes } from "./game-code"
+import { QuitLobbyButton } from "./quit-lobby"
 import { UserList } from "./user-list"
 
 export const Lobby = () => {
@@ -14,9 +18,14 @@ export const Lobby = () => {
             <div className="h-full min-h-0 flex-shrink flex flex-col p-6 gap-4">
                 <UserList />
 
-                <div className="flex justify-end gap-2">
-                    <button className="p-3 opacity-50">Quit lobby</button>
-                    <button className="flex-grow sm:flex-grow-0 sm:text-xl sm:p-6 sm:px-12 rounded-lg bg-primary text-white p-3 text-lg font-bold">Start quiz</button>
+                <div className="flex justify-end items-center gap-2">
+                    <QuitLobbyButton />
+                    <button className="flex items-center gap-2 flex-grow justify-center sm:flex-grow-0 sm:text-xl sm:p-6 sm:px-8 rounded-lg bg-primary text-white p-3 text-lg font-bold">
+                        <PlayIcon fill="currentColor" strokeWidth={2} size={32} />
+                        <span>
+                            Start quiz
+                        </span>
+                    </button>
                 </div>
             </div>
         </div>
