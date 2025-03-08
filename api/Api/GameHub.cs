@@ -3,24 +3,25 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Api
 {
-    public class GameHub : Hub
+    public class GameHub(GameService gameService) : Hub
     {
-        private GameService _gameService;
-
-        public GameHub(GameService gameService)
-        {
-            _gameService = gameService;
-        }
+        private readonly GameService _gameService = gameService;
 
         public async Task ConnectHost(string gameCode)
         {
-            if (_gameService.ActiveGames.ContainsKey(gameCode))
+            var connectionId = Context.ConnectionId;
+            Game? game = _gameService.GetGame(gameCode);
+
+            if (game != null)
             {
-                var game = _gameService.ActiveGames[gameCode];
-                var connectionId = Context.ConnectionId;
-                _gameService.ActiveGames[gameCode].HostConnectionId = connectionId;
+                game.HostConnectionId = connectionId;
                 await Groups.AddToGroupAsync(Context.ConnectionId, gameCode);
                 await Clients.Client(connectionId).SendAsync("HostConnected", game.Quiz.Title);
+            }
+            else
+            {
+                await Clients.Client(connectionId).SendAsync("GameNotFound");
+                Context.Abort();
             }
         }
 

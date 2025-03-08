@@ -10,6 +10,16 @@ namespace Business.GameService
         {
 
         }
+        
+        public Game? GetGame(string gameId)
+        {
+            if (ActiveGames.TryGetValue(gameId, out Game? value))
+            {
+                return value;
+            }
+
+            return null;
+        }
 
         public string CreateGame(Quiz quiz)
         {
