@@ -1,4 +1,5 @@
 using System.Text;
+using Api;
 using Business.GameService;
 using Business.QuizService;
 using Business.UserService;
@@ -56,11 +57,11 @@ builder.Services.AddScoped<IQuizRepository, QuizRepositoryMock>();
 builder.Services.AddSingleton<GameService>();
 builder.Services.AddSignalR();
 
-
 if (builder.Environment.IsDevelopment())
 {
     // Register mock services
     //builder.Services.AddScoped<IUserRepository, UserRepositoryMock>();
+
 }
 
 var app = builder.Build();
@@ -70,11 +71,23 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    app.UseCors(builder =>
+    {
+        builder.AllowAnyHeader()
+               .AllowAnyMethod()
+               .AllowCredentials()
+               .SetIsOriginAllowed(origin => true); // Allow all origins for development
+    });
+
 }
 
+app.UseRouting();
 app.UseHttpsRedirection();
 app.MapControllers();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapHub<GameHub>("/gamehub");
 
 app.Run();

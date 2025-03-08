@@ -1,11 +1,11 @@
-import { Lobby } from "./_components/lobby/lobby";
+import Game from "./_components/game";
 
 export default function DashboardLobbyPage() {
     // VALIDATE IF GAME CODE EXISTS
 
     return (
         <div className="h-dvh">
-            <Lobby />
+            <Game />
         </div>
     )
 }

@@ -14,11 +14,13 @@ namespace Api
 
         public async Task ConnectHost(string gameCode)
         {
-            if (GameService.ActiveGames.ContainsKey(gameCode))
+            if (_gameService.ActiveGames.ContainsKey(gameCode))
             {
-                GameService.ActiveGames[gameCode].HostConnectionId = Context.ConnectionId;
+                var game = _gameService.ActiveGames[gameCode];
+                var connectionId = Context.ConnectionId;
+                _gameService.ActiveGames[gameCode].HostConnectionId = connectionId;
                 await Groups.AddToGroupAsync(Context.ConnectionId, gameCode);
-                await Clients.Group(gameCode).SendAsync("HostConnected", Context.ConnectionId);
+                await Clients.Client(connectionId).SendAsync("HostConnected", game.Quiz.Title);
             }
         }
 

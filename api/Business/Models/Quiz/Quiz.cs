@@ -3,13 +3,13 @@ namespace Business.Models
     public class Quiz
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public string Title { get; set; }
         public Question[] Questions { get; set; }
 
-        public Quiz(int id, string name, Question[] questions)
+        public Quiz(int id, string title, Question[] questions)
         {
             Id = id;
-            Name = name;
+            Title = title;
             Questions = questions;
         }
     }

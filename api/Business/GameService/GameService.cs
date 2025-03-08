@@ -4,7 +4,7 @@ namespace Business.GameService
 {
     public class GameService
     {
-        public static readonly Dictionary<string, Game> ActiveGames = [];
+        public readonly Dictionary<string, Game> ActiveGames = [];
 
         public GameService()
         {

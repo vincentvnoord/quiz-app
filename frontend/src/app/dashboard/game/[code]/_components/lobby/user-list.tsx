@@ -5,13 +5,13 @@ import useGameStore from "../game-store";
 import { motion } from "framer-motion";
 
 export const UserList = () => {
-    const { players, addPlayer } = useGameStore();
+    const { players, addPlayer, title } = useGameStore();
 
     return (
         <div className="flex min-h-0 flex-col gap-3 flex-grow">
             <div className="flex justify-between">
                 <div className="flex flex-col">
-                    <p className="text-2xl font-bold">Quiz Title</p>
+                    <p className="text-2xl font-bold">{title}</p>
                     <p className="opacity-50">10 questions</p>
                 </div>
 
