@@ -5,14 +5,14 @@ import useGameStore from "../game-store";
 import { motion } from "framer-motion";
 
 export const UserList = () => {
-    const { players, addPlayer, title } = useGameStore();
+    const { players, addPlayer, title, questionCount } = useGameStore();
 
     return (
         <div className="flex min-h-0 flex-col gap-3 flex-grow">
             <div className="flex justify-between">
                 <div className="flex flex-col">
                     <p className="text-2xl font-bold">{title}</p>
-                    <p className="opacity-50">10 questions</p>
+                    <p className="opacity-50">{questionCount} question{questionCount > 1 && "s"}</p>
                 </div>
 
                 <div onClick={() => addPlayer("New Player1!!!!!")} className="flex items-center justify-center p-2 px-4 rounded-lg bg-black/10 text-white">

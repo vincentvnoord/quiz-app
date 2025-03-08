@@ -9,10 +9,16 @@ import Connecting from "./connecting";
 import { Ban, Undo2 } from "lucide-react";
 import Link from "next/link";
 
+type GameState = {
+    title: string;
+    questionCount: number;
+}
+
 export default function Game() {
+    const [connected, setConnected] = useState(false);
     const [connection, setConnection] = useState<HubConnection | null>(null);
     const [gameNotFound, setGameNotFound] = useState(false);
-    const { setGameCode, setTitle } = useGameStore();
+    const { setGameCode, setTitle, setQuestionCount } = useGameStore();
 
     const params = useParams();
 
@@ -38,8 +44,12 @@ export default function Game() {
                     .withAutomaticReconnect()
                     .build();
 
-                newConnection.on("HostConnected", (quizTitle: string) => {
-                    setTitle(quizTitle);
+                newConnection.on("HostConnected", (state: GameState) => {
+                    console.log(state);
+                    setTitle(state.title);
+                    setQuestionCount(state.questionCount);
+
+                    setConnected(true);
                 })
 
                 newConnection.on("GameNotFound", () => {
@@ -49,8 +59,7 @@ export default function Game() {
                 await newConnection.start();
                 await newConnection.invoke("ConnectHost", code);
 
-                // Debug timeout (to test out animations and such)
-                setTimeout(() => setConnection(newConnection), 2000);
+                setConnection(newConnection);
             } catch (e) {
                 console.log(e);
             }
@@ -81,7 +90,7 @@ export default function Game() {
     return (
         <>
             {
-                connection ?
+                connected ?
                     <Lobby />
                     :
                     <Connecting />

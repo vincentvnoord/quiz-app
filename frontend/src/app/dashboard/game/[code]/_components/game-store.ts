@@ -12,6 +12,9 @@ interface GameStore {
     title: string;
     setTitle: (title: string) => void;
 
+    questionCount: number;
+    setQuestionCount: (questionCount: number) => void;
+
     players: string[];
     setPlayers: (players: string[]) => void;
     addPlayer: (player: string) => void;
@@ -26,6 +29,9 @@ const useGameStore = create<GameStore>((set) => ({
 
     title: "",
     setTitle: (title) => set({ title }),
+
+    questionCount: 0,
+    setQuestionCount: (questionCount) => set({ questionCount }),
 
     players: [],
     setPlayers: (players) => set({ players }),

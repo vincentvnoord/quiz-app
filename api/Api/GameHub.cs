@@ -16,7 +16,11 @@ namespace Api
             {
                 game.HostConnectionId = connectionId;
                 await Groups.AddToGroupAsync(Context.ConnectionId, gameCode);
-                await Clients.Client(connectionId).SendAsync("HostConnected", game.Quiz.Title);
+                await Clients.Client(connectionId).SendAsync("HostConnected", new
+                {
+                    Title = game.Quiz.Title,
+                    QuestionCount = game.Quiz.Questions.Length
+                });
             }
             else
             {
