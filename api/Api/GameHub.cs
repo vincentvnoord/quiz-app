@@ -29,6 +29,13 @@ namespace Api
             }
         }
 
+        public async Task CloseGame(string gameCode)
+        {
+            _gameService.CloseGame(gameCode);
+            await Clients.Group(gameCode).SendAsync("GameClosed");
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, gameCode);
+        }
+
         public async Task JoinGame(string gameCode)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, gameCode);

@@ -59,6 +59,18 @@ builder.Services.AddSignalR();
 
 if (builder.Environment.IsDevelopment())
 {
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy(name: "AllowAll",
+        policy =>
+        {
+            policy.AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials()
+                  .SetIsOriginAllowed(origin => true); // Allow all origins for development
+        });
+    });
+
     // Register mock services
     //builder.Services.AddScoped<IUserRepository, UserRepositoryMock>();
 
@@ -79,7 +91,6 @@ if (app.Environment.IsDevelopment())
                .AllowCredentials()
                .SetIsOriginAllowed(origin => true); // Allow all origins for development
     });
-
 }
 
 app.UseRouting();

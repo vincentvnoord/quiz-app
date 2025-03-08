@@ -10,7 +10,7 @@ namespace Business.GameService
         {
 
         }
-        
+
         public Game? GetGame(string gameId)
         {
             if (ActiveGames.TryGetValue(gameId, out Game? value))
@@ -29,6 +29,11 @@ namespace Business.GameService
             ActiveGames.Add(gameId, game);
 
             return gameId;
+        }
+
+        public void CloseGame(string gameId)
+        {
+            ActiveGames.Remove(gameId);
         }
 
         private string GenerateGameId()

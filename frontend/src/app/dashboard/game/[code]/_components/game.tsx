@@ -1,6 +1,7 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { motion } from "framer-motion";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import useGameStore from "./game-store";
 import { HubConnectionBuilder, HubConnection } from "@microsoft/signalr";
@@ -16,11 +17,11 @@ type GameState = {
 
 export default function Game() {
     const [connected, setConnected] = useState(false);
-    const [connection, setConnection] = useState<HubConnection | null>(null);
     const [gameNotFound, setGameNotFound] = useState(false);
-    const { setGameCode, setTitle, setQuestionCount } = useGameStore();
+    const { setGameCode, setTitle, setQuestionCount, connection, setConnection } = useGameStore();
 
     const params = useParams();
+    const router = useRouter();
 
     useEffect(() => {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -55,6 +56,10 @@ export default function Game() {
                 newConnection.on("GameNotFound", () => {
                     setGameNotFound(true);
                 });
+
+                newConnection.on("GameClosed", () => {
+                    router.push("/dashboard");
+                })
 
                 await newConnection.start();
                 await newConnection.invoke("ConnectHost", code);
@@ -91,7 +96,9 @@ export default function Game() {
         <>
             {
                 connected ?
-                    <Lobby />
+                    <motion.div initial={{ opacity: 0, translateY: -50 }} animate={{ opacity: 1, translateY: 0 }} className="h-full w-full">
+                        <Lobby />
+                    </motion.div>
                     :
                     <Connecting />
             }

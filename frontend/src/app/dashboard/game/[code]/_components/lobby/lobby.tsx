@@ -2,7 +2,7 @@
 
 import { PlayIcon } from "lucide-react";
 import { GameCodes } from "./game-code"
-import { QuitLobbyButton } from "./quit-lobby"
+import { CloseLobbyButton } from "./quit-lobby"
 import { UserList } from "./user-list"
 
 export const Lobby = () => {
@@ -19,7 +19,7 @@ export const Lobby = () => {
                 <UserList />
 
                 <div className="flex justify-end items-center gap-2">
-                    <QuitLobbyButton />
+                    <CloseLobbyButton />
                     <button className="flex items-center gap-2 flex-grow justify-center sm:flex-grow-0 sm:text-xl rounded-lg bg-primary text-white p-3 text-lg font-bold">
                         <PlayIcon fill="currentColor" strokeWidth={2} size={32} />
                         <span>

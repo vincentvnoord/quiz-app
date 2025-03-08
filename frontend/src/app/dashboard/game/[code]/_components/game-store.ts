@@ -1,8 +1,12 @@
+import { HubConnection } from "@microsoft/signalr";
 import { create } from "zustand";
 
 type GameState = "lobby" | "playing" | "results";
 
 interface GameStore {
+    connection: HubConnection | null;
+    setConnection: (connection: HubConnection | null) => void;
+
     gameCode: string;
     setGameCode: (gameCode: string) => void;
 
@@ -21,6 +25,9 @@ interface GameStore {
 }
 
 const useGameStore = create<GameStore>((set) => ({
+    connection: null,
+    setConnection: (connection) => set({ connection }),
+
     gameCode: "",
     setGameCode: (gameCode) => set({ gameCode }),
 
