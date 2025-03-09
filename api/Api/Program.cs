@@ -1,4 +1,7 @@
 using System.Text;
+using Api;
+using Business.GameService;
+using Business.QuizService;
 using Business.UserService;
 using DataAccess;
 using DataAccess.Mocks;
@@ -20,7 +23,7 @@ builder.Services.AddDbContext<QuizDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-var jwtSecretKey = builder.Configuration["Jwt:Key"];
+var jwtSecretKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is missing in appsettings.json");
 
 builder.Services.AddAuthentication(options =>
 {
@@ -43,15 +46,34 @@ builder.Services.AddAuthentication(options =>
 
 // Register production services
 builder.Services.AddScoped<JwtService>();
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<UserService>();
-
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+
+builder.Services.AddScoped<QuizService>();
+builder.Services.AddScoped<IQuizRepository, QuizRepositoryMock>();
+
+builder.Services.AddSingleton<GameService>();
+builder.Services.AddSignalR();
 
 if (builder.Environment.IsDevelopment())
 {
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy(name: "AllowAll",
+        policy =>
+        {
+            policy.AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials()
+                  .SetIsOriginAllowed(origin => true); // Allow all origins for development
+        });
+    });
+
     // Register mock services
     //builder.Services.AddScoped<IUserRepository, UserRepositoryMock>();
+
 }
 
 var app = builder.Build();
@@ -61,11 +83,22 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    app.UseCors(builder =>
+    {
+        builder.AllowAnyHeader()
+               .AllowAnyMethod()
+               .AllowCredentials()
+               .SetIsOriginAllowed(origin => true); // Allow all origins for development
+    });
 }
 
+app.UseRouting();
 app.UseHttpsRedirection();
 app.MapControllers();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapHub<GameHub>("/gamehub");
 
 app.Run();

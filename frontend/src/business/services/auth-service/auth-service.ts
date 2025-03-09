@@ -1,5 +1,4 @@
 import { UserLoginDto } from "@/business/entities/user";
-import { IUserRepository } from "../../repositories/user-repository/user-repository-interface";
 import { IAuthService } from "./auth-service-interface";
 import { UnAuthorizedError } from "@/business/entities/errors/common";
 
