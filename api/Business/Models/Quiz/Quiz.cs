@@ -6,6 +6,12 @@ namespace Business.Models
         public string Title { get; set; }
         public Question[] Questions { get; set; }
 
+        public Quiz()
+        {
+            Title = "Default Quiz";
+            Questions = [];
+        }
+
         public Quiz(int id, string title, Question[] questions)
         {
             Id = id;

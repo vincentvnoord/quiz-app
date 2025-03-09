@@ -49,6 +49,5 @@ namespace Business.GameService
 
             return gameId;
         }
-
     }
 }
