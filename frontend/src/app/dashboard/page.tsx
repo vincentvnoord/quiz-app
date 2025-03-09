@@ -1,26 +1,8 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import { getUserData } from "./_actions";
 import { ChevronRight, UserIcon } from "lucide-react";
 import { CreateQuiz } from "./_components/create-quiz";
 import { CreateGame } from "./_components/create-game";
 
 export default async function DashBoardPage() {
-    const cookieStore = await cookies();
-    const authToken = cookieStore.get("authToken");
-    if (!authToken) {
-        redirect("/login");
-    }
-
-    const res = await getUserData(authToken.value);
-
-    if (res.error) {
-        return (
-            <div className="flex items-center justify-center h-dvh">
-                <h1 className="text-foreground/50">{res.error}</h1>
-            </div>
-        )
-    }
 
     return (
         <div className="flex flex-col h-dvh relative">
