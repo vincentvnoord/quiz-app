@@ -12,7 +12,7 @@ export const GameCodes = () => {
 
     useEffect(() => {
         if (code) {
-            setUrl(window.location.origin + "/game/" + code);
+            setUrl(window.location.origin + "/" + code);
         }
 
     }, [code]);

@@ -1,15 +1,11 @@
+using System.Collections.Concurrent;
 using Business.Models;
 
 namespace Business.GameService
 {
     public class GameService
     {
-        public readonly Dictionary<string, Game> ActiveGames = [];
-
-        public GameService()
-        {
-
-        }
+        public readonly ConcurrentDictionary<string, Game> ActiveGames = [];
 
         public Game? GetGame(string gameId)
         {
@@ -26,14 +22,14 @@ namespace Business.GameService
             string gameId = GenerateGameId();
             Game game = new(gameId, quiz);
 
-            ActiveGames.Add(gameId, game);
+            ActiveGames[gameId] = game;
 
             return gameId;
         }
 
         public void CloseGame(string gameId)
         {
-            ActiveGames.Remove(gameId);
+            ActiveGames.TryRemove(gameId, out _);
         }
 
         private string GenerateGameId()

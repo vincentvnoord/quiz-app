@@ -18,7 +18,7 @@ type GameState = {
 export default function Game() {
     const [connected, setConnected] = useState(false);
     const [gameNotFound, setGameNotFound] = useState(false);
-    const { setGameCode, setTitle, setQuestionCount, connection, setConnection } = useGameStore();
+    const { setGameCode, setTitle, setQuestionCount, connection, setConnection, addPlayer } = useGameStore();
 
     const params = useParams();
     const router = useRouter();
@@ -59,6 +59,10 @@ export default function Game() {
 
                 newConnection.on("GameClosed", () => {
                     router.push("/dashboard");
+                })
+
+                newConnection.on("PlayerJoined", (playerName: string) => {
+                    addPlayer(playerName);
                 })
 
                 await newConnection.start();
