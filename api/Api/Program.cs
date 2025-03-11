@@ -1,5 +1,5 @@
 using System.Text;
-using Api;
+using Api.GameHubManagement;
 using Business.GameService;
 using Business.QuizService;
 using Business.UserService;
@@ -55,6 +55,7 @@ builder.Services.AddScoped<QuizService>();
 builder.Services.AddScoped<IQuizRepository, QuizRepositoryMock>();
 
 builder.Services.AddSingleton<GameService>();
+builder.Services.AddScoped<ConnectionManager>();
 builder.Services.AddSignalR();
 
 if (builder.Environment.IsDevelopment())

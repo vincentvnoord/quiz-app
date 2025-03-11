@@ -7,11 +7,12 @@ import { usePlayerGameStore } from "../_stores/game-store";
 import { ChooseNickName } from "./choose-nickname";
 import { usePlayerStore } from "../_stores/player-store";
 import { HubConnectionBuilder } from "@microsoft/signalr";
+import { Player } from "@/app/dashboard/game/[code]/_components/game-store";
 
 export const PlayerGame = () => {
     const router = useRouter();
     const { setGameCode, gameState, setGameState } = usePlayerGameStore();
-    const { playerId, setConnection, setPlayerId, setPlayerName } = usePlayerStore();
+    const { playerId, setConnection, setPlayerId, setPlayerName, setForGame, forGame } = usePlayerStore();
     const params = useParams();
 
     useEffect(() => {
@@ -26,10 +27,22 @@ export const PlayerGame = () => {
             return;
         }
 
-        const game = params.game as string;
-        setGameCode(game);
+        const gameCode = params.game as string;
+        setGameCode(gameCode);
 
-        // Connection to SignalR hub
+        console.log("Game code: ", gameCode);
+        console.log("STORED Game code: ", forGame);
+
+        if (!playerId) {
+            setGameState("choose-name");
+            return;
+        }
+
+        if (forGame !== gameCode) {
+            setPlayerId(null);
+            return;
+        }
+
         const createConnection = async () => {
             try {
                 const newConnection = new HubConnectionBuilder()
@@ -42,28 +55,23 @@ export const PlayerGame = () => {
                 });
 
                 newConnection.on("NonRegisteredPlayer", () => {
-                    setGameState("choose-name");
-                    setPlayerId(null);
-                    setPlayerName("");
+                    console.log("Non registered player");
                 });
 
-                newConnection.on("Connected", (playerName: string) => {
-                    setPlayerName(playerName);
+                newConnection.on("Connected", (player: string) => {
+                    setForGame(gameCode);
+                    setPlayerName(player);
                     setGameState("lobby");
+                    console.log("Connected as", player);
                 });
 
                 await newConnection.start();
-                await newConnection.invoke("ConnectPlayer", game, playerId);
+                await newConnection.invoke("ConnectPlayer", gameCode, playerId);
 
                 setConnection(newConnection);
             } catch (e) {
                 console.log(e);
             }
-        }
-
-        if (!playerId) {
-            setGameState("choose-name");
-            return;
         }
 
         setGameState("connecting");
@@ -77,6 +85,12 @@ export const PlayerGame = () => {
             }
             {
                 gameState === "choose-name" && <ChooseNickName />
+            }
+            {
+                gameState === "connecting" &&
+                <div className="w-full h-full flex items-center justify-center">
+                    <p className="text-xl font-bold">Connecting...</p>
+                </div>
             }
         </>
     )

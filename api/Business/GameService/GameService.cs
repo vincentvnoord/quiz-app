@@ -17,6 +17,19 @@ namespace Business.GameService
             return null;
         }
 
+        public Game? GetGameByPlayerId(string playerId)
+        {
+            foreach (Game game in ActiveGames.Values)
+            {
+                if (game.TryGetPlayer(playerId, out _))
+                {
+                    return game;
+                }
+            }
+
+            return null;
+        }
+
         public string CreateGame(Quiz quiz)
         {
             string gameId = GenerateGameId();

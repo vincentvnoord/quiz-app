@@ -19,7 +19,7 @@ type GameState = {
 export default function Game() {
     const [connected, setConnected] = useState(false);
     const [gameNotFound, setGameNotFound] = useState(false);
-    const { setGameCode, setTitle, setQuestionCount, connection, setConnection, addPlayer, setPlayers } = useGameStore();
+    const { setGameCode, setTitle, setQuestionCount, connection, setConnection, addPlayer, setPlayers, removePlayer } = useGameStore();
 
     const params = useParams();
     const router = useRouter();
@@ -67,6 +67,10 @@ export default function Game() {
                     addPlayer(player);
                 })
 
+                newConnection.on("PlayerDisconnected", (playerId: string) => {
+                    removePlayer(playerId);
+                })
+                
                 await newConnection.start();
                 await newConnection.invoke("ConnectHost", code);
 

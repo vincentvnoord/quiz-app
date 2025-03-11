@@ -1,12 +1,11 @@
-using System.Collections.Concurrent;
 using Business.GameService;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Api
+namespace Api.GameHubManagement
 {
-    public class GameHub(GameService gameService) : Hub
+    public class GameHub(GameService gameService, ConnectionManager connectionManager) : Hub
     {
-        private static ConcurrentDictionary<string, string> _playerConnections = [];
+        private readonly ConnectionManager _connectionManager = connectionManager;
         private readonly GameService _gameService = gameService;
 
         public async Task ConnectHost(string gameCode)
@@ -18,15 +17,16 @@ namespace Api
             {
                 game.HostConnectionId = connectionId;
                 await Groups.AddToGroupAsync(Context.ConnectionId, gameCode);
+                Player[] connectedPlayers = [.. game.Players.Where(p => _connectionManager.IsPlayerConnected(p.Id))];
                 await Clients.Client(connectionId).SendAsync("HostConnected", new
                 {
                     Title = game.Quiz.Title,
                     QuestionCount = game.Quiz.Questions.Length,
-                    Players = game.Players.Select(p => new
+                    Players = connectedPlayers.Select(p => new
                     {
                         Id = p.Id,
-                        Name = p.Name
-                    })
+                        Name = p.Name,
+                    }),
                 });
             }
             else
@@ -47,7 +47,6 @@ namespace Api
 
         public async Task ConnectPlayer(string gameCode, string playerId)
         {
-            await Task.Delay(2000);
             Game? game = _gameService.GetGame(gameCode);
             if (game == null)
             {
@@ -58,16 +57,16 @@ namespace Api
 
             if (game.TryGetPlayer(playerId, out var player))
             {
-                _playerConnections[playerId] = Context.ConnectionId;
-                await Groups.AddToGroupAsync(Context.ConnectionId, gameCode);
-                await Clients.Client(Context.ConnectionId).SendAsync("Connected", player.Name);
+                string connectionId = _connectionManager.AddOrUpdatePlayerConnection(playerId, Context.ConnectionId);
+                await Groups.AddToGroupAsync(connectionId, gameCode);
+                await Clients.Client(connectionId).SendAsync("Connected", player.Name);
 
                 var host = game.HostConnectionId;
                 if (host != null)
                     await Clients.Client(host).SendAsync("PlayerJoined", new
                     {
                         Id = player.Id,
-                        Name = player.Name
+                        Name = player.Name,
                     });
             }
             else
@@ -78,11 +77,20 @@ namespace Api
             }
         }
 
-        public override Task OnDisconnectedAsync(Exception? exception)
+        public override async Task<Task> OnDisconnectedAsync(Exception? exception)
         {
             var connectionId = Context.ConnectionId;
-            var playerId = _playerConnections[connectionId];
-            _playerConnections.TryRemove(playerId, out _);
+            string? playerId = _connectionManager.GetPlayerId(connectionId);
+            if (playerId != null)
+            {
+                var game = _gameService.GetGameByPlayerId(playerId);
+                if (game != null)
+                {
+                    await Clients.Client(game.HostConnectionId ?? "").SendAsync("PlayerDisconnected", playerId);
+                }
+            }
+
+            _connectionManager.TryRemoveConnection(connectionId);
 
             return base.OnDisconnectedAsync(exception);
         }

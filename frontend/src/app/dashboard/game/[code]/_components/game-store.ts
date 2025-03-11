@@ -27,6 +27,7 @@ interface GameStore {
     players: Player[];
     setPlayers: (players: Player[]) => void;
     addPlayer: (player: Player) => void;
+    removePlayer: (playerId: string) => void;
 }
 
 const useGameStore = create<GameStore>((set) => ({
@@ -48,6 +49,7 @@ const useGameStore = create<GameStore>((set) => ({
     players: [],
     setPlayers: (players) => set({ players }),
     addPlayer: (player) => set((state) => ({ players: [...state.players, player] })),
+    removePlayer: (playerId) => set((state) => ({ players: state.players.filter((player) => player.id !== playerId) })),
 }));
 
 export default useGameStore;

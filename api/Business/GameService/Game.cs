@@ -29,6 +29,16 @@ namespace Business.GameService
             Players.Add(player);
         }
 
+        // Not efficient at large player scales, but good if kept small
+        public void RemovePlayer(string playerId)
+        {
+            Player? player = Players.FirstOrDefault(p => p.Id == playerId);
+            if (player != null)
+            {
+                Players = [.. Players.Where(p => p.Id != playerId)];
+            }
+        }
+
         public bool TryGetPlayer(string playerId, [NotNullWhen(true)] out Player? player)
         {
             player = Players.FirstOrDefault(p => p.Id == playerId);

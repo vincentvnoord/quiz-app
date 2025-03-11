@@ -6,6 +6,7 @@ using Business.QuizService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Api.GameHubManagement;
 
 namespace Api.Controllers
 {
@@ -78,10 +79,10 @@ namespace Api.Controllers
             {
                 return StatusCode(500, "Host not connected.");
             }
-            
+
             try
             {
-                var player = new Player(request.PlayerName);
+                var player = new Player(request.PlayerName, request.Code);
                 game.AddPlayer(player);
                 return Ok(new { PlayerId = player.Id });
             }

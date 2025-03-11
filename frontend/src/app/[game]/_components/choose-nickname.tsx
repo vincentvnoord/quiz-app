@@ -10,7 +10,7 @@ export const ChooseNickName = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    const { setPlayerId, setPlayerName } = usePlayerStore();
+    const { setPlayerId, setPlayerName, setForGame } = usePlayerStore();
     const { gameCode } = usePlayerGameStore();
 
     const handleSubmit = async () => {
@@ -26,9 +26,11 @@ export const ChooseNickName = () => {
                     setError("Failed to join game");
                     return;
                 }
-
+                console.log("NAME:", name);
                 setPlayerName(name);
                 setPlayerId(res.playerId);
+                setForGame(gameCode);
+                console.log("Joined game", res);
             } else {
                 if (!res.message) {
                     setError("Failed to join game");
