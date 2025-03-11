@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using Business.Models;
 
 namespace Business.GameService
@@ -28,9 +29,10 @@ namespace Business.GameService
             Players.Add(player);
         }
 
-        public bool PlayerExists(string playerId)
+        public bool TryGetPlayer(string playerId, [NotNullWhen(true)] out Player? player)
         {
-            return Players.Any(p => p.Id == playerId);
+            player = Players.FirstOrDefault(p => p.Id == playerId);
+            return player != null;
         }
     }
 }

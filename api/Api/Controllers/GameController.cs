@@ -31,7 +31,6 @@ namespace Api.Controllers
             return Ok("Game");
         }
 
-
         /// <summary>
         /// NEEDS USER SPECIFIC AUTHORIZATION (CHECK IF USER IS OWNER OF QUIZ)
         /// also check if user already created a game, so they can't overflow the server with games 

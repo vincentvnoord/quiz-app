@@ -1,6 +1,11 @@
 import { HubConnection } from "@microsoft/signalr";
 import { create } from "zustand";
 
+export type Player = {
+    id: string;
+    name: string;
+}
+
 type GameState = "lobby" | "playing" | "results";
 
 interface GameStore {
@@ -19,9 +24,9 @@ interface GameStore {
     questionCount: number;
     setQuestionCount: (questionCount: number) => void;
 
-    players: string[];
-    setPlayers: (players: string[]) => void;
-    addPlayer: (player: string) => void;
+    players: Player[];
+    setPlayers: (players: Player[]) => void;
+    addPlayer: (player: Player) => void;
 }
 
 const useGameStore = create<GameStore>((set) => ({

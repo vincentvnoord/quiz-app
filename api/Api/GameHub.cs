@@ -22,7 +22,11 @@ namespace Api
                 {
                     Title = game.Quiz.Title,
                     QuestionCount = game.Quiz.Questions.Length,
-                    Players = game.Players.Select(p => new { p.Name })
+                    Players = game.Players.Select(p => new
+                    {
+                        Id = p.Id,
+                        Name = p.Name
+                    })
                 });
             }
             else
@@ -43,6 +47,7 @@ namespace Api
 
         public async Task ConnectPlayer(string gameCode, string playerId)
         {
+            await Task.Delay(2000);
             Game? game = _gameService.GetGame(gameCode);
             if (game == null)
             {
@@ -51,16 +56,35 @@ namespace Api
                 return;
             }
 
-            bool playerExists = _gameService.GetGame(gameCode)?.PlayerExists(playerId) ?? false;
-            if (!playerExists)
+            if (game.TryGetPlayer(playerId, out var player))
             {
+                _playerConnections[playerId] = Context.ConnectionId;
+                await Groups.AddToGroupAsync(Context.ConnectionId, gameCode);
+                await Clients.Client(Context.ConnectionId).SendAsync("Connected", player.Name);
+
+                var host = game.HostConnectionId;
+                if (host != null)
+                    await Clients.Client(host).SendAsync("PlayerJoined", new
+                    {
+                        Id = player.Id,
+                        Name = player.Name
+                    });
+            }
+            else
+            {
+                await Clients.Client(Context.ConnectionId).SendAsync("NonRegisteredPlayer");
                 Context.Abort();
                 return;
             }
+        }
 
-            _playerConnections[playerId] = Context.ConnectionId;
-            await Groups.AddToGroupAsync(Context.ConnectionId, gameCode);
-            await Clients.Group(gameCode).SendAsync("PlayerJoined", Context.ConnectionId);
+        public override Task OnDisconnectedAsync(Exception? exception)
+        {
+            var connectionId = Context.ConnectionId;
+            var playerId = _playerConnections[connectionId];
+            _playerConnections.TryRemove(playerId, out _);
+
+            return base.OnDisconnectedAsync(exception);
         }
     }
 }

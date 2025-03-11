@@ -3,8 +3,8 @@
 import { motion } from "framer-motion";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import useGameStore from "./game-store";
-import { HubConnectionBuilder, HubConnection } from "@microsoft/signalr";
+import useGameStore, { Player } from "./game-store";
+import { HubConnectionBuilder } from "@microsoft/signalr";
 import { Lobby } from "./lobby/lobby";
 import Connecting from "./connecting";
 import { Ban, Undo2 } from "lucide-react";
@@ -13,12 +13,13 @@ import Link from "next/link";
 type GameState = {
     title: string;
     questionCount: number;
+    players: Player[];
 }
 
 export default function Game() {
     const [connected, setConnected] = useState(false);
     const [gameNotFound, setGameNotFound] = useState(false);
-    const { setGameCode, setTitle, setQuestionCount, connection, setConnection, addPlayer } = useGameStore();
+    const { setGameCode, setTitle, setQuestionCount, connection, setConnection, addPlayer, setPlayers } = useGameStore();
 
     const params = useParams();
     const router = useRouter();
@@ -49,6 +50,7 @@ export default function Game() {
                     console.log(state);
                     setTitle(state.title);
                     setQuestionCount(state.questionCount);
+                    setPlayers(state.players);
 
                     setConnected(true);
                 })
@@ -61,8 +63,8 @@ export default function Game() {
                     router.push("/dashboard");
                 })
 
-                newConnection.on("PlayerJoined", (playerName: string) => {
-                    addPlayer(playerName);
+                newConnection.on("PlayerJoined", (player: Player) => {
+                    addPlayer(player);
                 })
 
                 await newConnection.start();
