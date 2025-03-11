@@ -7,12 +7,14 @@ import { usePlayerGameStore } from "../_stores/game-store";
 import { ChooseNickName } from "./choose-nickname";
 import { usePlayerStore } from "../_stores/player-store";
 import { HubConnectionBuilder } from "@microsoft/signalr";
-import { Player } from "@/app/dashboard/game/[code]/_components/game-store";
+import { motion } from "framer-motion";
+import { PlayerLobby } from "./lobby";
+import Connecting from "@/components/connecting";
 
 export const PlayerGame = () => {
     const router = useRouter();
     const { setGameCode, gameState, setGameState } = usePlayerGameStore();
-    const { playerId, setConnection, setPlayerId, setPlayerName, setForGame, forGame } = usePlayerStore();
+    const { playerId, setConnection, setPlayerId, setPlayerName, setForGame, forGame, connection } = usePlayerStore();
     const params = useParams();
 
     useEffect(() => {
@@ -30,9 +32,6 @@ export const PlayerGame = () => {
         const gameCode = params.game as string;
         setGameCode(gameCode);
 
-        console.log("Game code: ", gameCode);
-        console.log("STORED Game code: ", forGame);
-
         if (!playerId) {
             setGameState("choose-name");
             return;
@@ -42,6 +41,9 @@ export const PlayerGame = () => {
             setPlayerId(null);
             return;
         }
+
+        if (connection)
+            return;
 
         const createConnection = async () => {
             try {
@@ -55,14 +57,13 @@ export const PlayerGame = () => {
                 });
 
                 newConnection.on("NonRegisteredPlayer", () => {
-                    console.log("Non registered player");
+                    setGameState("choose-name");
                 });
 
                 newConnection.on("Connected", (player: string) => {
                     setForGame(gameCode);
                     setPlayerName(player);
                     setGameState("lobby");
-                    console.log("Connected as", player);
                 });
 
                 await newConnection.start();
@@ -79,33 +80,17 @@ export const PlayerGame = () => {
     }, [params.game, playerId]);
 
     return (
-        <>
+        <motion.div animate={{ opacity: 1, scale: 1 }} initial={{ opacity: 0, scale: 0 }} transition={{ delay: 0.1 }} className="w-full h-full">
             {
-                gameState === "lobby" && <WaitingForHost />
+                gameState === "lobby" && <PlayerLobby />
             }
             {
                 gameState === "choose-name" && <ChooseNickName />
             }
             {
                 gameState === "connecting" &&
-                <div className="w-full h-full flex items-center justify-center">
-                    <p className="text-xl font-bold">Connecting...</p>
-                </div>
+                <Connecting />
             }
-        </>
-    )
-}
-
-const WaitingForHost = () => {
-    const { playerName } = usePlayerStore();
-
-    return (
-        <div className="w-full h-full flex flex-col items-center pb-12 p-6 md:p-12">
-            <div className="h-full flex flex-col items-center justify-center gap-4">
-                <h1 className={`${barriecieto.className} text-5xl text-primary`}>You're in!</h1>
-                <p>Playing as <span className="font-bold">{playerName}</span></p>
-            </div>
-            <p className="text-xl font-bold">Waiting for host to start...</p>
-        </div>
+        </motion.div>
     )
 }

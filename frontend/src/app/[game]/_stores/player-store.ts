@@ -27,13 +27,11 @@ export const usePlayerStore = create<PlayerStore>()(
 
             playerId: null,
             setPlayerId: (id) => {
-                console.log("Setting player ID", id);
                 set({ playerId: id })
             },
 
             playerName: "",
             setPlayerName: (name) => {
-                console.log("Setting player name", name);
                 set({ playerName: name })
             },
         }),
@@ -42,7 +40,7 @@ export const usePlayerStore = create<PlayerStore>()(
             partialize: (state) => ({
                 forGame: state.forGame,
                 playerId: state.playerId,
-                playerName: state.playerName, // ✅ Persist only playerId & playerName
+                playerName: state.playerName,
             }),
         }
     )

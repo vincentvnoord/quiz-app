@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import useGameStore, { Player } from "./game-store";
 import { HubConnectionBuilder } from "@microsoft/signalr";
 import { Lobby } from "./lobby/lobby";
-import Connecting from "./connecting";
+import Connecting from "../../../../../components/connecting";
 import { Ban, Undo2 } from "lucide-react";
 import Link from "next/link";
 

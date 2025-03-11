@@ -15,6 +15,6 @@ export const usePlayerGameStore = create<GameStore>((set) => ({
     gameCode: "",
     setGameCode: (gameCode) => set({ gameCode }),
 
-    gameState: "choose-name",
+    gameState: "connecting",
     setGameState: (gameState) => set({ gameState }),
 }));
