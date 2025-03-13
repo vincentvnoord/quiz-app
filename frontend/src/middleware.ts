@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(req: NextRequest) {
-    const authHeader = req.headers.get("authorization");
+    console.log("Middleware called");
+    const authHeader = req.cookies.get("authToken");
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if (!authHeader) {
         return NextResponse.redirect(new URL("/login", req.url));
     }
 

@@ -5,14 +5,16 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Api.GameHubManagement
 {
-    [Authorize]
-    public class GameHub(GameService gameService, ConnectionManager connectionManager) : Hub
+    public class GameHub(GameService gameService, ConnectionManager connectionManager, ILogger<GameHub> logger) : Hub
     {
+        private readonly ILogger<GameHub> _logger = logger;
         private readonly ConnectionManager _connectionManager = connectionManager;
         private readonly GameService _gameService = gameService;
 
+        [Authorize]
         public async Task ConnectHost(string gameCode)
         {
+            _logger.LogInformation("Authenticated: ", Context.User?.Identity?.IsAuthenticated);
             var connectionId = Context.ConnectionId;
             Game? game = _gameService.GetGame(gameCode);
 
@@ -39,6 +41,7 @@ namespace Api.GameHubManagement
             }
         }
 
+        [Authorize]
         public async Task CloseGame(string gameCode)
         {
             string? userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -56,7 +59,6 @@ namespace Api.GameHubManagement
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, gameCode);
         }
 
-        [AllowAnonymous]
         public async Task ConnectPlayer(string gameCode, string playerId)
         {
             Game? game = _gameService.GetGame(gameCode);

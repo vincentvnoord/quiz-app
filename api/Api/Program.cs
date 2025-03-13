@@ -47,13 +47,18 @@ builder.Services.AddAuthentication(options =>
     {
         OnMessageReceived = context =>
         {
-            if (context.HttpContext.Request.Query.ContainsKey("access_token"))
+            // This is necessary to allow SignalR to accept the access token from the query string
+            var accessToken = context.Request.Query["access_token"];
+            var path = context.HttpContext.Request.Path;
+
+            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/gamehub"))
             {
-                context.Token = context.HttpContext.Request.Query["access_token"];
+                context.Token = accessToken;
             }
             return Task.CompletedTask;
         }
     };
+
 });
 
 // Register production services
@@ -107,11 +112,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
-app.UseHttpsRedirection();
-app.MapControllers();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseHttpsRedirection();
 
-app.MapHub<GameHub>("/gamehub").RequireAuthorization();
+app.MapControllers();
+app.MapHub<GameHub>("/gamehub");
 
 app.Run();
