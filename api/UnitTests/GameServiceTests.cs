@@ -19,7 +19,7 @@ namespace UnitTests
                 ]
             };
         }
-        
+
         [Test]
         public void NewGame_CreatesUniqueCodes()
         {
@@ -30,7 +30,7 @@ namespace UnitTests
 
             for (int i = 0; i < numberOfGames; i++)
             {
-                string gameId = gameService.CreateGame(_quiz);
+                string gameId = gameService.CreateGame(_quiz, "host");
                 Assert.Multiple(() =>
                 {
                     Assert.That(gameId, Has.Length.EqualTo(6), $"Game code length is not 6: {gameId}");
@@ -43,13 +43,13 @@ namespace UnitTests
         public void CloseGame_RemovesGameFromActiveGames()
         {
             var gameService = new GameService();
-            string gameId = gameService.CreateGame(_quiz);
+            string gameId = gameService.CreateGame(_quiz, "host");
 
-            Assert.That(gameService.ActiveGames, Contains.Key(gameId));
+            Assert.That(gameService.GetGame(gameId), Is.Not.Null);
 
-            gameService.CloseGame(gameId);
+            gameService.CloseGame(gameId, "host");
 
-            Assert.That(gameService.ActiveGames, Does.Not.ContainKey(gameId));
+            Assert.That(gameService.GetGame(gameId), Is.Null);
         }
     }
 }
