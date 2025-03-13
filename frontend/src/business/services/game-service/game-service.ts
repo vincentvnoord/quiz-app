@@ -27,19 +27,18 @@ export class GameService implements IGameService {
         return data.playerId;
     }
 
-    async createGame(authToken: string, quizId: string): Promise<string> {
+    async createGame(authToken: string, quizId: string, terminateExisting: boolean): Promise<{ activeGameSession: boolean, code: string }> {
         const res = await fetch(`${process.env.URL}/api/game/create`, {
             method: "post",
             body: JSON.stringify({
-                quizId
+                quizId,
+                terminateExisting
             }),
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${authToken}`
             }
         });
-
-        console.log(res);
 
         if (res.status === 401) {
             throw new UnAuthorizedError("Unauthorized");
@@ -50,6 +49,7 @@ export class GameService implements IGameService {
         }
 
         const data = await res.json();
-        return data.code;
+        console.log(data);
+        return data;
     }
 }

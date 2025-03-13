@@ -5,7 +5,10 @@ namespace Business.GameService
 {
     public class GameService
     {
-        public readonly ConcurrentDictionary<string, Game> ActiveGames = [];
+        private readonly ConcurrentDictionary<string, Game> ActiveGames = [];
+
+        // Saves the game code to the user id of host: <hostId, gameId>
+        private readonly ConcurrentDictionary<string, string> GameHosts = [];
 
         public Game? GetGame(string gameId)
         {
@@ -30,19 +33,27 @@ namespace Business.GameService
             return null;
         }
 
-        public string CreateGame(Quiz quiz)
+        public string CreateGame(Quiz quiz, string hostId)
         {
             string gameId = GenerateGameId();
             Game game = new(gameId, quiz);
 
             ActiveGames[gameId] = game;
+            GameHosts[hostId] = gameId;
 
             return gameId;
         }
 
-        public void CloseGame(string gameId)
+        public void CloseGame(string gameId, string hostId)
         {
             ActiveGames.TryRemove(gameId, out _);
+            GameHosts.TryRemove(hostId, out _);
+        }
+
+        public string? GetGameIdByHostId(string hostId)
+        {
+            GameHosts.TryGetValue(hostId, out string? gameId);
+            return gameId;
         }
 
         private string GenerateGameId()

@@ -19,7 +19,7 @@ type GameState = {
 export default function Game() {
     const [connected, setConnected] = useState(false);
     const [gameNotFound, setGameNotFound] = useState(false);
-    const { setGameCode, setTitle, setQuestionCount, connection, setConnection, addPlayer, setPlayers, removePlayer } = useGameStore();
+    const { setGameCode, setTitle, setQuestionCount, setConnection, addPlayer, setPlayers, removePlayer } = useGameStore();
 
     const params = useParams();
     const router = useRouter();
@@ -42,7 +42,11 @@ export default function Game() {
         const createConnection = async () => {
             try {
                 const newConnection = new HubConnectionBuilder()
-                    .withUrl(apiUrl + "/gamehub")
+                    .withUrl(apiUrl + "/gamehub", {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem("authToken")}`
+                        }
+                    })
                     .withAutomaticReconnect()
                     .build();
 
@@ -70,7 +74,7 @@ export default function Game() {
                 newConnection.on("PlayerDisconnected", (playerId: string) => {
                     removePlayer(playerId);
                 })
-                
+
                 await newConnection.start();
                 await newConnection.invoke("ConnectHost", code);
 

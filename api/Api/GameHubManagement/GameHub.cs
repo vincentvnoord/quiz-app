@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using Business.GameService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Api.GameHubManagement
@@ -36,11 +38,20 @@ namespace Api.GameHubManagement
             }
         }
 
+        [Authorize]
         public async Task CloseGame(string gameCode)
         {
+            string? userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                await Clients.Caller.SendAsync("Error", "Unauthorized: User ID not found.");
+                return;
+            }
+
             // Delay to allow the host to see the game closing
             await Task.Delay(2000);
-            _gameService.CloseGame(gameCode);
+            _gameService.CloseGame(gameCode, userId);
             await Clients.Group(gameCode).SendAsync("GameClosed");
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, gameCode);
         }
