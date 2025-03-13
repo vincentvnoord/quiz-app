@@ -23,7 +23,7 @@ export const CreateQuiz = () => {
                 <motion.div
                     initial={{ padding: 0 }}
                     animate={open ? { padding: 20 } : { padding: 0 }}
-                    className={`bg-white z-50 rounded-xl ${open ? "w-full" : "w-auto"}`}>
+                    className={`bg-white z-30 rounded-xl ${open ? "w-full" : "w-auto"}`}>
                     <motion.div
                         className="overflow-hidden"
                         animate={open ? { height: "auto", width: "auto" } : { height: 0, width: 0 }}

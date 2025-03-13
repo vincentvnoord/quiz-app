@@ -15,7 +15,7 @@ export const UserList = () => {
                     <p className="opacity-50">{questionCount} question{questionCount > 1 && "s"}</p>
                 </div>
 
-                <div onClick={() => addPlayer("New Player1!!!!!")} className="flex items-center justify-center p-2 px-4 rounded-lg bg-black/10 text-white">
+                <div className="flex items-center justify-center p-2 px-4 rounded-lg bg-black/10 text-white">
                     <UserIcon fill="white" stroke="transparent" size={28} />
                     <p className="text-2xl font-bold">{players.length}</p>
                 </div>
@@ -24,7 +24,7 @@ export const UserList = () => {
             <div className="h-[2px] bg-black/10"></div>
 
             <div className="grid min-h-0 pb-4 overflow-y-auto sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                {players.map((player, i) => <Player key={i} name={player} />)}
+                {players.map((player, i) => <Player key={i} name={player.name} />)}
             </div>
         </div>
 

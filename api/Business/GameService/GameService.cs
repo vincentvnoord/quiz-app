@@ -1,15 +1,14 @@
+using System.Collections.Concurrent;
 using Business.Models;
 
 namespace Business.GameService
 {
     public class GameService
     {
-        public readonly Dictionary<string, Game> ActiveGames = [];
+        private readonly ConcurrentDictionary<string, Game> ActiveGames = [];
 
-        public GameService()
-        {
-
-        }
+        // Saves the game code to the user id of host: <hostId, gameId>
+        private readonly ConcurrentDictionary<string, string> GameHosts = [];
 
         public Game? GetGame(string gameId)
         {
@@ -21,19 +20,40 @@ namespace Business.GameService
             return null;
         }
 
-        public string CreateGame(Quiz quiz)
+        public Game? GetGameByPlayerId(string playerId)
+        {
+            foreach (Game game in ActiveGames.Values)
+            {
+                if (game.TryGetPlayer(playerId, out _))
+                {
+                    return game;
+                }
+            }
+
+            return null;
+        }
+
+        public string CreateGame(Quiz quiz, string hostId)
         {
             string gameId = GenerateGameId();
             Game game = new(gameId, quiz);
 
-            ActiveGames.Add(gameId, game);
+            ActiveGames[gameId] = game;
+            GameHosts[hostId] = gameId;
 
             return gameId;
         }
 
-        public void CloseGame(string gameId)
+        public void CloseGame(string gameId, string hostId)
         {
-            ActiveGames.Remove(gameId);
+            ActiveGames.TryRemove(gameId, out _);
+            GameHosts.TryRemove(hostId, out _);
+        }
+
+        public string? GetGameIdByHostId(string hostId)
+        {
+            GameHosts.TryGetValue(hostId, out string? gameId);
+            return gameId;
         }
 
         private string GenerateGameId()

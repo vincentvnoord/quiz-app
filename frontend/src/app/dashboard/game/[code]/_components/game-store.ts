@@ -1,6 +1,11 @@
 import { HubConnection } from "@microsoft/signalr";
 import { create } from "zustand";
 
+export type Player = {
+    id: string;
+    name: string;
+}
+
 type GameState = "lobby" | "playing" | "results";
 
 interface GameStore {
@@ -19,9 +24,10 @@ interface GameStore {
     questionCount: number;
     setQuestionCount: (questionCount: number) => void;
 
-    players: string[];
-    setPlayers: (players: string[]) => void;
-    addPlayer: (player: string) => void;
+    players: Player[];
+    setPlayers: (players: Player[]) => void;
+    addPlayer: (player: Player) => void;
+    removePlayer: (playerId: string) => void;
 }
 
 const useGameStore = create<GameStore>((set) => ({
@@ -42,7 +48,14 @@ const useGameStore = create<GameStore>((set) => ({
 
     players: [],
     setPlayers: (players) => set({ players }),
-    addPlayer: (player) => set((state) => ({ players: [...state.players, player] })),
+    addPlayer: (player) => set((state) => {
+        const updatedPlayers = state.players.some(p => p.id === player.id)
+            ? state.players.map(p => p.id === player.id ? player : p)
+            : [...state.players, player];
+
+        return { players: updatedPlayers };
+    }),
+    removePlayer: (playerId) => set((state) => ({ players: state.players.filter((player) => player.id !== playerId) })),
 }));
 
 export default useGameStore;

@@ -1,7 +1,7 @@
 "use client";
 
 import { barriecieto } from "@/lib/fonts"
-import { RefreshCcw, RefreshCw } from "lucide-react"
+import { RefreshCw } from "lucide-react"
 import { motion } from "framer-motion";
 
 export default function Connecting() {

@@ -3,22 +3,24 @@
 import { motion } from "framer-motion";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import useGameStore from "./game-store";
-import { HubConnectionBuilder, HubConnection } from "@microsoft/signalr";
+import useGameStore, { Player } from "./game-store";
+import { HubConnectionBuilder } from "@microsoft/signalr";
 import { Lobby } from "./lobby/lobby";
-import Connecting from "./connecting";
+import Connecting from "../../../../../components/connecting";
 import { Ban, Undo2 } from "lucide-react";
 import Link from "next/link";
+import { getUserTokenFromCookies } from "@/app/dashboard/_actions";
 
 type GameState = {
     title: string;
     questionCount: number;
+    players: Player[];
 }
 
 export default function Game() {
     const [connected, setConnected] = useState(false);
     const [gameNotFound, setGameNotFound] = useState(false);
-    const { setGameCode, setTitle, setQuestionCount, connection, setConnection } = useGameStore();
+    const { setGameCode, setTitle, setQuestionCount, setConnection, addPlayer, setPlayers, removePlayer } = useGameStore();
 
     const params = useParams();
     const router = useRouter();
@@ -40,31 +42,33 @@ export default function Game() {
 
         const createConnection = async () => {
             try {
-                const newConnection = new HubConnectionBuilder()
-                    .withUrl(apiUrl + "/gamehub")
+                const authToken = await getUserTokenFromCookies();
+                console.log("Auth token: ", authToken);
+                const connection = new HubConnectionBuilder()
+                    .withUrl(apiUrl + "/gamehub", {
+                        accessTokenFactory: () => authToken
+                    })
                     .withAutomaticReconnect()
                     .build();
 
-                newConnection.on("HostConnected", (state: GameState) => {
+                connection.on("HostConnected", (state: GameState) => {
                     console.log(state);
                     setTitle(state.title);
                     setQuestionCount(state.questionCount);
+                    setPlayers(state.players);
 
                     setConnected(true);
                 })
 
-                newConnection.on("GameNotFound", () => {
-                    setGameNotFound(true);
-                });
+                connection.on("GameNotFound", () => setGameNotFound(true));
+                connection.on("GameClosed", () => router.push("/dashboard"));
+                connection.on("PlayerJoined", (player: Player) => addPlayer(player));
+                connection.on("PlayerDisconnected", (playerId: string) => removePlayer(playerId));
 
-                newConnection.on("GameClosed", () => {
-                    router.push("/dashboard");
-                })
+                await connection.start();
+                await connection.invoke("ConnectHost", code);
 
-                await newConnection.start();
-                await newConnection.invoke("ConnectHost", code);
-
-                setConnection(newConnection);
+                setConnection(connection);
             } catch (e) {
                 console.log(e);
             }
