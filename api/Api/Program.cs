@@ -42,6 +42,18 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey))
     };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            if (context.HttpContext.Request.Query.ContainsKey("access_token"))
+            {
+                context.Token = context.HttpContext.Request.Query["access_token"];
+            }
+            return Task.CompletedTask;
+        }
+    };
 });
 
 // Register production services
@@ -100,6 +112,6 @@ app.MapControllers();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapHub<GameHub>("/gamehub");
+app.MapHub<GameHub>("/gamehub").RequireAuthorization();
 
 app.Run();

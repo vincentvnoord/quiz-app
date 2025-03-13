@@ -9,6 +9,7 @@ import { Lobby } from "./lobby/lobby";
 import Connecting from "../../../../../components/connecting";
 import { Ban, Undo2 } from "lucide-react";
 import Link from "next/link";
+import { getUserTokenFromCookies } from "@/app/dashboard/_actions";
 
 type GameState = {
     title: string;
@@ -41,16 +42,16 @@ export default function Game() {
 
         const createConnection = async () => {
             try {
-                const newConnection = new HubConnectionBuilder()
+                const authToken = await getUserTokenFromCookies();
+                console.log("Auth token: ", authToken);
+                const connection = new HubConnectionBuilder()
                     .withUrl(apiUrl + "/gamehub", {
-                        headers: {
-                            Authorization: `Bearer ${localStorage.getItem("authToken")}`
-                        }
+                        accessTokenFactory: () => authToken
                     })
                     .withAutomaticReconnect()
                     .build();
 
-                newConnection.on("HostConnected", (state: GameState) => {
+                connection.on("HostConnected", (state: GameState) => {
                     console.log(state);
                     setTitle(state.title);
                     setQuestionCount(state.questionCount);
@@ -59,26 +60,15 @@ export default function Game() {
                     setConnected(true);
                 })
 
-                newConnection.on("GameNotFound", () => {
-                    setGameNotFound(true);
-                });
+                connection.on("GameNotFound", () => setGameNotFound(true));
+                connection.on("GameClosed", () => router.push("/dashboard"));
+                connection.on("PlayerJoined", (player: Player) => addPlayer(player));
+                connection.on("PlayerDisconnected", (playerId: string) => removePlayer(playerId));
 
-                newConnection.on("GameClosed", () => {
-                    router.push("/dashboard");
-                })
+                await connection.start();
+                await connection.invoke("ConnectHost", code);
 
-                newConnection.on("PlayerJoined", (player: Player) => {
-                    addPlayer(player);
-                })
-
-                newConnection.on("PlayerDisconnected", (playerId: string) => {
-                    removePlayer(playerId);
-                })
-
-                await newConnection.start();
-                await newConnection.invoke("ConnectHost", code);
-
-                setConnection(newConnection);
+                setConnection(connection);
             } catch (e) {
                 console.log(e);
             }
