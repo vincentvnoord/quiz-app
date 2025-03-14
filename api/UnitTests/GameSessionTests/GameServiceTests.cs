@@ -61,7 +61,7 @@ namespace UnitTests.GameSessionTests
             Game game = gameService.CreateGame(_quiz, "host");
 
             Player player = new("player", game.Id);
-            game.AddPlayer(player);
+            game.TryAddPlayer(player);
 
             var validationResult = gameService.ValidatePlayerConnection(game.Id, player.Id);
 

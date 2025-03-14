@@ -5,9 +5,8 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Api.GameHubManagement
 {
-    public class GameHub(GameService gameService, ConnectionManager connectionManager, ILogger<GameHub> logger) : Hub
+    public class GameHub(GameService gameService, ConnectionManager connectionManager) : Hub
     {
-        private readonly ILogger<GameHub> _logger = logger;
         private readonly ConnectionManager _connectionManager = connectionManager;
         private readonly GameService _gameService = gameService;
 
@@ -51,8 +50,6 @@ namespace Api.GameHubManagement
                 return;
             }
 
-            // Delay to allow the host to see the game closing
-            //            await Task.Delay(2000);
             _gameService.CloseGame(gameCode, userId);
             await Clients.Group(gameCode).SendAsync("GameClosed");
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, gameCode);

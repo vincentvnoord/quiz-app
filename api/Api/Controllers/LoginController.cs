@@ -8,10 +8,10 @@ namespace Api.Controllers
 
     [ApiController]
     [Route("/[controller]")]
-    public class LoginController : Controller
+    public class LoginController : ControllerBase
     {
-        private JwtService _jwtService;
-        private UserService _userService;
+        private readonly JwtService _jwtService;
+        private readonly UserService _userService;
 
         public LoginController(JwtService jwtService, UserService userService)
         {
@@ -32,7 +32,7 @@ namespace Api.Controllers
                 Email = model.Email,
                 Password = model.Password
             };
-            
+
             UserModel? authenticateResult = await _userService.AuthenticateUserAsync(user);
             if (authenticateResult == null)
                 return Unauthorized();
