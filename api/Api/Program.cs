@@ -119,4 +119,11 @@ app.UseHttpsRedirection();
 app.MapControllers();
 app.MapHub<GameHub>("/gamehub");
 
-app.Run();
+// Apply migrations on startup
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<QuizDbContext>();
+    await dbContext.Database.MigrateAsync();  // This applies any pending migrations
+}
+
+await app.RunAsync();
