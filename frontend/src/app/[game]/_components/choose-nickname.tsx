@@ -31,12 +31,10 @@ export const ChooseNickName = () => {
                 setPlayerId(res.playerId);
                 setForGame(gameCode);
                 console.log("Joined game", res);
+            } else if (!res.message) {
+                setError("Failed to join game");
             } else {
-                if (!res.message) {
-                    setError("Failed to join game");
-                } else {
-                    setError(res.message);
-                }
+                setError(res.message);
             }
         } catch (e) {
             console.error(e);
@@ -62,6 +60,9 @@ export const ChooseNickName = () => {
                     animate={loading ? { scale: 0.9 } : { scale: 1 }}
                 >
                     <button onClick={handleSubmit} className={`bg-primary w-full text-white p-2 text-5xl rounded-lg ${barriecieto.className}`}>JOIN GAME</button>
+                </motion.div>
+                <motion.div className="overflow-hidden" animate={error ? { opacity: 1, height: "auto" } : { opacity: 0, height: 0 }}>
+                    <p className="text-red-500 text-center">{error}</p>
                 </motion.div>
             </div>
         </div>

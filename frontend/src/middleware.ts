@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(req: NextRequest) {
-    console.log("Middleware called");
     const authHeader = req.cookies.get("authToken");
 
     if (!authHeader) {

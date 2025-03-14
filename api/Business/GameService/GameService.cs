@@ -20,6 +20,28 @@ namespace Business.GameService
             return null;
         }
 
+        /// <summary>
+        /// Validate if game exists and player is registered
+        /// </summary>
+        /// <param name="gameId"></param>
+        /// <param name="playerId"></param>
+        /// <returns>Validation object which has the validation status. When succesful, also returns the player and the game object</returns>
+        public PlayerConnectionValidation ValidatePlayerConnection(string gameId, string playerId)
+        {
+            Game? game = GetGame(gameId);
+            if (game == null)
+            {
+                return PlayerConnectionValidation.GameNotFound();
+            }
+
+            if (!game.TryGetPlayer(playerId, out Player? player))
+            {
+                return PlayerConnectionValidation.NonRegisteredPlayer();
+            }
+
+            return PlayerConnectionValidation.Success(player, game);
+        }
+
         public Game? GetGameByPlayerId(string playerId)
         {
             foreach (Game game in ActiveGames.Values)
@@ -33,7 +55,7 @@ namespace Business.GameService
             return null;
         }
 
-        public string CreateGame(Quiz quiz, string hostId)
+        public Game CreateGame(Quiz quiz, string hostId)
         {
             string gameId = GenerateGameId();
             Game game = new(gameId, quiz);
@@ -41,7 +63,7 @@ namespace Business.GameService
             ActiveGames[gameId] = game;
             GameHosts[hostId] = gameId;
 
-            return gameId;
+            return game;
         }
 
         public void CloseGame(string gameId, string hostId)

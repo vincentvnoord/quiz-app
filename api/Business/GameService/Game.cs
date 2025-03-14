@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
 using Business.Models;
 
 namespace Business.GameService
@@ -19,14 +20,15 @@ namespace Business.GameService
             Quiz = quiz;
         }
 
-        public void AddPlayer(Player player)
+        public bool TryAddPlayer(Player player)
         {
             if (Players.Count >= MAX_PLAYERS)
             {
-                throw new Exception("Game is full.");
+                return false;
             }
 
             Players.Add(player);
+            return true;
         }
 
         // Not efficient at large player scales, but good if kept small

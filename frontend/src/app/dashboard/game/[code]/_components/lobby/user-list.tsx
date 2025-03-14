@@ -5,7 +5,7 @@ import useGameStore from "../game-store";
 import { motion } from "framer-motion";
 
 export const UserList = () => {
-    const { players, addPlayer, title, questionCount } = useGameStore();
+    const { players, title, questionCount } = useGameStore();
 
     return (
         <div className="flex min-h-0 flex-col gap-3 flex-grow">

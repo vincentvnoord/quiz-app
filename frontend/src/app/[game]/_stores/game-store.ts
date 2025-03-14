@@ -1,4 +1,3 @@
-import { HubConnection } from "@microsoft/signalr";
 import { create } from "zustand";
 
 type GameState = "choose-name" | "connecting" | "lobby" | "playing" | "results";

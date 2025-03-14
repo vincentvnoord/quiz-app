@@ -8,9 +8,9 @@ namespace api.Controllers
 {
     [ApiController]
     [Route("/[controller]")]
-    public class RegisterController : Controller
+    public class RegisterController : ControllerBase
     {
-        private UserService _userService;
+        private readonly UserService _userService;
 
         public RegisterController(UserService userService)
         {

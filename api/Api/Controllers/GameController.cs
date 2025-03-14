@@ -73,8 +73,8 @@ namespace Api.Controllers
                 return NotFound("Quiz not found.");
             }
 
-            string newGame = _gameService.CreateGame(quiz, userId);
-            return Ok(new { ActiveGameSession = false, Code = newGame });
+            Game newGame = _gameService.CreateGame(quiz, userId);
+            return Ok(new { ActiveGameSession = false, Code = newGame.Id });
         }
 
         [HttpPost("join")]
@@ -93,16 +93,11 @@ namespace Api.Controllers
                 return NotFound("Game not found.");
             }
 
-            try
-            {
-                var player = new Player(request.PlayerName, request.Code);
-                game.AddPlayer(player);
+            var player = new Player(request.PlayerName, request.Code);
+            if (game.TryAddPlayer(player))
                 return Ok(new { PlayerId = player.Id });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500);
-            }
+            
+            return StatusCode(500);
         }
     }
 }
