@@ -7,12 +7,6 @@ WORKDIR /home/app
 COPY package.json ./
 COPY package-lock.json ./
 
-ARG NEXT_PUBLIC_API_URL
-ARG NEXT_PUBLIC_DOMAIN
-
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_DOMAIN=$NEXT_PUBLIC_DOMAIN
-
 RUN npm i
 
 FROM node:18-alpine AS builder
@@ -20,6 +14,12 @@ FROM node:18-alpine AS builder
 WORKDIR /home/app
 COPY --from=dependencies /home/app/node_modules ./node_modules
 COPY . .
+
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_DOMAIN
+
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_DOMAIN=$NEXT_PUBLIC_DOMAIN
 
 RUN npm run build
 
