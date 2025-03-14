@@ -73,8 +73,8 @@ namespace Api.Controllers
                 return NotFound("Quiz not found.");
             }
 
-            string newGame = _gameService.CreateGame(quiz, userId);
-            return Ok(new { ActiveGameSession = false, Code = newGame });
+            Game newGame = _gameService.CreateGame(quiz, userId);
+            return Ok(new { ActiveGameSession = false, Code = newGame.Id });
         }
 
         [HttpPost("join")]

@@ -60,15 +60,15 @@ namespace Api.GameHubManagement
 
         public async Task ConnectPlayer(string gameCode, string playerId)
         {
-            PlayerConnectionResult result = _gameService.ConnectPlayer(gameCode, playerId);
-            if (result.Status == PlayerConnectionResultStatus.GameNotFound)
+            PlayerConnectionValidation result = _gameService.ValidatePlayerConnection(gameCode, playerId);
+            if (result.Status == PlayerConnectionValidationResult.GameNotFound)
             {
                 await Clients.Client(Context.ConnectionId).SendAsync("GameNotFound");
                 Context.Abort();
                 return;
             }
 
-            if (result.Status == PlayerConnectionResultStatus.NonRegisteredPlayer)
+            if (result.Status == PlayerConnectionValidationResult.NonRegisteredPlayer)
             {
                 await Clients.Client(Context.ConnectionId).SendAsync("NonRegisteredPlayer");
                 Context.Abort();
