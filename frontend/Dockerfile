@@ -4,6 +4,7 @@ FROM node:18-alpine AS dependencies
 RUN apk add --no-cache libc6-compat
 WORKDIR /home/app
 
+COPY .env .env
 COPY package.json ./
 COPY package-lock.json ./
 
