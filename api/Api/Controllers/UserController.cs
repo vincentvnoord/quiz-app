@@ -8,10 +8,10 @@ namespace Api.Controllers
     [ApiController]
     [Route("/[controller]")]
     [Authorize]
-    public class UserController : Controller
+    public class UserController : ControllerBase
     {
-        private ILogger<UserController> _logger;
-        private UserService _userService;
+        private readonly ILogger<UserController> _logger;
+        private readonly UserService _userService;
 
         public UserController(UserService userService, ILogger<UserController> logger)
         {

@@ -1,12 +1,11 @@
 import { UserLoginDto } from "@/business/entities/user";
-import { IUserRepository } from "../../repositories/user-repository/user-repository-interface";
 import { IAuthService } from "./auth-service-interface";
 import { UnAuthorizedError } from "@/business/entities/errors/common";
 
 export default class AuthService implements IAuthService {
 
     async login(userData: UserLoginDto): Promise<string> {
-        const res = await fetch(`${process.env.URL}/api/login`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
             method: "post",
             body: JSON.stringify(userData),
             headers: {

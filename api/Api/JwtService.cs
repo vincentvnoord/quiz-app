@@ -14,9 +14,9 @@ public class JwtService
 
     public string GenerateJwtToken(string userId, string username)
     {
-        var jwtSecretKey = _configuration["Jwt:Key"];
-        var jwtIssuer = _configuration["Jwt:Issuer"];
-        var jwtAudience = _configuration["Jwt:Audience"];
+        var jwtSecretKey = _configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt secret is not set in config");
+        var jwtIssuer = _configuration["Jwt:Issuer"] ?? throw new InvalidOperationException("Jwt issuer is not set in config");
+        var jwtAudience = _configuration["Jwt:Audience"] ?? throw new InvalidOperationException("Jwt audience is not set in config");
 
         var claims = new[]
         {
@@ -27,7 +27,7 @@ public class JwtService
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey));
 
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        
+
         var token = new JwtSecurityToken(
             issuer: jwtIssuer,
             audience: jwtAudience,
