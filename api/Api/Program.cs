@@ -111,6 +111,15 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+var frontendOrigin = app.Configuration["FrontendOrigin"] ?? throw new InvalidOperationException("FrontendOrigin is missing in configuration");
+app.UseCors(builder =>
+{
+    builder.AllowAnyHeader()
+           .AllowAnyMethod()
+           .AllowCredentials()
+           .WithOrigins(frontendOrigin);
+});
+
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
