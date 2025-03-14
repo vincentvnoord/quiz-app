@@ -13,6 +13,7 @@ import { PrivacyAgreement } from "./privacy";
 import { Info } from "lucide-react";
 import SuccessMessage from "./success-message";
 import { registerUser } from "../_actions";
+import Link from "next/link";
 
 type FormData = z.infer<typeof registerSchema>;
 
@@ -89,7 +90,7 @@ export const RegisterForm = () => {
                     <FloatingDissapearing dissapear={success} delay={0.4}>
                         <p className="text-center text-sm">
                             Already have an account? {" "}
-                            <a href="/login" className="underline text-primary">Login</a>
+                            <Link href="/login" className="underline text-primary">Login</Link>
                         </p>
                     </FloatingDissapearing>
                 </motion.div>
