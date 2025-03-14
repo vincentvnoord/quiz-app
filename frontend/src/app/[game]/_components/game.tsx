@@ -1,6 +1,5 @@
 "use client";
 
-import { barriecieto } from "@/lib/fonts"
 import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { usePlayerGameStore } from "../_stores/game-store";

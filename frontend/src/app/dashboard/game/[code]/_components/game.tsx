@@ -76,7 +76,7 @@ export default function Game() {
 
         createConnection();
 
-    }, [params.code]);
+    }, [params.code, addPlayer, removePlayer, router, setConnection, setGameCode, setPlayers, setTitle, setQuestionCount]);
 
     if (gameNotFound) {
         return (
