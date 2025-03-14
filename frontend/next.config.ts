@@ -5,14 +5,6 @@ console.log(`API URL: ${api_url}`);
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  async rewrites() {
-    return [
-      {
-        source: "/api/:path*",
-        destination: `${api_url}/:path*`
-      }
-    ]
-  }
 };
 
 export default nextConfig;
