@@ -14,7 +14,6 @@ namespace Api.GameHubManagement
         [Authorize]
         public async Task ConnectHost(string gameCode)
         {
-            _logger.LogInformation("Authenticated: ", Context.User?.Identity?.IsAuthenticated);
             var connectionId = Context.ConnectionId;
             Game? game = _gameService.GetGame(gameCode);
 
@@ -61,34 +60,35 @@ namespace Api.GameHubManagement
 
         public async Task ConnectPlayer(string gameCode, string playerId)
         {
-            Game? game = _gameService.GetGame(gameCode);
-            if (game == null)
+            PlayerConnectionResult result = _gameService.ConnectPlayer(gameCode, playerId);
+            if (result.Status == PlayerConnectionResultStatus.GameNotFound)
             {
                 await Clients.Client(Context.ConnectionId).SendAsync("GameNotFound");
                 Context.Abort();
                 return;
             }
 
-            if (game.TryGetPlayer(playerId, out var player))
-            {
-                string connectionId = _connectionManager.AddOrUpdatePlayerConnection(playerId, Context.ConnectionId);
-                await Groups.AddToGroupAsync(connectionId, gameCode);
-                await Clients.Client(connectionId).SendAsync("Connected", player.Name);
-
-                var host = game.HostConnectionId;
-                if (host != null)
-                    await Clients.Client(host).SendAsync("PlayerJoined", new
-                    {
-                        Id = player.Id,
-                        Name = player.Name,
-                    });
-            }
-            else
+            if (result.Status == PlayerConnectionResultStatus.NonRegisteredPlayer)
             {
                 await Clients.Client(Context.ConnectionId).SendAsync("NonRegisteredPlayer");
                 Context.Abort();
                 return;
             }
+
+            Player player = result.Player!;
+            Game game = result.Game!;
+
+            string connectionId = _connectionManager.AddOrUpdatePlayerConnection(playerId, Context.ConnectionId);
+            await Groups.AddToGroupAsync(connectionId, gameCode);
+            await Clients.Client(connectionId).SendAsync("Connected", player.Name);
+
+            var host = game.HostConnectionId;
+            if (host != null)
+                await Clients.Client(host).SendAsync("PlayerJoined", new
+                {
+                    Id = player.Id,
+                    Name = player.Name,
+                });
         }
 
         public override async Task<Task> OnDisconnectedAsync(Exception? exception)

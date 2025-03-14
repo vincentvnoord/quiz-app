@@ -20,6 +20,22 @@ namespace Business.GameService
             return null;
         }
 
+        public PlayerConnectionResult ConnectPlayer(string gameId, string playerId)
+        {
+            Game? game = GetGame(gameId);
+            if (game == null)
+            {
+                return PlayerConnectionResult.GameNotFound();
+            }
+
+            if (!game.TryGetPlayer(playerId, out Player? player))
+            {
+                return PlayerConnectionResult.NonRegisteredPlayer();
+            }
+
+            return PlayerConnectionResult.Success(player, game);
+        }
+
         public Game? GetGameByPlayerId(string playerId)
         {
             foreach (Game game in ActiveGames.Values)

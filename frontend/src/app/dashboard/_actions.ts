@@ -9,8 +9,6 @@ export async function getUserTokenFromCookies() {
     const cookieStore = cookies();
     const authToken = (await cookieStore).get("authToken");
 
-    console.log(authToken);
-
     if (!authToken) {
         redirect("/login");
     }
