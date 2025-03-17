@@ -100,7 +100,7 @@ export default function Game() {
         <>
             {
                 connected ?
-                    <motion.div initial={{ opacity: 0, translateY: -50 }} animate={{ opacity: 1, translateY: 0 }} className="h-full w-full">
+                    <motion.div initial={{ opacity: 0, translateY: -50 }} animate={{ opacity: 1, translateY: 0 }} className="h-full w-full overflow-hidden">
                         <Lobby />
                     </motion.div>
                     :

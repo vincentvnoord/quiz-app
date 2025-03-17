@@ -1,10 +1,10 @@
-# Stage 1: Build the application
+# Stage 1: Get aspnet runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-# Stage 2: Build the application
+# Stage 2: Get dotnet sdk image for build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
 WORKDIR /src
 
@@ -14,11 +14,10 @@ COPY ["Business/Business.csproj", "Business/"]
 COPY ["DataAccess/DataAccess.csproj", "DataAccess/"]
 COPY ["UnitTests/UnitTests.csproj", "UnitTests/"]
 
-# Restore NuGet packages for all projects
+# Restore NuGet packages for solution
 RUN dotnet restore "QuizAppApi.sln"
 
 # Now copy the remaining application code
-COPY . .
 COPY . .
 WORKDIR "/src/Api"
 RUN dotnet build "Api.csproj" -c Release -o /app/build

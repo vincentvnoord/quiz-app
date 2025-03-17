@@ -14,7 +14,7 @@ export const CloseLobbyButton = () => {
             setIsModalOpen(false);
         }
     }
-    
+
     const closeLobby = async () => {
         setClosing(true);
         await connection?.invoke("CloseGame", gameCode);
@@ -46,12 +46,16 @@ export const CloseLobbyButton = () => {
                             <p className="text-destructive">Players will not be able to reconnect</p>
                         </div>
 
-                        <div className="flex justify-between gap-2 pt-4">
-                            <button onClick={exitModal} className="p-2 hover:opacity-100 hover:underline">
+                        <div className={`flex justify-between gap-2 pt-4 ${isModalOpen ? "pointer-events-auto" : "pointer-events-none"}`}>
+                            <button
+                                onClick={exitModal}
+                                className="p-2 hover:opacity-100 hover:underline">
                                 Cancel
                             </button>
 
-                            <button onClick={closeLobby} className="bg-destructive text-white p-3 rounded-lg font-semibold">
+                            <button
+                                onClick={closeLobby}
+                                className={`bg-destructive text-white p-3 rounded-lg font-semibold`}>
                                 Confirm and close
                             </button>
                         </div>

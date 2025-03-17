@@ -4,7 +4,7 @@ export default function DashboardLobbyPage() {
     // VALIDATE IF GAME CODE EXISTS
 
     return (
-        <div className="h-dvh">
+        <div className="h-dvh overflow-hidden">
             <Game />
         </div>
     )
