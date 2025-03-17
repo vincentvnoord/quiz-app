@@ -1,7 +1,7 @@
 "use client";
 
 import { UserIcon, UsersIcon } from "lucide-react"
-import useGameStore from "../game-store";
+import useGameStore from "../../_stores/game-store";
 import { motion } from "framer-motion";
 
 export const UserList = () => {

@@ -18,7 +18,7 @@ export const Lobby = () => {
             <div className="h-full overflow-hidden min-h-0 flex-shrink flex flex-col p-6 gap-4">
                 <UserList />
 
-                <div className="flex justify-end items-center gap-2 relative">
+                <div className="flex justify-end items-center gap-2 relative z-0">
                     <CloseLobbyButton />
                     <StartQuiz />
                 </div>

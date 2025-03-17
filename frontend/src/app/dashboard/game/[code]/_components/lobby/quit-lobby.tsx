@@ -1,5 +1,5 @@
 import { useState } from "react";
-import useGameStore from "../game-store"
+import useGameStore from "../../_stores/game-store"
 import { motion } from "framer-motion";
 import { AlertCircle, RefreshCw } from "lucide-react";
 
@@ -7,7 +7,7 @@ import { AlertCircle, RefreshCw } from "lucide-react";
 export const CloseLobbyButton = () => {
     const [closing, setClosing] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const { connection, gameCode } = useGameStore();
+    const { gameManager } = useGameStore();
 
     const exitModal = () => {
         if (!closing) {
@@ -17,7 +17,7 @@ export const CloseLobbyButton = () => {
 
     const closeLobby = async () => {
         setClosing(true);
-        await connection?.invoke("CloseGame", gameCode);
+        await gameManager?.closeLobby();
     }
 
     return (

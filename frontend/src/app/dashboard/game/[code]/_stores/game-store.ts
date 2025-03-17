@@ -1,14 +1,20 @@
 import { HubConnection } from "@microsoft/signalr";
 import { create } from "zustand";
+import { GameManager, IGameManager } from "../_logic/game-manager";
+import { GameManagerMock } from "../_logic/game-manager-mock";
 
 export type Player = {
     id: string;
     name: string;
 }
 
-type GameState = "lobby" | "playing" | "results";
+const UI_DEBUG = false;
 
-interface GameStore {
+type GameState = "connecting" | "lobby" | "starting" | "question" | "reveal-answer" | "results" | "not-found";
+
+export interface GameStore {
+    gameManager: IGameManager | null;
+
     connection: HubConnection | null;
     setConnection: (connection: HubConnection | null) => void;
 
@@ -31,6 +37,8 @@ interface GameStore {
 }
 
 const useGameStore = create<GameStore>((set) => ({
+    gameManager: null,
+
     connection: null,
     setConnection: (connection) => set({ connection }),
 
@@ -38,7 +46,7 @@ const useGameStore = create<GameStore>((set) => ({
     setGameCode: (gameCode) => set({ gameCode }),
 
     setGameState: (gameState) => set({ gameState }),
-    gameState: "lobby",
+    gameState: "connecting",
 
     title: "",
     setTitle: (title) => set({ title }),
@@ -57,5 +65,9 @@ const useGameStore = create<GameStore>((set) => ({
     }),
     removePlayer: (playerId) => set((state) => ({ players: state.players.filter((player) => player.id !== playerId) })),
 }));
+
+useGameStore.setState((state) => ({
+    gameManager: UI_DEBUG ? new GameManagerMock(state) : new GameManager(state)
+}))
 
 export default useGameStore;
