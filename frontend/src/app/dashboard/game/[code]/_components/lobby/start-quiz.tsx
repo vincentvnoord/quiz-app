@@ -6,12 +6,12 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 
 export const StartQuiz = () => {
-    const { connection, players } = useGameStore();
+    const { gameManager, players } = useGameStore();
     const [showError, setShowError] = useState(false);
-    const enoughPlayers = players.length >= 1;
+    const enoughPlayers = gameManager ? players.length >= gameManager?.getMinimumPlayers() : 2;
 
-    const handleStart = () => {
-        if (!connection)
+    const handleStart = async () => {
+        if (!gameManager)
             return;
 
         if (!enoughPlayers) {
@@ -23,8 +23,7 @@ export const StartQuiz = () => {
             return;
         }
 
-        console.log("Starting quiz");
-        // connection.send("start-quiz");
+        await gameManager.startGame();
     };
 
     const classes = "flex items-center gap-2 flex-grow justify-center sm:flex-grow-0 sm:text-xl rounded-lg text-white p-3 text-lg font-bold z-0";

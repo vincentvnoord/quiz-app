@@ -8,7 +8,7 @@ export type Player = {
     name: string;
 }
 
-const UI_DEBUG = false;
+const UI_DEBUG = true;
 
 type GameState = "connecting" | "lobby" | "starting" | "question" | "reveal-answer" | "results" | "not-found";
 

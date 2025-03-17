@@ -6,6 +6,7 @@ export interface IGameManager {
     startGame: () => Promise<void>;
     connectToGame: (code: string) => Promise<void>;
     closeLobby: () => Promise<void>;
+    getMinimumPlayers: () => number;
 }
 
 export class GameManager implements IGameManager {
@@ -16,6 +17,8 @@ export class GameManager implements IGameManager {
     constructor(store: GameStore) {
         this.gameStore = store;
     }
+
+    getMinimumPlayers = () => 2;
 
     async startGame() {
         if (this.connection) {

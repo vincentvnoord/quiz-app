@@ -10,9 +10,7 @@ export class GameManagerMock implements IGameManager {
         this.gameStore = store;
     }
 
-    closeLobby(): Promise<void> {
-        return Promise.resolve();
-    }
+    getMinimumPlayers = () => 0;
 
     connectToGame(code: string): Promise<void> {
         this.gameStore.setGameCode(code);
@@ -22,6 +20,10 @@ export class GameManagerMock implements IGameManager {
         }, 1000);
         return Promise.resolve();
     };
+
+    closeLobby(): Promise<void> {
+        return Promise.resolve();
+    }
 
     startGame(): Promise<void> {
         this.gameStore.setGameState("starting");
