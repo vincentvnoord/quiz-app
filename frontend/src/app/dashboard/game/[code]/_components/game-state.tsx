@@ -8,8 +8,9 @@ import { Lobby } from "./lobby/lobby";
 import Connecting from "@/components/connecting";
 import { StartingDisplay } from "./game/starting";
 import { GameNotFound } from "./game-not-found";
+import { Question } from "./game/question";
 
-export default function Game() {
+export default function GameState() {
     const { gameState, gameManager } = useGameStore();
 
     const params = useParams();
@@ -38,7 +39,7 @@ export default function Game() {
                 </motion.div>
             }
             {gameState === "starting" && <StartingDisplay />}
-            {gameState === "question" && <div>Question</div>}
+            {gameState === "question" && <Question />}
             {gameState === "reveal-answer" && <div>Reveal Answer</div>}
             {gameState === "results" && <div>Results</div>}
         </>

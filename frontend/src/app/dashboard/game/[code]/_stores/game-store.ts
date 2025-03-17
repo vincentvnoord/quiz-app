@@ -1,4 +1,3 @@
-import { HubConnection } from "@microsoft/signalr";
 import { create } from "zustand";
 import { GameManager, IGameManager } from "../_logic/game-manager";
 import { GameManagerMock } from "../_logic/game-manager-mock";
@@ -11,12 +10,14 @@ export type Player = {
 const UI_DEBUG = true;
 
 type GameState = "connecting" | "lobby" | "starting" | "question" | "reveal-answer" | "results" | "not-found";
+export type Question = {
+    text: string;
+    answers: string[];
+    timeToAnswer: number;
+}
 
 export interface GameStore {
     gameManager: IGameManager | null;
-
-    connection: HubConnection | null;
-    setConnection: (connection: HubConnection | null) => void;
 
     gameCode: string;
     setGameCode: (gameCode: string) => void;
@@ -34,13 +35,16 @@ export interface GameStore {
     setPlayers: (players: Player[]) => void;
     addPlayer: (player: Player) => void;
     removePlayer: (playerId: string) => void;
+
+    timer: number;
+    setTimer: (timer: number) => void;
+
+    currentQuestion: Question;
+    setCurrentQuestion: (question: Question) => void;
 }
 
 const useGameStore = create<GameStore>((set) => ({
     gameManager: null,
-
-    connection: null,
-    setConnection: (connection) => set({ connection }),
 
     gameCode: "",
     setGameCode: (gameCode) => set({ gameCode }),
@@ -64,6 +68,12 @@ const useGameStore = create<GameStore>((set) => ({
         return { players: updatedPlayers };
     }),
     removePlayer: (playerId) => set((state) => ({ players: state.players.filter((player) => player.id !== playerId) })),
+
+    timer: 5,
+    setTimer: (timer) => { set({ timer }) },
+
+    currentQuestion: { text: "", answers: [], timeToAnswer: 0 },
+    setCurrentQuestion: (question) => set({ currentQuestion: question }),
 }));
 
 useGameStore.setState((state) => ({

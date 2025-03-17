@@ -1,6 +1,7 @@
 import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
 import { getUserTokenFromCookies } from "@/app/dashboard/_actions";
 import { GameStore } from "../_stores/game-store";
+import { GameEventHandler } from "./game-event-handler";
 
 export interface IGameManager {
     startGame: () => Promise<void>;
@@ -12,6 +13,8 @@ export interface IGameManager {
 export class GameManager implements IGameManager {
     private gameCode: string | null = null;
     private connection: HubConnection | null = null;
+    private gameEventHandler: GameEventHandler | null = null;
+
     private readonly gameStore
 
     constructor(store: GameStore) {
@@ -44,28 +47,28 @@ export class GameManager implements IGameManager {
                 .withAutomaticReconnect()
                 .build();
 
-            this.connection.on("HostConnected", (state) => {
-                this.gameStore.setTitle(state.title);
-                this.gameStore.setQuestionCount(state.questionCount);
-                this.gameStore.setPlayers(state.players);
-                this.gameStore.setGameState("lobby");
-            });
-
-            this.connection.on("GameNotFound", () => this.gameStore.setGameState("not-found"));
-            this.connection.on("GameClosed", () => {
-                console.log("Game closed");
-                window.location.href = "/dashboard"
-            });
-            this.connection.on("PlayerJoined", (player) => this.gameStore.addPlayer(player));
-            this.connection.on("PlayerDisconnected", (playerId) => this.gameStore.removePlayer(playerId));
+            this.gameEventHandler = new GameEventHandler(this.gameStore);
+            this.registerEvents(this.connection, this.gameEventHandler);
 
             await this.connection.start();
             await this.connection.invoke("ConnectHost", code);
-
-            this.gameStore.setConnection(this.connection);
         } catch (error) {
             console.error("Connection failed:", error);
         }
+    }
+
+    private registerEvents(connection: HubConnection, handler: GameEventHandler) {
+        // Host events
+        connection.on("HostConnected", handler.onHostConnected);
+
+        // Player events
+        connection.on("PlayerJoined", handler.onPlayerJoined);
+        connection.on("PlayerDisconnected", handler.onPlayerDisconnected);
+
+        // Game state events
+        connection.on("GameNotFound", handler.onGameNotFound);
+        connection.on("GameClosed", handler.onGameClosed);
+        connection.on("GameStarted", handler.onGameStarted);
     }
 
     async closeLobby() {
