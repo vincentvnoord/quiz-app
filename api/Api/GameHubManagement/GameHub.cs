@@ -10,7 +10,7 @@ namespace Api.GameHubManagement
         private readonly ConnectionManager _connectionManager = connectionManager;
         private readonly GameService _gameService = gameService;
 
-        [Authorize]
+        [Authorize("GameHost")]
         public async Task ConnectHost(string gameCode)
         {
             var connectionId = Context.ConnectionId;
@@ -39,7 +39,14 @@ namespace Api.GameHubManagement
             }
         }
 
-        [Authorize]
+        [Authorize(Policy = "GameHost")]
+        public async Task StartGame(string gameCode)
+        {
+            Game game = _gameService.GetGame(gameCode)!;
+            await Clients.Group(gameCode).SendAsync("GameStarted");
+        }
+
+        [Authorize(Policy = "GameHost")]
         public async Task CloseGame(string gameCode)
         {
             string? userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -55,6 +62,7 @@ namespace Api.GameHubManagement
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, gameCode);
         }
 
+        [AllowAnonymous]
         public async Task ConnectPlayer(string gameCode, string playerId)
         {
             PlayerConnectionValidation result = _gameService.ValidatePlayerConnection(gameCode, playerId);

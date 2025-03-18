@@ -1,6 +1,6 @@
 import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
 import { getUserTokenFromCookies } from "@/app/dashboard/_actions";
-import { GameStore } from "../_stores/game-store";
+import useGameStore, { GameStore } from "../_stores/game-store";
 import { GameEventHandler } from "./game-event-handler";
 
 export interface IGameManager {
@@ -18,7 +18,7 @@ export class GameManager implements IGameManager {
 
     private readonly gameStore
 
-    constructor(store: GameStore) {
+    constructor(store: typeof useGameStore) {
         this.gameStore = store;
     }
 
@@ -45,10 +45,13 @@ export class GameManager implements IGameManager {
             }
 
             const authToken = await getUserTokenFromCookies();
+            const queryParams = new URLSearchParams({
+                gameCode: this.gameCode,
+                access_token: authToken,
+            }).toString();
+
             this.connection = new HubConnectionBuilder()
-                .withUrl(apiUrl + "/gamehub", {
-                    accessTokenFactory: () => authToken
-                })
+                .withUrl(apiUrl + `/gamehub?${queryParams}`)
                 .withAutomaticReconnect()
                 .build();
 
@@ -57,6 +60,7 @@ export class GameManager implements IGameManager {
 
             await this.connection.start();
             await this.connection.invoke("ConnectHost", code);
+            console.log("Connected to game", code);
         } catch (error) {
             console.error("Connection failed:", error);
         }
@@ -64,16 +68,16 @@ export class GameManager implements IGameManager {
 
     private registerEvents(connection: HubConnection, handler: GameEventHandler) {
         // Host events
-        connection.on("HostConnected", handler.onHostConnected);
+        connection.on("HostConnected", (state) => handler.onHostConnected(state));
 
         // Player events
-        connection.on("PlayerJoined", handler.onPlayerJoined);
-        connection.on("PlayerDisconnected", handler.onPlayerDisconnected);
+        connection.on("PlayerJoined", (state) => handler.onPlayerJoined(state));
+        connection.on("PlayerDisconnected", (state) => handler.onPlayerDisconnected(state));
 
         // Game state events
-        connection.on("GameNotFound", handler.onGameNotFound);
-        connection.on("GameClosed", handler.onGameClosed);
-        connection.on("GameStarted", handler.onGameStarted);
+        connection.on("GameNotFound", () => handler.onGameNotFound());
+        connection.on("GameClosed", () => handler.onGameClosed());
+        connection.on("GameStarted", (state) => handler.onGameStarted(state));
     }
 
     async closeLobby() {

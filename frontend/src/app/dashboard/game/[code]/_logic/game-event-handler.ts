@@ -1,33 +1,37 @@
-import { GameStore } from "../_stores/game-store";
+import useGameStore, { GameStore } from "../_stores/game-store";
 import { Player } from "../_stores/players-slice";
 import { Question } from "../_stores/question-slice";
 
 export class GameEventHandler {
-    private readonly gameStore: GameStore;
+    private readonly gameStore: typeof useGameStore;
 
-    constructor(store: GameStore) {
+    constructor(store: typeof useGameStore) {
         this.gameStore = store;
     }
 
     onQuestion(question: Question) {
-        this.gameStore.setGameState("question");
-        this.gameStore.setCurrentQuestion(question);
+        const state = this.gameStore.getState();
+        state.setGameState("question");
+        state.setCurrentQuestion(question);
     }
 
     onRevealAnswer(correctAnswer: number) {
-        this.gameStore.setGameState("reveal-answer");
-        this.gameStore.setCorrectAnswer(correctAnswer);
+        const state = this.gameStore.getState();
+        state.setGameState("reveal-answer");
+        state.setCorrectAnswer(correctAnswer);
     }
 
-    onHostConnected(state: { title: string, questionCount: number, players: Player[] }) {
-        this.gameStore.setTitle(state.title);
-        this.gameStore.setQuestionCount(state.questionCount);
-        this.gameStore.setPlayers(state.players);
-        this.gameStore.setGameState("lobby");
+    onHostConnected(gameState: { title: string, questionCount: number, players: Player[] }) {
+        const state = this.gameStore.getState();
+        state.setTitle(gameState.title);
+        state.setQuestionCount(gameState.questionCount);
+        state.setPlayers(gameState.players);
+        state.setGameState("lobby");
     }
 
     onGameNotFound() {
-        this.gameStore.setGameState("not-found");
+        const state = this.gameStore.getState();
+        state.setGameState("not-found");
     }
 
     onGameClosed() {
@@ -36,16 +40,19 @@ export class GameEventHandler {
     }
 
     onPlayerJoined(player: Player) {
-        this.gameStore.addPlayer(player);
+        const state = this.gameStore.getState();
+        state.addPlayer(player);
     }
 
     onPlayerDisconnected(playerId: string) {
-        this.gameStore.removePlayer(playerId);
+        const state = this.gameStore.getState();
+        state.removePlayer(playerId);
     }
 
     onGameStarted(delay: number) {
-        this.gameStore.setGameState("starting");
-        this.gameStore.setTimer(delay);
+        const state = this.gameStore.getState();
+        state.setGameState("starting");
+        state.setTimer(delay);
 
         let remainingTime = delay;
 
@@ -55,12 +62,13 @@ export class GameEventHandler {
             if (remainingTime <= 0) {
                 clearInterval(interval);
             } else {
-                this.gameStore.setTimer(remainingTime);
+                state.setTimer(remainingTime);
             }
         }, 1000);
     };
 
     onGameEnd() {
-        this.gameStore.setGameState("results");
+        const state = this.gameStore.getState();
+        state.setGameState("results");
     }
 }

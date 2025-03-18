@@ -92,11 +92,15 @@ namespace Api.Controllers
             {
                 return NotFound("Game not found.");
             }
+            if (game.State != GameState.Lobby)
+            {
+                return BadRequest("Game is not open for joining.");
+            }
 
             var player = new Player(request.PlayerName, request.Code);
             if (game.TryAddPlayer(player))
                 return Ok(new { PlayerId = player.Id });
-            
+
             return StatusCode(500);
         }
     }

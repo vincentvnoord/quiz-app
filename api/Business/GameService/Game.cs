@@ -5,24 +5,34 @@ using Business.Models;
 
 namespace Business.GameService
 {
+    public enum GameState
+    {
+        Lobby,
+        InProgress,
+        Finished,
+    }
+
     public class Game
     {
+        public GameState State { get; private set; } = GameState.Lobby;
         public const int MAX_PLAYERS = 50;
         public string Id { get; private set; }
         public Quiz Quiz { get; private set; }
         public string? HostConnectionId { get; set; }
+        public string HostId { get; private set; }
 
         public ConcurrentBag<Player> Players { get; private set; } = [];
 
-        public Game(string id, Quiz quiz)
+        public Game(string id, string hostId, Quiz quiz)
         {
             Id = id;
+            HostId = hostId;
             Quiz = quiz;
         }
 
         public bool TryAddPlayer(Player player)
         {
-            if (Players.Count >= MAX_PLAYERS)
+            if (Players.Count >= MAX_PLAYERS || State != GameState.Lobby)
             {
                 return false;
             }

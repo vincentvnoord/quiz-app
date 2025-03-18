@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using System.Text;
+using Api.Authorization;
 using Api.GameHubManagement;
 using Business.GameService;
 using Business.QuizService;
@@ -7,6 +9,7 @@ using DataAccess;
 using DataAccess.Mocks;
 using DataAccess.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -17,6 +20,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
+
+builder.Services.AddLogging();
 
 builder.Services.AddDbContext<QuizDbContext>(options =>
 {
@@ -49,11 +54,17 @@ builder.Services.AddAuthentication(options =>
         {
             // This is necessary to allow SignalR to accept the access token from the query string
             var accessToken = context.Request.Query["access_token"];
+            var gameCode = context.Request.Query["gameCode"];
             var path = context.HttpContext.Request.Path;
 
             if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/gamehub"))
             {
                 context.Token = accessToken;
+
+                if (!string.IsNullOrEmpty(gameCode))
+                {
+                    context.HttpContext.Items["gameCode"] = gameCode;
+                }
             }
             return Task.CompletedTask;
         }
@@ -61,7 +72,18 @@ builder.Services.AddAuthentication(options =>
 
 });
 
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("GameHost", policy =>
+    policy.Requirements.Add(new GameHostRequirement()));
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AnyPolicy", policy => policy.RequireClaim(ClaimTypes.NameIdentifier));
+});
+
+
 // Register production services
+builder.Services.AddSingleton<IAuthorizationHandler, GameHostHandler>();
 builder.Services.AddScoped<JwtService>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();

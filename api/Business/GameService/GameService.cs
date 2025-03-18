@@ -58,7 +58,7 @@ namespace Business.GameService
         public Game CreateGame(Quiz quiz, string hostId)
         {
             string gameId = GenerateGameId();
-            Game game = new(gameId, quiz);
+            Game game = new(gameId, hostId, quiz);
 
             ActiveGames[gameId] = game;
             GameHosts[hostId] = gameId;

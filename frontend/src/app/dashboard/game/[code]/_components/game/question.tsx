@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 
 export const Question = () => {
-    const { currentQuestion, gameState, gameManager, correctAnswer } = useGameStore();
+    const { currentQuestion, gameState, gameManager } = useGameStore();
     const { timeToAnswer } = currentQuestion;
     const [timeLeft, setTimeLeft] = useState(timeToAnswer);
 
@@ -39,17 +39,17 @@ export const Question = () => {
                 <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: [0.9, 1] }}
-                    className="rounded-full bg-black/20 aspect-square flex-shrink-0 text-center p-4 text-6xl">
+                    className="rounded-full bg-black/20 aspect-square flex-shrink-0 text-center p-4 text-4xl md:text-6xl">
                     <h2 className={`${barriecieto.className} w-full text-white`}>{timeLeft}</h2>
                 </motion.div>
                 <motion.div
                     initial={{ y: -200 }}
-                    animate={gameState === "reveal-answer" ? { y: [-200, 20, 0] } : { y: -200 }}
-                    transition={{ duration: 0.8, ease: "circInOut" }}
+                    animate={gameState === "reveal-answer" ? { y: [-200, 10, 0] } : { y: -200 }}
+                    transition={{ duration: 0.6, ease: "circInOut" }}
                     className="flex">
-                    <button className="bg-white h-fit flex items-center gap-2 text-xl md:text-2xl p-4 rounded-lg font-semibold" onClick={nextQuestion}>
+                    <button className="bg-white h-fit flex items-center gap-2 text-xl md:text-2xl p-3 rounded-lg font-semibold" onClick={nextQuestion}>
                         Continue
-                        <ArrowRight className="w-12 h-12 md:w-16 md:h-16" />
+                        <ArrowRight className="w-12 h-10" />
                     </button>
                 </motion.div>
             </div>
@@ -58,7 +58,7 @@ export const Question = () => {
                 <div className="w-full bg-white flex items-center justify-center p-2 md:p-5">
                     <h1 className={`text-2xl md:text-5xl font-semibold`}>{currentQuestion.text}</h1>
                 </div>
-                <div className={`w-full p-2 md:p-12 md:pt-6 h-full h-fit gap-2 font-extrabold grid grid-cols-2`}>
+                <div className={`w-full p-2 md:p-12 md:pt-6 h-full gap-2 font-extrabold grid grid-cols-2`}>
                     {currentQuestion.answers.map((answer, index) => <AnswerButton index={index} key={answer} answer={answer} />)}
                 </div>
             </div>
