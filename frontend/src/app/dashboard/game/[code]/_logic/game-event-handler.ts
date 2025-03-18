@@ -1,4 +1,6 @@
-import { GameStore, Player } from "../_stores/game-store";
+import { GameStore } from "../_stores/game-store";
+import { Player } from "../_stores/players-slice";
+import { Question } from "../_stores/question-slice";
 
 export class GameEventHandler {
     private readonly gameStore: GameStore;
@@ -7,9 +9,14 @@ export class GameEventHandler {
         this.gameStore = store;
     }
 
-    onQuestion(question: string, answers: string[], timeToAnswer: number) {
+    onQuestion(question: Question) {
         this.gameStore.setGameState("question");
-        this.gameStore.setCurrentQuestion({ text: question, answers, timeToAnswer });
+        this.gameStore.setCurrentQuestion(question);
+    }
+
+    onRevealAnswer(correctAnswer: number) {
+        this.gameStore.setGameState("reveal-answer");
+        this.gameStore.setCorrectAnswer(correctAnswer);
     }
 
     onHostConnected(state: { title: string, questionCount: number, players: Player[] }) {

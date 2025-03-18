@@ -39,8 +39,7 @@ export default function GameState() {
                 </motion.div>
             }
             {gameState === "starting" && <StartingDisplay />}
-            {gameState === "question" && <Question />}
-            {gameState === "reveal-answer" && <div>Reveal Answer</div>}
+            {(gameState === "question" || gameState === "reveal-answer") && <Question />}
             {gameState === "results" && <div>Results</div>}
         </>
     )

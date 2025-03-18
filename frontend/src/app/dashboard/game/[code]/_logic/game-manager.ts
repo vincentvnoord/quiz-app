@@ -8,6 +8,7 @@ export interface IGameManager {
     connectToGame: (code: string) => Promise<void>;
     closeLobby: () => Promise<void>;
     getMinimumPlayers: () => number;
+    nextQuestion: () => Promise<void>;
 }
 
 export class GameManager implements IGameManager {
@@ -19,6 +20,10 @@ export class GameManager implements IGameManager {
 
     constructor(store: GameStore) {
         this.gameStore = store;
+    }
+
+    nextQuestion(): Promise<void> {
+        throw new Error("Method not implemented.");
     }
 
     getMinimumPlayers = () => 2;

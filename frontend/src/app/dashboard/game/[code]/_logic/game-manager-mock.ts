@@ -1,16 +1,21 @@
 "use client";
 
-import { GameStore, Question } from "../_stores/game-store";
+import useGameStore, { GameStore } from "../_stores/game-store";
 import { GameEventHandler } from "./game-event-handler";
 import { IGameManager } from "./game-manager";
 
 export class GameManagerMock implements IGameManager {
-    protected gameStore;
+    protected gameStore: GameStore;
     private readonly gameEventHandler: GameEventHandler;
+    private currentQuestionIndex: number = 0;
 
-    constructor(store: GameStore) {
-        this.gameStore = store;
-        this.gameEventHandler = new GameEventHandler(store);
+    constructor(store: typeof useGameStore) {
+        this.gameStore = store.getState();
+        this.gameEventHandler = new GameEventHandler(this.gameStore);
+        store.subscribe((state) => {
+            console.log("State changed", state);
+            this.gameStore = state;
+        });
     }
 
     getMinimumPlayers = () => 0;
@@ -34,37 +39,41 @@ export class GameManagerMock implements IGameManager {
     }
 
     startGame(): Promise<void> {
-        this.mockGame();
-
-        return Promise.resolve();
-    }
-
-    mockGame() {
         const delay = 1;
         this.gameEventHandler.onGameStarted(delay);
 
         setTimeout(() => {
-            this.showQuestion(mockQuiz.questions, 0);
+            this.showQuestion()
         }, delay * 1000);
+
+        return Promise.resolve();
     }
 
-    showQuestion(questions: Question[], currentQuestion: number) {
-        const length = questions.length;
-        if (currentQuestion >= length) {
+    nextQuestion(): Promise<void> {
+        console.log(this.gameStore);
+        if (this.gameStore.gameState !== "reveal-answer")
+            return Promise.resolve();
+
+        this.showQuestion();
+
+        return Promise.resolve();
+    };
+
+    showQuestion() {
+        if (this.currentQuestionIndex >= this.gameStore.questionCount) {
             this.gameEventHandler.onGameEnd();
             return;
         }
 
-        const question = questions[currentQuestion];
-
+        const question = mockQuiz.questions[this.currentQuestionIndex];
+        console.log("Showing question", question);
         this.gameEventHandler.onQuestion(
-            question.text,
-            question.answers,
-            question.timeToAnswer
+            { index: this.currentQuestionIndex, ...question }
         );
 
         setTimeout(() => {
-            this.showQuestion(questions, currentQuestion + 1);
+            this.currentQuestionIndex++;
+            this.gameEventHandler.onRevealAnswer(question.correctAnswer);
         }, question.timeToAnswer * 1000);
     }
 }
@@ -87,7 +96,7 @@ const mockQuiz = {
             text: "What is the capital of France?",
             answers: ["Paris", "London", "Berlin", "Madrid"],
             correctAnswer: 0,
-            timeToAnswer: 3
+            timeToAnswer: 3,
         },
         {
             text: "How is electricity measured?",
@@ -103,7 +112,7 @@ const mockQuiz = {
         },
         {
             text: "What is the capital of Italy?",
-            answers: ["Paris", "London", "Berlin", "Madrid"],
+            answers: ["Paris", "London", "Rome", "Madrid"],
             correctAnswer: 1,
             timeToAnswer: 3
         },
