@@ -13,24 +13,15 @@ namespace Api.Controllers
 {
     [ApiController]
     [Route("/[controller]")]
-    public class GameController : Controller
+    public class GameController : ControllerBase
     {
-        private IHubContext<GameHub> _gameHub;
-
-        private GameService _gameService;
-        private QuizService _quizService;
+        private readonly GameService _gameService;
+        private readonly QuizService _quizService;
 
         public GameController(GameService gameService, QuizService quizService, IHubContext<GameHub> gameHub)
         {
             _gameService = gameService;
             _quizService = quizService;
-            _gameHub = gameHub;
-        }
-
-        [HttpGet]
-        public IActionResult GetGame()
-        {
-            return Ok("Game");
         }
 
         /// <summary>
@@ -54,7 +45,7 @@ namespace Api.Controllers
             }
 
             // Check if host has an active game session
-            string? gameId = _gameService.GetGameIdByHostId(userId);
+            string? gameId = GameService.GetGameIdByHostId(userId);
             if (gameId != null)
             {
                 // Return current game session if it exists and the request does not specify to terminate it
@@ -62,7 +53,7 @@ namespace Api.Controllers
                     return Ok(new { ActiveGameSession = true, Code = gameId });
 
                 // Terminate existing game session because request specifies to do so
-                _gameService.CloseGame(gameId, userId);
+                await _gameService.CloseGame(gameId, userId);
             }
 
             // Create a new game session
@@ -73,7 +64,7 @@ namespace Api.Controllers
                 return NotFound("Quiz not found.");
             }
 
-            Game newGame = _gameService.CreateGame(quiz, userId);
+            Game newGame = GameService.CreateGame(quiz, userId);
             return Ok(new { ActiveGameSession = false, Code = newGame.Id });
         }
 
@@ -87,7 +78,7 @@ namespace Api.Controllers
 
             string gameCode = request.Code;
 
-            Game? game = _gameService.GetGame(gameCode);
+            Game? game = GameService.GetGame(gameCode);
             if (game == null)
             {
                 return NotFound("Game not found.");

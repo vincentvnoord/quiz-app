@@ -1,5 +1,7 @@
 
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 using Business.GameService;
 using Microsoft.AspNetCore.SignalR;
 
@@ -29,6 +31,15 @@ namespace Api.GameHubManagement
             AddOrUpdatePlayerConnection(userId, connectionId);
         }
 
+        public async Task Disconnect(string userId, string gameCode)
+        {
+            // Remove the connection from the player
+            if (TryRemovePlayer(userId, out var connectionId))
+            {
+                await _hubContext.Groups.RemoveFromGroupAsync(connectionId, gameCode);
+            }
+        }
+
         /// <summary>
         /// Add a player connection coupled to the player id
         /// </summary>
@@ -55,6 +66,19 @@ namespace Api.GameHubManagement
                 return true;
             }
 
+            return false;
+        }
+
+        public static bool TryRemovePlayer(string playerId, [NotNullWhen(true)] out string? connectionId)
+        {
+            if (_playerToConnection.TryRemove(playerId, out string? id))
+            {
+                connectionId = id;
+                _connectionToPlayer.TryRemove(id, out _);
+                return true;
+            }
+
+            connectionId = null;
             return false;
         }
 
@@ -89,5 +113,6 @@ namespace Api.GameHubManagement
         {
             return [.. game.Players.Where(p => IsPlayerConnected(p.Id))];
         }
+
     }
 }

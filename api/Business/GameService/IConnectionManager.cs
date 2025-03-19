@@ -3,6 +3,8 @@ namespace Business.GameService
     public interface IConnectionManager
     {
         void Connect(string userId, string gameCode, string connectionId);
+        Task Disconnect(string userId, string gameCode);
+
         string AddOrUpdatePlayerConnection(string playerId, string connectionId);
         public bool TryRemoveConnection(string connectionId);
         public string? GetPlayerId(string connectionId);

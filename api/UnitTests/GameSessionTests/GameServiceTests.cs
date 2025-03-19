@@ -47,11 +47,11 @@ namespace UnitTests.GameSessionTests
             Game game = gameService.CreateGame(_quiz, "host");
             string gameId = game.Id;
 
-            Assert.That(gameService.GetGame(gameId), Is.Not.Null);
+            Assert.That(GameService.GetGame(gameId), Is.Not.Null);
 
             gameService.CloseGame(gameId, "host");
 
-            Assert.That(gameService.GetGame(gameId), Is.Null);
+            Assert.That(GameService.GetGame(gameId), Is.Null);
         }
 
         [Test]
@@ -63,7 +63,7 @@ namespace UnitTests.GameSessionTests
             Player player = new("player", game.Id);
             game.TryAddPlayer(player);
 
-            var validationResult = gameService.ValidatePlayerConnection(game.Id, player.Id);
+            var validationResult = GameService.ValidatePlayerConnection(game.Id, player.Id);
 
             Assert.That(validationResult.Status, Is.EqualTo(PlayerConnectionValidationResult.Success));
         }
@@ -75,7 +75,7 @@ namespace UnitTests.GameSessionTests
             string gameId = "nonexistent";
             string playerId = "player";
 
-            PlayerConnectionValidation result = gameService.ValidatePlayerConnection(gameId, playerId);
+            PlayerConnectionValidation result = GameService.ValidatePlayerConnection(gameId, playerId);
 
             Assert.That(result.Status, Is.EqualTo(PlayerConnectionValidationResult.GameNotFound));
         }
@@ -87,7 +87,7 @@ namespace UnitTests.GameSessionTests
             Game game = gameService.CreateGame(_quiz, "host");
             string playerId = "player";
 
-            PlayerConnectionValidation result = gameService.ValidatePlayerConnection(game.Id, playerId);
+            PlayerConnectionValidation result = GameService.ValidatePlayerConnection(game.Id, playerId);
 
             Assert.That(result.Status, Is.EqualTo(PlayerConnectionValidationResult.NonRegisteredPlayer));
         }

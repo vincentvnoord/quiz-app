@@ -53,5 +53,36 @@ namespace Api.GameHubManagement
             if (connectionId != null)
                 await _gameHub.Clients.Client(connectionId).SendAsync("UnAuthorized");
         }
+
+        public async Task GameClosed(string gameCode)
+        {
+            await _gameHub.Clients.Group(gameCode).SendAsync("GameClosed");
+        }
+
+        public async Task NonRegisteredPlayer(string connectionId)
+        {
+            await _gameHub.Clients.Client(connectionId).SendAsync("NonRegisteredPlayer");
+        }
+
+        public async Task NotifyPlayerConnected(string playerId, string playerName)
+        {
+            string? connectionId = _connectionManager.GetConnectionId(playerId);
+            if (connectionId != null)
+                await _gameHub.Clients.Client(connectionId).SendAsync("Connected", playerName);
+        }
+
+        public async Task NotifyHostPlayerConnected(string hostId, PlayerStatePresenter player)
+        {
+            string? connectionId = _connectionManager.GetConnectionId(hostId);
+            if (connectionId != null)
+                await _gameHub.Clients.Client(connectionId).SendAsync("PlayerConnected", player);
+        }
+
+        public async Task NotifyHostPlayerDisconnected(string hostId, string playerId)
+        {
+            string? connectionId = _connectionManager.GetConnectionId(hostId);
+            if (connectionId != null)
+                await _gameHub.Clients.Client(connectionId).SendAsync("PlayerDisconnected", playerId);
+        }
     }
 }

@@ -77,7 +77,7 @@ export class GameManager implements IGameManager {
         connection.on("HostConnected", (state) => handler.onHostConnected(state));
 
         // Player events
-        connection.on("PlayerJoined", (state) => handler.onPlayerJoined(state));
+        connection.on("PlayerConnected", (state) => handler.onPlayerJoined(state));
         connection.on("PlayerDisconnected", (state) => handler.onPlayerDisconnected(state));
 
         // Game state events

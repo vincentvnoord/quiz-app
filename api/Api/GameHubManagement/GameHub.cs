@@ -1,14 +1,17 @@
 using System.Security.Claims;
 using Business.GameService;
 using Business.Models;
+using Business.Models.GameState;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Api.GameHubManagement
 {
-    public class GameHub(GameService gameService, IConnectionManager connectionManager) : Hub
+    public class GameHub(GameService gameService, IConnectionManager connectionManager, IGameMessenger gameMessenger) : Hub
     {
         private readonly IConnectionManager _connectionManager = connectionManager;
+        private readonly IGameMessenger _gameMessenger = gameMessenger;
+
         private readonly GameService _gameService = gameService;
 
         [Authorize]
@@ -56,45 +59,40 @@ namespace Api.GameHubManagement
         public async Task CloseGame(string gameCode)
         {
             string? userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (_gameService.IsHost(gameCode, userId, out Game? game))
+            if (userId == null)
             {
-                _gameService.CloseGame(game);
-                await Clients.Group(gameCode).SendAsync("GameClosed");
-                await Groups.RemoveFromGroupAsync(Context.ConnectionId, gameCode);
+                Context.Abort();
+                return;
             }
+
+            await _gameService.CloseGame(gameCode, userId);
         }
 
         public async Task ConnectPlayer(string gameCode, string playerId)
         {
-            PlayerConnectionValidation result = _gameService.ValidatePlayerConnection(gameCode, playerId);
+            PlayerConnectionValidation result = GameService.ValidatePlayerConnection(gameCode, playerId);
             if (result.Status == PlayerConnectionValidationResult.GameNotFound)
             {
-                await Clients.Client(Context.ConnectionId).SendAsync("GameNotFound");
+                await _gameMessenger.GameNotFound(Context.ConnectionId);
                 Context.Abort();
                 return;
             }
 
             if (result.Status == PlayerConnectionValidationResult.NonRegisteredPlayer)
             {
-                await Clients.Client(Context.ConnectionId).SendAsync("NonRegisteredPlayer");
+                await _gameMessenger.NonRegisteredPlayer(Context.ConnectionId);
                 Context.Abort();
                 return;
             }
 
+            // Valid so make connection
+            string connectionId = Context.ConnectionId;
+            _connectionManager.Connect(playerId, gameCode, connectionId);
+
+            // Send over to game service which notifies necessary players
             Player player = result.Player!;
             Game game = result.Game!;
-
-            string connectionId = _connectionManager.AddOrUpdatePlayerConnection(playerId, Context.ConnectionId);
-            await Groups.AddToGroupAsync(connectionId, gameCode);
-            await Clients.Client(connectionId).SendAsync("Connected", player.Name);
-
-            // Sending message to host that player joined
-            //           if (host != null)
-            //               await Clients.Client(host).SendAsync("PlayerJoined", new
-            //               {
-            //                   Id = player.Id,
-            //                   Name = player.Name,
-            //               });
+            await _gameService.OnPlayerConnected(player, game);
         }
 
         public override async Task<Task> OnDisconnectedAsync(Exception? exception)
@@ -103,11 +101,10 @@ namespace Api.GameHubManagement
             string? playerId = _connectionManager.GetPlayerId(connectionId);
             if (playerId != null)
             {
-                var game = _gameService.GetGameByPlayerId(playerId);
+                var game = GameService.GetGameByPlayerId(playerId);
                 if (game != null)
                 {
-                    // USES WRONG ID: NEEDS TO BE CONNECTION ID
-                    await Clients.Client(game.HostId ?? "").SendAsync("PlayerDisconnected", playerId);
+                    await _gameMessenger.NotifyHostPlayerDisconnected(game.HostId, playerId);
                 }
             }
 

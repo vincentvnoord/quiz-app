@@ -37,7 +37,7 @@ namespace Api.Authorization
                 return Task.CompletedTask;
             }
 
-            var game = _gameService.GetGame(gameCode);
+            var game = GameService.GetGame(gameCode);
             if (game == null || game.HostId != userId)
             {
                 _logger.LogInformation("User tried to access game hub without being the host.");

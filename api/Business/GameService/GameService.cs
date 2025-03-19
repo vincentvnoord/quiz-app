@@ -46,6 +46,20 @@ namespace Business.GameService
             }
         }
 
+        public async Task OnPlayerConnected(Player player, Game game)
+        {
+            // TO DO Needs to send complete current game state to the player
+            await _gameMessenger.NotifyPlayerConnected(player.Id, player.Name);
+
+            var payload = new PlayerStatePresenter
+            {
+                Id = player.Id,
+                Name = player.Name,
+            };
+
+            await _gameMessenger.NotifyHostPlayerConnected(game.HostId, payload);
+        }
+
         public async Task StartGame(string gameCode, string userId)
         {
             Game? game = GetGame(gameCode);
@@ -78,7 +92,7 @@ namespace Business.GameService
                 await _gameMessenger.GameEnd(game.Id);
                 return;
             }
-            
+
             game.Next();
             await ShowQuestion(game);
         }
@@ -105,7 +119,7 @@ namespace Business.GameService
             await _gameMessenger.RevealAnswer(game.Id, question.Answers.Select(a => a.IsCorrect).ToList().IndexOf(true));
         }
 
-        public Game? GetGame(string gameId)
+        public static Game? GetGame(string gameId)
         {
             if (ActiveGames.TryGetValue(gameId, out Game? value))
             {
@@ -115,7 +129,7 @@ namespace Business.GameService
             return null;
         }
 
-        public bool IsHost(string gameId, string? hostId, [NotNullWhen(true)] out Game? game)
+        public static bool IsHost(string gameId, string? hostId, [NotNullWhen(true)] out Game? game)
         {
             game = null;
             if (hostId == null)
@@ -138,7 +152,7 @@ namespace Business.GameService
         /// <param name="gameId"></param>
         /// <param name="playerId"></param>
         /// <returns>Validation object which has the validation status. When succesful, also returns the player and the game object</returns>
-        public PlayerConnectionValidation ValidatePlayerConnection(string gameId, string playerId)
+        public static PlayerConnectionValidation ValidatePlayerConnection(string gameId, string playerId)
         {
             Game? game = GetGame(gameId);
             if (game == null)
@@ -154,7 +168,7 @@ namespace Business.GameService
             return PlayerConnectionValidation.Success(player, game);
         }
 
-        public Game? GetGameByPlayerId(string playerId)
+        public static Game? GetGameByPlayerId(string playerId)
         {
             foreach (Game game in ActiveGames.Values)
             {
@@ -167,7 +181,7 @@ namespace Business.GameService
             return null;
         }
 
-        public Game CreateGame(Quiz quiz, string hostId)
+        public static Game CreateGame(Quiz quiz, string hostId)
         {
             string gameId = GenerateGameId();
             Game game = new(gameId, hostId, quiz);
@@ -178,25 +192,28 @@ namespace Business.GameService
             return game;
         }
 
-        public void CloseGame(string gameId, string hostId)
+        public async Task CloseGame(string gameCode, string userId)
         {
-            ActiveGames.TryRemove(gameId, out _);
-            GameHosts.TryRemove(hostId, out _);
+            if (IsHost(gameCode, userId, out Game? game))
+            {
+                ActiveGames.TryRemove(gameCode, out _);
+                GameHosts.TryRemove(userId, out _);
+                await _gameMessenger.GameClosed(gameCode);
+
+                foreach (Player player in game.Players)
+                {
+                    await _connectionManager.Disconnect(player.Id, gameCode);
+                }
+            }
         }
 
-        public void CloseGame(Game game)
-        {
-            ActiveGames.TryRemove(game.Id, out _);
-            GameHosts.TryRemove(game.HostId, out _);
-        }
-
-        public string? GetGameIdByHostId(string hostId)
+        public static string? GetGameIdByHostId(string hostId)
         {
             GameHosts.TryGetValue(hostId, out string? gameId);
             return gameId;
         }
 
-        private string GenerateGameId()
+        private static string GenerateGameId()
         {
             Random random = new();
             string gameId;
