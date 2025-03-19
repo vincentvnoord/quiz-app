@@ -20,7 +20,9 @@ namespace Api.GameHubManagement
                 return;
             }
 
-            _connectionManager.Connect(userId, Context.ConnectionId);
+            // Order is essential as .AssignHost sends message to the host with current game state (after connection step)
+            _connectionManager.Connect(userId, gameCode, Context.ConnectionId);
+
             await _gameService.AssignHost(gameCode, userId);
         }
 
@@ -28,58 +30,26 @@ namespace Api.GameHubManagement
         public async Task StartGame(string gameCode)
         {
             string? userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (_gameService.IsHost(gameCode, userId, out Game? game))
+            if (userId == null)
             {
-                if (game == null)
-                {
-                    return;
-                }
-
-                int delay = 5;
-                await Clients.Group(gameCode).SendAsync("GameStarted", delay);
-                game.StartGame();
-                await Task.Delay(delay * 1000);
-                await SendQuestion(game);
+                Context.Abort();
+                return;
             }
+
+            await _gameService.StartGame(gameCode, userId);
         }
 
         [Authorize]
         public async Task Continue(string gameCode)
         {
-            Game? game = _gameService.GetGame(gameCode);
-            if (game?.State != GameState.RevealQuestion || game == null)
-                return;
-
-            if (game.NoMoreQuestions())
+            string? userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
             {
-                await Clients.Group(game.Id).SendAsync("GameEnd");
+                Context.Abort();
                 return;
             }
 
-            game.Next();
-            await SendQuestion(game);
-        }
-
-        private async Task SendQuestion(Game game)
-        {
-            Question currentQuestion = game.GetCurrentQuestion();
-            await Clients.Group(game.Id).SendAsync("Question", new
-            {
-                Index = game.CurrentQuestionIndex,
-                Text = currentQuestion.Text,
-                Answers = currentQuestion.Answers.Select(a => a.Text),
-                TimeToAnswer = currentQuestion.TimeToAnswer,
-            });
-
-            await RevealAnswer(game, currentQuestion);
-        }
-
-        private async Task RevealAnswer(Game game, Question question)
-        {
-            await Task.Delay(question.TimeToAnswer * 1000);
-            int correctAnswerIndex = question.Answers.ToList().FindIndex(a => a.IsCorrect);
-            await Clients.Group(game.Id).SendAsync("RevealAnswer", correctAnswerIndex);
-            game.RevealAnswer();
+            await _gameService.Continue(gameCode);
         }
 
         [Authorize]
@@ -118,13 +88,13 @@ namespace Api.GameHubManagement
             await Groups.AddToGroupAsync(connectionId, gameCode);
             await Clients.Client(connectionId).SendAsync("Connected", player.Name);
 
-            var host = game.HostConnectionId;
-            if (host != null)
-                await Clients.Client(host).SendAsync("PlayerJoined", new
-                {
-                    Id = player.Id,
-                    Name = player.Name,
-                });
+            // Sending message to host that player joined
+            //           if (host != null)
+            //               await Clients.Client(host).SendAsync("PlayerJoined", new
+            //               {
+            //                   Id = player.Id,
+            //                   Name = player.Name,
+            //               });
         }
 
         public override async Task<Task> OnDisconnectedAsync(Exception? exception)
@@ -136,7 +106,8 @@ namespace Api.GameHubManagement
                 var game = _gameService.GetGameByPlayerId(playerId);
                 if (game != null)
                 {
-                    await Clients.Client(game.HostConnectionId ?? "").SendAsync("PlayerDisconnected", playerId);
+                    // USES WRONG ID: NEEDS TO BE CONNECTION ID
+                    await Clients.Client(game.HostId ?? "").SendAsync("PlayerDisconnected", playerId);
                 }
             }
 

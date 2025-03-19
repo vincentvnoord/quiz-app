@@ -1,4 +1,4 @@
-import useGameStore, { GameStore } from "../_stores/game-store";
+import useGameStore from "../_stores/game-store";
 import { Player } from "../_stores/players-slice";
 import { Question } from "../_stores/question-slice";
 
@@ -49,12 +49,12 @@ export class GameEventHandler {
         state.removePlayer(playerId);
     }
 
-    onGameStarted(delay: number) {
+    onGameStarted(timer: number) {
         const state = this.gameStore.getState();
         state.setGameState("starting");
-        state.setTimer(delay);
+        state.setTimer(timer);
 
-        let remainingTime = delay;
+        let remainingTime = timer;
 
         const interval = setInterval(() => {
             remainingTime--;

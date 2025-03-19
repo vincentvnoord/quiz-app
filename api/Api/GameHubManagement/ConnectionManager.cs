@@ -13,8 +13,19 @@ namespace Api.GameHubManagement
         // A dictionary to reference the player id with the connection id: <connectionId, playerId>
         private static readonly ConcurrentDictionary<string, string> _connectionToPlayer = [];
 
-        public void Connect(string userId, string connectionId)
+        private readonly IHubContext<GameHub> _hubContext;
+
+        public ConnectionManager(IHubContext<GameHub> hubContext)
         {
+            _hubContext = hubContext;
+        }
+
+        public void Connect(string userId, string gameCode, string connectionId)
+        {
+            // Add the connection to the group
+            _hubContext.Groups.AddToGroupAsync(connectionId, gameCode);
+
+            // Add the connection to the player
             AddOrUpdatePlayerConnection(userId, connectionId);
         }
 

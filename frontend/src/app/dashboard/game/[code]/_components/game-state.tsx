@@ -40,7 +40,7 @@ export default function GameState() {
             }
             {gameState === "starting" && <StartingDisplay />}
             {(gameState === "question" || gameState === "reveal-answer") && <Question />}
-            {gameState === "results" && <div>Results</div>}
+            {gameState === "results" && <div className="w-full h-dvh flex justify-center items-center text-5xl font-bold overflow-hidden">Results</div>}
         </>
     )
 }

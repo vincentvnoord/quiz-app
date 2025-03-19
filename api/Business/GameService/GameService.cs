@@ -1,12 +1,14 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using Business.Models;
-using Business.Models.GameStates;
+using Business.Models.GameState;
 
 namespace Business.GameService
 {
     public class GameService
     {
+        public const int START_TIMER = 5;
+
         private static readonly ConcurrentDictionary<string, Game> ActiveGames = [];
 
         // Saves the game code to the user id of host: <hostId, gameId>
@@ -29,7 +31,7 @@ namespace Business.GameService
             {
                 Player[] connectedPlayers = _connectionManager.getConnectedPlayers(game);
 
-                var message = new HostConnectedState
+                var message = new GameStatePresenter
                 {
                     Title = game.Quiz.Title,
                     QuestionCount = game.Quiz.Questions.Length,
@@ -42,6 +44,65 @@ namespace Business.GameService
             {
                 await _gameMessenger.GameNotFound(hostId);
             }
+        }
+
+        public async Task StartGame(string gameCode, string userId)
+        {
+            Game? game = GetGame(gameCode);
+            if (game == null)
+            {
+                await _gameMessenger.GameNotFound(userId);
+                return;
+            }
+            await _gameMessenger.GameStarted(game.Id, START_TIMER);
+
+            if (game.HostId != userId)
+            {
+                await _gameMessenger.UnAuthorized(userId);
+                return;
+            }
+
+            game.StartGame();
+            await Task.Delay(START_TIMER * 1000);
+            await ShowQuestion(game);
+        }
+
+        public async Task Continue(string gameCode)
+        {
+            Game? game = GetGame(gameCode);
+            if (game?.State != GameState.RevealQuestion || game == null)
+                return;
+
+            if (game.NoMoreQuestions())
+            {
+                await _gameMessenger.GameEnd(game.Id);
+                return;
+            }
+            
+            game.Next();
+            await ShowQuestion(game);
+        }
+
+        private async Task ShowQuestion(Game game)
+        {
+            Question currentQuestion = game.GetCurrentQuestion();
+            var question = new QuestionPresenter
+            {
+                Index = game.CurrentQuestionIndex,
+                Text = currentQuestion.Text,
+                Answers = [.. currentQuestion.Answers.Select(a => a.Text)],
+                TimeToAnswer = currentQuestion.TimeToAnswer,
+            };
+
+            await _gameMessenger.Question(game.Id, question);
+            await Task.Delay(currentQuestion.TimeToAnswer * 1000);
+            await RevealAnswer(game, currentQuestion);
+        }
+
+        private async Task RevealAnswer(Game game, Question question)
+        {
+            game.RevealAnswer();
+            await _gameMessenger.RevealAnswer(game.Id, question.Answers.Select(a => a.IsCorrect).ToList().IndexOf(true));
         }
 
         public Game? GetGame(string gameId)

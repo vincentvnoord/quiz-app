@@ -32,7 +32,12 @@ export class GameManager implements IGameManager {
 
     async startGame() {
         if (this.connection) {
-            await this.connection.invoke("StartGame", this.gameCode);
+            try {
+                await this.connection.invoke("StartGame", this.gameCode);
+                console.log("Game started");
+            } catch (e) {
+                console.error(e);
+            }
         }
     };
 
@@ -81,7 +86,12 @@ export class GameManager implements IGameManager {
         connection.on("GameStarted", (state) => handler.onGameStarted(state));
         connection.on("GameEnd", () => handler.onGameEnd());
 
-        connection.on("Question", (question) => handler.onQuestion(question));
+        connection.on("UnAuthorized", () => console.log("Unauthorized"));
+
+        connection.on("Question", (question) => {
+            console.log("Received question", question);
+            handler.onQuestion(question)
+        });
         connection.on("RevealAnswer", (correctAnswer) => handler.onRevealAnswer(correctAnswer));
     }
 

@@ -1,8 +1,8 @@
 using Business.GameService;
 
-namespace Business.Models.GameStates
+namespace Business.Models.GameState
 {
-    public record HostConnectedState
+    public record GameStatePresenter
     {
         public string Title { get; init; } = default!;
         public int QuestionCount { get; init; }

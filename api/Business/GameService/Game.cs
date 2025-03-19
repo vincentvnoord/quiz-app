@@ -19,7 +19,6 @@ namespace Business.GameService
         public const int MAX_PLAYERS = 50;
         public string Id { get; private set; }
         public Quiz Quiz { get; private set; }
-        public string? HostConnectionId { get; set; }
         public string HostId { get; private set; }
         public int CurrentQuestionIndex { get; private set; } = 0;
 
