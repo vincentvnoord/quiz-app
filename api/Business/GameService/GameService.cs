@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using Business.Models;
 
 namespace Business.GameService
@@ -18,6 +19,23 @@ namespace Business.GameService
             }
 
             return null;
+        }
+
+        public bool IsHost(string gameId, string? hostId, [NotNullWhen(true)] out Game? game)
+        {
+            game = null;
+            if (hostId == null)
+                return false;
+
+            Game? g = GetGame(gameId);
+            if (g == null)
+                return false;
+
+            if (g.HostId != hostId)
+                return false;
+
+            game = g;
+            return true;
         }
 
         /// <summary>
@@ -70,6 +88,12 @@ namespace Business.GameService
         {
             ActiveGames.TryRemove(gameId, out _);
             GameHosts.TryRemove(hostId, out _);
+        }
+
+        public void CloseGame(Game game)
+        {
+            ActiveGames.TryRemove(game.Id, out _);
+            GameHosts.TryRemove(game.HostId, out _);
         }
 
         public string? GetGameIdByHostId(string hostId)

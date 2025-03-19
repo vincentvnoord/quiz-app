@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Business.GameService;
+using Business.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
@@ -10,7 +11,7 @@ namespace Api.GameHubManagement
         private readonly ConnectionManager _connectionManager = connectionManager;
         private readonly GameService _gameService = gameService;
 
-        [Authorize("GameHost")]
+        [Authorize]
         public async Task ConnectHost(string gameCode)
         {
             var connectionId = Context.ConnectionId;
@@ -39,30 +40,76 @@ namespace Api.GameHubManagement
             }
         }
 
-        [Authorize(Policy = "GameHost")]
+        [Authorize]
         public async Task StartGame(string gameCode)
         {
-            Game game = _gameService.GetGame(gameCode)!;
-            await Clients.Group(gameCode).SendAsync("GameStarted");
+            string? userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (_gameService.IsHost(gameCode, userId, out Game? game))
+            {
+                if (game == null)
+                {
+                    return;
+                }
+
+                int delay = 5;
+                await Clients.Group(gameCode).SendAsync("GameStarted", delay);
+                game.StartGame();
+                await Task.Delay(delay * 1000);
+                await SendQuestion(game);
+            }
         }
 
-        [Authorize(Policy = "GameHost")]
-        public async Task CloseGame(string gameCode)
+        [Authorize]
+        public async Task Continue(string gameCode)
         {
-            string? userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            Game? game = _gameService.GetGame(gameCode);
+            if (game?.State != GameState.RevealQuestion || game == null)
+                return;
 
-            if (string.IsNullOrEmpty(userId))
+            if (game.NoMoreQuestions())
             {
-                await Clients.Caller.SendAsync("Error", "Unauthorized: User ID not found.");
+                await Clients.Group(game.Id).SendAsync("GameEnd");
                 return;
             }
 
-            _gameService.CloseGame(gameCode, userId);
-            await Clients.Group(gameCode).SendAsync("GameClosed");
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, gameCode);
+            game.Next();
+            await SendQuestion(game);
         }
 
-        [AllowAnonymous]
+        private async Task SendQuestion(Game game)
+        {
+            Question currentQuestion = game.GetCurrentQuestion();
+            await Clients.Group(game.Id).SendAsync("Question", new
+            {
+                Index = game.CurrentQuestionIndex,
+                Text = currentQuestion.Text,
+                Answers = currentQuestion.Answers.Select(a => a.Text),
+                TimeToAnswer = currentQuestion.TimeToAnswer,
+            });
+
+            await RevealAnswer(game, currentQuestion);
+        }
+
+        private async Task RevealAnswer(Game game, Question question)
+        {
+            await Task.Delay(question.TimeToAnswer * 1000);
+            int correctAnswerIndex = question.Answers.ToList().FindIndex(a => a.IsCorrect);
+            await Clients.Group(game.Id).SendAsync("RevealAnswer", correctAnswerIndex);
+            game.RevealAnswer();
+        }
+
+        [Authorize]
+        public async Task CloseGame(string gameCode)
+        {
+            string? userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (_gameService.IsHost(gameCode, userId, out Game? game))
+            {
+                _gameService.CloseGame(game);
+                await Clients.Group(gameCode).SendAsync("GameClosed");
+                await Groups.RemoveFromGroupAsync(Context.ConnectionId, gameCode);
+            }
+        }
+
         public async Task ConnectPlayer(string gameCode, string playerId)
         {
             PlayerConnectionValidation result = _gameService.ValidatePlayerConnection(gameCode, playerId);

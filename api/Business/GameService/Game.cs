@@ -8,7 +8,8 @@ namespace Business.GameService
     public enum GameState
     {
         Lobby,
-        InProgress,
+        Question,
+        RevealQuestion,
         Finished,
     }
 
@@ -20,6 +21,7 @@ namespace Business.GameService
         public Quiz Quiz { get; private set; }
         public string? HostConnectionId { get; set; }
         public string HostId { get; private set; }
+        public int CurrentQuestionIndex { get; private set; } = 0;
 
         public ConcurrentBag<Player> Players { get; private set; } = [];
 
@@ -28,6 +30,42 @@ namespace Business.GameService
             Id = id;
             HostId = hostId;
             Quiz = quiz;
+        }
+
+        public void StartGame()
+        {
+            State = GameState.Question;
+            CurrentQuestionIndex = 0;
+        }
+
+        public Question GetCurrentQuestion()
+        {
+            return Quiz.Questions[CurrentQuestionIndex];
+        }
+
+        public bool NoMoreQuestions()
+        {
+            return CurrentQuestionIndex >= Quiz.Questions.Length - 1;
+        }
+
+        public GameState Next()
+        {
+            CurrentQuestionIndex++;
+            if (CurrentQuestionIndex >= Quiz.Questions.Length)
+            {
+                State = GameState.Finished;
+            }
+            else
+            {
+                State = GameState.Question;
+            }
+
+            return State;
+        }
+
+        public void RevealAnswer()
+        {
+            State = GameState.RevealQuestion;
         }
 
         public bool TryAddPlayer(Player player)

@@ -54,33 +54,16 @@ builder.Services.AddAuthentication(options =>
         {
             // This is necessary to allow SignalR to accept the access token from the query string
             var accessToken = context.Request.Query["access_token"];
-            var gameCode = context.Request.Query["gameCode"];
             var path = context.HttpContext.Request.Path;
 
             if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/gamehub"))
             {
                 context.Token = accessToken;
-
-                if (!string.IsNullOrEmpty(gameCode))
-                {
-                    context.HttpContext.Items["gameCode"] = gameCode;
-                }
             }
             return Task.CompletedTask;
         }
     };
-
 });
-
-builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("GameHost", policy =>
-    policy.Requirements.Add(new GameHostRequirement()));
-
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("AnyPolicy", policy => policy.RequireClaim(ClaimTypes.NameIdentifier));
-});
-
 
 // Register production services
 builder.Services.AddSingleton<IAuthorizationHandler, GameHostHandler>();

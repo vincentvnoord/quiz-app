@@ -29,7 +29,7 @@ export const Question = () => {
 
     const nextQuestion = () => {
         console.log("Next question");
-        gameManager?.nextQuestion();
+        gameManager?.continue();
         console.log(gameManager);
     }
 

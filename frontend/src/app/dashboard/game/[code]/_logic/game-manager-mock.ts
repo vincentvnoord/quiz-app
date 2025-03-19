@@ -11,7 +11,7 @@ export class GameManagerMock implements IGameManager {
 
     constructor(store: typeof useGameStore) {
         this.gameStore = store.getState();
-        this.gameEventHandler = new GameEventHandler(this.gameStore);
+        this.gameEventHandler = new GameEventHandler(store);
         store.subscribe((state) => {
             console.log("State changed", state);
             this.gameStore = state;
@@ -49,7 +49,7 @@ export class GameManagerMock implements IGameManager {
         return Promise.resolve();
     }
 
-    nextQuestion(): Promise<void> {
+    continue(): Promise<void> {
         console.log(this.gameStore);
         if (this.gameStore.gameState !== "reveal-answer")
             return Promise.resolve();

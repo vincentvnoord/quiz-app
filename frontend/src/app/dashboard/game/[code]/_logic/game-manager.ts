@@ -8,7 +8,7 @@ export interface IGameManager {
     connectToGame: (code: string) => Promise<void>;
     closeLobby: () => Promise<void>;
     getMinimumPlayers: () => number;
-    nextQuestion: () => Promise<void>;
+    continue: () => Promise<void>;
 }
 
 export class GameManager implements IGameManager {
@@ -22,15 +22,17 @@ export class GameManager implements IGameManager {
         this.gameStore = store;
     }
 
-    nextQuestion(): Promise<void> {
-        throw new Error("Method not implemented.");
+    async continue(): Promise<void> {
+        if (this.connection) {
+            await this.connection.invoke("Continue", this.gameCode);
+        }
     }
 
-    getMinimumPlayers = () => 2;
+    getMinimumPlayers = () => 1;
 
     async startGame() {
         if (this.connection) {
-            await this.connection.invoke("StartGame");
+            await this.connection.invoke("StartGame", this.gameCode);
         }
     };
 
@@ -45,13 +47,12 @@ export class GameManager implements IGameManager {
             }
 
             const authToken = await getUserTokenFromCookies();
-            const queryParams = new URLSearchParams({
-                gameCode: this.gameCode,
-                access_token: authToken,
-            }).toString();
-
             this.connection = new HubConnectionBuilder()
-                .withUrl(apiUrl + `/gamehub?${queryParams}`)
+                .withUrl(apiUrl + `/gamehub`,
+                    {
+                        accessTokenFactory: () => authToken,
+                    }
+                )
                 .withAutomaticReconnect()
                 .build();
 
@@ -78,6 +79,10 @@ export class GameManager implements IGameManager {
         connection.on("GameNotFound", () => handler.onGameNotFound());
         connection.on("GameClosed", () => handler.onGameClosed());
         connection.on("GameStarted", (state) => handler.onGameStarted(state));
+        connection.on("GameEnd", () => handler.onGameEnd());
+
+        connection.on("Question", (question) => handler.onQuestion(question));
+        connection.on("RevealAnswer", (correctAnswer) => handler.onRevealAnswer(correctAnswer));
     }
 
     async closeLobby() {
