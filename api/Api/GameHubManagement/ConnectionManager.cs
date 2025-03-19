@@ -1,15 +1,22 @@
 
 using System.Collections.Concurrent;
+using Business.GameService;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Api.GameHubManagement
 {
-    public class ConnectionManager
+    public class ConnectionManager : IConnectionManager
     {
         // A dictionary to reference the connection id with the player id: <playerId, connectionId>
-        private static ConcurrentDictionary<string, string> _playerToConnection = [];
+        private static readonly ConcurrentDictionary<string, string> _playerToConnection = [];
 
         // A dictionary to reference the player id with the connection id: <connectionId, playerId>
-        private static ConcurrentDictionary<string, string> _connectionToPlayer = [];
+        private static readonly ConcurrentDictionary<string, string> _connectionToPlayer = [];
+
+        public void Connect(string userId, string connectionId)
+        {
+            AddOrUpdatePlayerConnection(userId, connectionId);
+        }
 
         /// <summary>
         /// Add a player connection coupled to the player id
@@ -61,10 +68,15 @@ namespace Api.GameHubManagement
             _playerToConnection.TryGetValue(playerId, out var connectionId);
             return connectionId;
         }
-        
+
         public bool IsPlayerConnected(string playerId)
         {
             return _playerToConnection.ContainsKey(playerId);
+        }
+
+        public Player[] getConnectedPlayers(Game game)
+        {
+            return [.. game.Players.Where(p => IsPlayerConnected(p.Id))];
         }
     }
 }

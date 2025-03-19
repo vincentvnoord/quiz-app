@@ -66,7 +66,6 @@ builder.Services.AddAuthentication(options =>
 });
 
 // Register production services
-builder.Services.AddSingleton<IAuthorizationHandler, GameHostHandler>();
 builder.Services.AddScoped<JwtService>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -76,8 +75,9 @@ builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<QuizService>();
 builder.Services.AddScoped<IQuizRepository, QuizRepositoryMock>();
 
-builder.Services.AddSingleton<GameService>();
-builder.Services.AddScoped<ConnectionManager>();
+builder.Services.AddScoped<IConnectionManager, ConnectionManager>();
+builder.Services.AddScoped<IGameMessenger, GameMessenger>();
+builder.Services.AddScoped<GameService>();
 builder.Services.AddSignalR();
 
 if (builder.Environment.IsDevelopment())

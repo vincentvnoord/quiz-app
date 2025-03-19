@@ -1,6 +1,6 @@
 import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
 import { getUserTokenFromCookies } from "@/app/dashboard/_actions";
-import useGameStore, { GameStore } from "../_stores/game-store";
+import useGameStore from "../_stores/game-store";
 import { GameEventHandler } from "./game-event-handler";
 
 export interface IGameManager {

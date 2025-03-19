@@ -15,7 +15,7 @@ namespace UnitTests.GameSessionTests
             {
                 Title = "Test Quiz",
                 Questions = [
-                    new Question(1, "Test Question 1"),
+                    new Question(1, "Test Question 1", []),
                 ]
             };
         }

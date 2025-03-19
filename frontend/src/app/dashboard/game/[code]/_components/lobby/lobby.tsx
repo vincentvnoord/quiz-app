@@ -10,7 +10,7 @@ export const Lobby = () => {
     return (
         <div className="h-dvh flex flex-col overflow-hidden">
             <div className="bg-white p-6">
-                <h2 className="text-lg">Join now at <span className="font-extrabold text-2xl">example.com</span> with game pin or use the QR-code for mobile!</h2>
+                <h2 className="text-lg">Join now at <span className="font-extrabold text-2xl">quiz.vincentvnoord.dev</span> with game pin or use the QR-code for mobile!</h2>
             </div>
 
             <GameCodes />

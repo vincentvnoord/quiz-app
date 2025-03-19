@@ -6,38 +6,22 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Api.GameHubManagement
 {
-    public class GameHub(GameService gameService, ConnectionManager connectionManager) : Hub
+    public class GameHub(GameService gameService, IConnectionManager connectionManager) : Hub
     {
-        private readonly ConnectionManager _connectionManager = connectionManager;
+        private readonly IConnectionManager _connectionManager = connectionManager;
         private readonly GameService _gameService = gameService;
 
         [Authorize]
         public async Task ConnectHost(string gameCode)
         {
-            var connectionId = Context.ConnectionId;
-            Game? game = _gameService.GetGame(gameCode);
+            var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+            if (userId == null)
+            {
+                return;
+            }
 
-            if (game != null)
-            {
-                game.HostConnectionId = connectionId;
-                await Groups.AddToGroupAsync(Context.ConnectionId, gameCode);
-                Player[] connectedPlayers = [.. game.Players.Where(p => _connectionManager.IsPlayerConnected(p.Id))];
-                await Clients.Client(connectionId).SendAsync("HostConnected", new
-                {
-                    Title = game.Quiz.Title,
-                    QuestionCount = game.Quiz.Questions.Length,
-                    Players = connectedPlayers.Select(p => new
-                    {
-                        Id = p.Id,
-                        Name = p.Name,
-                    }),
-                });
-            }
-            else
-            {
-                await Clients.Client(connectionId).SendAsync("GameNotFound");
-                Context.Abort();
-            }
+            _connectionManager.Connect(userId, Context.ConnectionId);
+            await _gameService.AssignHost(gameCode, userId);
         }
 
         [Authorize]

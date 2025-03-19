@@ -1,15 +1,48 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using Business.Models;
+using Business.Models.GameStates;
 
 namespace Business.GameService
 {
     public class GameService
     {
-        private readonly ConcurrentDictionary<string, Game> ActiveGames = [];
+        private static readonly ConcurrentDictionary<string, Game> ActiveGames = [];
 
         // Saves the game code to the user id of host: <hostId, gameId>
-        private readonly ConcurrentDictionary<string, string> GameHosts = [];
+        private static readonly ConcurrentDictionary<string, string> GameHosts = [];
+
+        private readonly IConnectionManager _connectionManager;
+        private readonly IGameMessenger _gameMessenger;
+
+        public GameService(IConnectionManager connectionManager, IGameMessenger gameMessenger)
+        {
+            _connectionManager = connectionManager;
+            _gameMessenger = gameMessenger;
+        }
+
+        public async Task AssignHost(string gameCode, string hostId)
+        {
+            Game? game = GetGame(gameCode);
+
+            if (game != null)
+            {
+                Player[] connectedPlayers = _connectionManager.getConnectedPlayers(game);
+
+                var message = new HostConnectedState
+                {
+                    Title = game.Quiz.Title,
+                    QuestionCount = game.Quiz.Questions.Length,
+                    Players = connectedPlayers
+                };
+
+                await _gameMessenger.HostConnected(hostId, message);
+            }
+            else
+            {
+                await _gameMessenger.GameNotFound(hostId);
+            }
+        }
 
         public Game? GetGame(string gameId)
         {
