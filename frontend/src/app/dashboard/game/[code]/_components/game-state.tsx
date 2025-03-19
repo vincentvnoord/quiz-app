@@ -6,12 +6,12 @@ import { useEffect } from "react";
 import useGameStore from "../_stores/game-store";
 import { Lobby } from "./lobby/lobby";
 import Connecting from "@/components/connecting";
-import { StartingDisplay } from "./game/starting";
+import { StartingDisplay } from "@/components/starting-display";
 import { GameNotFound } from "./game-not-found";
 import { Question } from "./game/question";
 
 export default function GameState() {
-    const { gameState, gameManager } = useGameStore();
+    const { gameState, gameManager, timer } = useGameStore();
 
     const params = useParams();
 
@@ -38,7 +38,7 @@ export default function GameState() {
                     <Lobby />
                 </motion.div>
             }
-            {gameState === "starting" && <StartingDisplay />}
+            {gameState === "starting" && <StartingDisplay timer={timer} />}
             {(gameState === "question" || gameState === "reveal-answer") && <Question />}
             {gameState === "results" && <div className="w-full h-dvh flex justify-center items-center text-5xl font-bold overflow-hidden">Results</div>}
         </>
