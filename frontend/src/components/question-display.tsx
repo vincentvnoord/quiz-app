@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { barriecieto } from "@/lib/fonts";
 import { motion } from "framer-motion";
 import { Question } from "@/client/quiz-game/shared/stores/question-slice";
+import { startTimer } from "@/lib/timer";
 
 type GameState = "question" | "reveal-answer";
 
@@ -13,25 +14,12 @@ type QuestionDisplayProps = {
 
 export const QuestionDisplay = ({ currentQuestion, gameState, correctAnswer }: QuestionDisplayProps) => {
     const timeToAnswer = currentQuestion.timeToAnswer;
-    const [timeLeft, setTimeLeft] = useState(timeToAnswer);
-
+    const [timeLeft, setTimeLeft] = useState(Math.ceil(timeToAnswer / 1000));
+        
     useEffect(() => {
         if (gameState !== "question") return;
-        setTimeLeft(timeToAnswer);
 
-        let remainingTime = timeToAnswer;
-
-        const interval = setInterval(() => {
-            remainingTime--;
-
-            if (remainingTime <= 0) {
-                clearInterval(interval);
-            }
-
-            setTimeLeft(remainingTime);
-        }, 1000);
-
-        return () => clearInterval(interval);
+        startTimer(timeToAnswer, (currentTime: number) => setTimeLeft(currentTime));
     }, [currentQuestion, gameState, timeToAnswer]);
 
     return (

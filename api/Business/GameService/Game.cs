@@ -1,14 +1,17 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using Business.Models;
-using Business.Models.Game;
-using Business.Models.Presenters;
 
 namespace Business.GameService
 {
-
     public class Game
     {
+        public TimeSpan StartTimer { get; private set; }
+        public DateTime StartedAt { get; private set; }
+        public QuestionTimer? QuestionTimer { get; private set; }
+
         public GameState State { get; private set; } = new();
         public const int MAX_PLAYERS = 50;
         public string Id { get; private set; }
@@ -18,17 +21,32 @@ namespace Business.GameService
 
         public ConcurrentBag<Player> Players { get; private set; } = [];
 
-        public Game(string id, string hostId, Quiz quiz)
+        public Game(string id, string hostId, Quiz quiz, int startTimer = 5)
         {
             Id = id;
             HostId = hostId;
             Quiz = quiz;
+            StartTimer = TimeSpan.FromSeconds(startTimer);
         }
 
         public void StartGame()
         {
             State.SetState(GameStateType.Starting);
             CurrentQuestionIndex = 0;
+            StartedAt = DateTime.UtcNow;
+        }
+
+        /// <summary>
+        /// Gets the remaining start time in milliseconds
+        /// </summary>
+        /// <returns></returns>
+        public double RemainingStartTime()
+        {
+            double elapsedTime = (DateTime.UtcNow - StartedAt).TotalMilliseconds;
+            double remainingTime = StartTimer.TotalMilliseconds - elapsedTime;
+            Console.WriteLine($"StartedAt: {StartedAt}, Elapsed: {elapsedTime}ms, Remaining: {remainingTime}ms");
+
+            return remainingTime < 0 ? 0 : remainingTime;
         }
 
         public Question GetCurrentQuestion()
@@ -41,16 +59,20 @@ namespace Business.GameService
             return CurrentQuestionIndex >= Quiz.Questions.Length - 1;
         }
 
+        public Question StartQuestion()
+        {
+            var question = GetCurrentQuestion();
+            State.SetState(GameStateType.Question);
+            QuestionTimer = new(question);
+            return question;
+        }
+
         public GameState Next()
         {
             CurrentQuestionIndex++;
             if (CurrentQuestionIndex >= Quiz.Questions.Length)
             {
                 State.SetState(GameStateType.Results);
-            }
-            else
-            {
-                State.SetState(GameStateType.Question);
             }
 
             return State;
@@ -59,6 +81,7 @@ namespace Business.GameService
         public void RevealAnswer()
         {
             State.SetState(GameStateType.RevealAnswer);
+            QuestionTimer = null;
         }
 
         public bool TryAddPlayer(Player player)
@@ -72,7 +95,7 @@ namespace Business.GameService
             return true;
         }
 
-        // Not efficient at large player scales, but good if kept small
+        // Not efficient at large player scales, but fine if kept small
         public void RemovePlayer(string playerId)
         {
             Player? player = Players.FirstOrDefault(p => p.Id == playerId);

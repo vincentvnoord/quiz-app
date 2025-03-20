@@ -1,5 +1,6 @@
 import { Question } from "@/client/quiz-game/shared/stores/question-slice";
 import { PlayerGameStore, usePlayerGameStore } from "../stores/player-game-store";
+import { startTimer } from "@/lib/timer";
 
 export class GameEventHandler {
     private readonly gameStore: typeof usePlayerGameStore;
@@ -10,6 +11,7 @@ export class GameEventHandler {
 
     onConnected(newState: Partial<PlayerGameStore>) {
         const state = this.gameStore.getState();
+        console.log("Connected to game with state: ", newState);
 
         const updates = {
             gameState: newState.gameState ?? state.gameState,
@@ -17,7 +19,10 @@ export class GameEventHandler {
             questionCount: newState.questionCount ?? state.questionCount,
             correctAnswer: newState.correctAnswer ?? -1,
             currentQuestion: newState.currentQuestion ?? state.currentQuestion,
-            timer: newState.timer ?? 5,
+        }
+
+        if (newState.gameState === "starting") {
+            startTimer(newState.timer ?? 5, (currentTime: number) => state.setTimer(currentTime));
         }
 
         this.gameStore.setState(updates);
@@ -48,18 +53,6 @@ export class GameEventHandler {
     onGameStarted(timer: number) {
         const state = this.gameStore.getState();
         state.setGameState("starting");
-        state.setTimer(timer);
-
-        let remainingTime = timer;
-
-        const interval = setInterval(() => {
-            remainingTime--;
-
-            if (remainingTime <= 0) {
-                clearInterval(interval);
-            } else {
-                state.setTimer(remainingTime);
-            }
-        }, 1000);
+        startTimer(timer, (currentTime: number) => state.setTimer(currentTime));
     };
 }

@@ -1,6 +1,7 @@
 import useHostStore, { HostStore } from "../stores/host-store";
 import { Question } from "@/client/quiz-game/shared/stores/question-slice";
 import { Player } from "../stores/players-slice";
+import { startTimer } from "@/lib/timer";
 
 export class GameEventHandler {
     private readonly gameStore: typeof useHostStore;
@@ -34,6 +35,10 @@ export class GameEventHandler {
             players: gameState.players ?? state.players,
         }
 
+        if (gameState.gameState === "starting") {
+            startTimer(gameState.timer ?? 5, (currentTime: number) => state.setTimer(currentTime));
+        }
+
         this.gameStore.setState(updates);
     }
 
@@ -60,19 +65,8 @@ export class GameEventHandler {
     onGameStarted(timer: number) {
         const state = this.gameStore.getState();
         state.setGameState("starting");
-        state.setTimer(timer);
 
-        let remainingTime = timer;
-
-        const interval = setInterval(() => {
-            remainingTime--;
-
-            if (remainingTime <= 0) {
-                clearInterval(interval);
-            } else {
-                state.setTimer(remainingTime);
-            }
-        }, 1000);
+        startTimer(timer, (currentTime: number) => state.setTimer(currentTime));
     };
 
     onGameEnd() {

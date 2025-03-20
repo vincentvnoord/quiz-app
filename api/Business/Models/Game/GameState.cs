@@ -1,5 +1,5 @@
 
-namespace Business.Models.Game
+namespace Business.Models
 {
     public enum GameStateType
     {

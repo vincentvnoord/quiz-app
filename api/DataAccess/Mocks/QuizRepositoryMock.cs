@@ -25,7 +25,8 @@ namespace DataAccess.Mocks
                 new Answer(2, "High-Level Text Machine Language", false),
                 new Answer(3, "Home Tool Markup Language", false),
                 new Answer(4, "Hyperlink and Text Management Language", false)
-            }
+            },
+            60
         ),
         new Question(
             id: 2,
