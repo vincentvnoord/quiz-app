@@ -1,5 +1,5 @@
 import { useState } from "react";
-import useGameStore from "../game-store"
+import useHostStore from "@/client/quiz-game/host/stores/host-store";
 import { motion } from "framer-motion";
 import { AlertCircle, RefreshCw } from "lucide-react";
 
@@ -7,17 +7,17 @@ import { AlertCircle, RefreshCw } from "lucide-react";
 export const CloseLobbyButton = () => {
     const [closing, setClosing] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const { connection, gameCode } = useGameStore();
+    const { gameManager } = useHostStore();
 
     const exitModal = () => {
         if (!closing) {
             setIsModalOpen(false);
         }
     }
-    
+
     const closeLobby = async () => {
         setClosing(true);
-        await connection?.invoke("CloseGame", gameCode);
+        await gameManager?.closeLobby();
     }
 
     return (
@@ -46,12 +46,16 @@ export const CloseLobbyButton = () => {
                             <p className="text-destructive">Players will not be able to reconnect</p>
                         </div>
 
-                        <div className="flex justify-between gap-2 pt-4">
-                            <button onClick={exitModal} className="p-2 hover:opacity-100 hover:underline">
+                        <div className={`flex justify-between gap-2 pt-4 ${isModalOpen ? "pointer-events-auto" : "pointer-events-none"}`}>
+                            <button
+                                onClick={exitModal}
+                                className="p-2 hover:opacity-100 hover:underline">
                                 Cancel
                             </button>
 
-                            <button onClick={closeLobby} className="bg-destructive text-white p-3 rounded-lg font-semibold">
+                            <button
+                                onClick={closeLobby}
+                                className={`bg-destructive text-white p-3 rounded-lg font-semibold`}>
                                 Confirm and close
                             </button>
                         </div>

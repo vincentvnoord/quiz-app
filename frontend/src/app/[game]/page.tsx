@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function GamePage() {
     return (
-        <div className="h-dvh w-full flex">
+        <div className="h-dvh w-full overflow-hidden flex">
             <PlayerGame />
         </div>
     )

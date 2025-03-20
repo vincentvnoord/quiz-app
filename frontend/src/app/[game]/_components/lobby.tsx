@@ -1,4 +1,4 @@
-import { usePlayerStore } from "../_stores/player-store";
+import { usePlayerStore } from "../../../client/quiz-game/player/stores/player-data-store";
 import { barriecieto } from "@/lib/fonts";
 
 export const PlayerLobby = () => {
