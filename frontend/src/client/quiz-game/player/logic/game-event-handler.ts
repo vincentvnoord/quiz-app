@@ -1,5 +1,5 @@
-import { usePlayerGameStore } from "../_stores/game-store";
-import { Question } from "@/app/dashboard/game/[code]/_stores/question-slice";
+import { Question } from "@/client/quiz-game/shared/stores/question-slice";
+import { usePlayerGameStore } from "../stores/player-game-store";
 
 export class GameEventHandler {
     private readonly gameStore: typeof usePlayerGameStore;

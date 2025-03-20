@@ -1,7 +1,8 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using Business.Models;
-using Business.Models.GameState;
+using Business.Models.Game;
+using Business.Models.Presenters;
 
 namespace Business.GameService
 {
@@ -29,14 +30,31 @@ namespace Business.GameService
 
             if (game != null)
             {
-                Player[] connectedPlayers = _connectionManager.getConnectedPlayers(game);
-
-                var message = new GameStatePresenter
+                var connectedPlayers = _connectionManager.getConnectedPlayers(game).Select(p => new PlayerStatePresenter
                 {
+                    Id = p.Id,
+                    Name = p.Name,
+                }).ToArray();
+
+                var currentQuestion = new QuestionPresenter
+                {
+                    Index = game.CurrentQuestionIndex,
+                    Text = game.GetCurrentQuestion().Text,
+                    Answers = game.GetCurrentQuestion().Answers.Select(a => a.Text).ToArray(),
+                    TimeToAnswer = game.GetCurrentQuestion().TimeToAnswer,
+                };
+
+                var message = new HostConnectState
+                {
+                    GameState = game.State.ToString(),
                     Title = game.Quiz.Title,
                     QuestionCount = game.Quiz.Questions.Length,
-                    Players = connectedPlayers
+                    Players = connectedPlayers,
+                    CurrentQuestion = currentQuestion,
+                    CorrectAnswer = game.GetCurrentQuestion().CorrectAnswer(),
                 };
+
+                Console.WriteLine("Sending back game state: " + message);
 
                 await _gameMessenger.HostConnected(hostId, message);
             }
@@ -84,11 +102,12 @@ namespace Business.GameService
         public async Task Continue(string gameCode)
         {
             Game? game = GetGame(gameCode);
-            if (game?.State != GameState.RevealQuestion || game == null)
+            if (game?.State.State != GameStateType.RevealAnswer || game == null)
                 return;
 
             if (game.NoMoreQuestions())
             {
+                game.State.SetState(GameStateType.Results);
                 await _gameMessenger.GameEnd(game.Id);
                 return;
             }

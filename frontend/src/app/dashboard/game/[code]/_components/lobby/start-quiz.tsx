@@ -1,12 +1,12 @@
 "use client";
 
 import { PlayIcon } from "lucide-react";
-import useGameStore from "../../_stores/game-store";
+import useHostStore from "@/client/quiz-game/host/stores/host-store";
 import { useState } from "react";
 import { motion } from "framer-motion";
 
 export const StartQuiz = () => {
-    const { gameManager, players } = useGameStore();
+    const { gameManager, players } = useHostStore();
     const [showError, setShowError] = useState(false);
     const enoughPlayers = gameManager ? players.length >= gameManager?.getMinimumPlayers() : 2;
 

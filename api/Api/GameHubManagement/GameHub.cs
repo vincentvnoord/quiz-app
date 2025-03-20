@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using Business.GameService;
 using Business.Models;
-using Business.Models.GameState;
+using Business.Models.Presenters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 

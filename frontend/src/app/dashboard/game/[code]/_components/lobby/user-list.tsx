@@ -1,11 +1,11 @@
 "use client";
 
 import { UserIcon, UsersIcon } from "lucide-react"
-import useGameStore from "../../_stores/game-store";
+import useHostStore from "@/client/quiz-game/host/stores/host-store";
 import { motion } from "framer-motion";
 
 export const UserList = () => {
-    const { players, title, questionCount } = useGameStore();
+    const { players, title, questionCount } = useHostStore();
 
     return (
         <div className="flex min-h-0 flex-col gap-3 flex-grow">

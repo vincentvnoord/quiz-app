@@ -1,6 +1,6 @@
 using System.Diagnostics.Contracts;
 
-namespace Business.Models.GameState
+namespace Business.Models.Presenters
 {
     public record QuestionPresenter
     {

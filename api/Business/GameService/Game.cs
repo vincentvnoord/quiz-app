@@ -1,21 +1,15 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq.Expressions;
 using Business.Models;
+using Business.Models.Game;
+using Business.Models.Presenters;
 
 namespace Business.GameService
 {
-    public enum GameState
-    {
-        Lobby,
-        Question,
-        RevealQuestion,
-        Finished,
-    }
 
     public class Game
     {
-        public GameState State { get; private set; } = GameState.Lobby;
+        public GameState State { get; private set; } = new();
         public const int MAX_PLAYERS = 50;
         public string Id { get; private set; }
         public Quiz Quiz { get; private set; }
@@ -33,7 +27,7 @@ namespace Business.GameService
 
         public void StartGame()
         {
-            State = GameState.Question;
+            State.SetState(GameStateType.Starting);
             CurrentQuestionIndex = 0;
         }
 
@@ -52,11 +46,11 @@ namespace Business.GameService
             CurrentQuestionIndex++;
             if (CurrentQuestionIndex >= Quiz.Questions.Length)
             {
-                State = GameState.Finished;
+                State.SetState(GameStateType.Results);
             }
             else
             {
-                State = GameState.Question;
+                State.SetState(GameStateType.Question);
             }
 
             return State;
@@ -64,12 +58,12 @@ namespace Business.GameService
 
         public void RevealAnswer()
         {
-            State = GameState.RevealQuestion;
+            State.SetState(GameStateType.RevealAnswer);
         }
 
         public bool TryAddPlayer(Player player)
         {
-            if (Players.Count >= MAX_PLAYERS || State != GameState.Lobby)
+            if (Players.Count >= MAX_PLAYERS || State.State != GameStateType.Lobby)
             {
                 return false;
             }

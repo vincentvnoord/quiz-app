@@ -1,5 +1,5 @@
 import { useState } from "react";
-import useGameStore from "../../_stores/game-store"
+import useHostStore from "@/client/quiz-game/host/stores/host-store";
 import { motion } from "framer-motion";
 import { AlertCircle, RefreshCw } from "lucide-react";
 
@@ -7,7 +7,7 @@ import { AlertCircle, RefreshCw } from "lucide-react";
 export const CloseLobbyButton = () => {
     const [closing, setClosing] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const { gameManager } = useGameStore();
+    const { gameManager } = useHostStore();
 
     const exitModal = () => {
         if (!closing) {

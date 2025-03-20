@@ -1,5 +1,5 @@
 import { QuestionDisplay } from "@/components/question-display"
-import { usePlayerGameStore } from "../_stores/game-store"
+import { usePlayerGameStore } from "../../../client/quiz-game/player/stores/player-game-store"
 
 export const Question = () => {
     const { currentQuestion, gameState, correctAnswer } = usePlayerGameStore();

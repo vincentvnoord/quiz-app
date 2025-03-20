@@ -1,10 +1,10 @@
-import useGameStore from "../../_stores/game-store"
+import useHostStore from "@/client/quiz-game/host/stores/host-store";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { QuestionDisplay } from "@/components/question-display";
 
 export const Question = () => {
-    const { currentQuestion, gameState, gameManager, correctAnswer } = useGameStore();
+    const { currentQuestion, gameState, gameManager, correctAnswer } = useHostStore();
 
     const nextQuestion = () => {
         console.log("Next question");

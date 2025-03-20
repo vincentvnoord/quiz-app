@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
-import useGameStore from "../_stores/game-store";
+import useHostStore from "@/client/quiz-game/host/stores/host-store";
 import { Lobby } from "./lobby/lobby";
 import Connecting from "@/components/connecting";
 import { StartingDisplay } from "@/components/starting-display";
@@ -11,7 +11,7 @@ import { GameNotFound } from "./game-not-found";
 import { Question } from "./game/question";
 
 export default function GameState() {
-    const { gameState, gameManager, timer } = useGameStore();
+    const { gameState, gameManager, timer } = useHostStore();
 
     const params = useParams();
 

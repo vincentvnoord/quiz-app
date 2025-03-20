@@ -1,4 +1,4 @@
-namespace Business.Models.GameState
+namespace Business.Models.Presenters
 {
     public record PlayerStatePresenter
     {

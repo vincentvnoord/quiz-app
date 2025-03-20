@@ -1,6 +1,6 @@
 import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
 import { getUserTokenFromCookies } from "@/app/dashboard/_actions";
-import useGameStore from "../_stores/game-store";
+import useHostStore from "../stores/host-store";
 import { GameEventHandler } from "./game-event-handler";
 
 export interface IGameManager {
@@ -18,7 +18,7 @@ export class GameManager implements IGameManager {
 
     private readonly gameStore
 
-    constructor(store: typeof useGameStore) {
+    constructor(store: typeof useHostStore) {
         this.gameStore = store;
     }
 

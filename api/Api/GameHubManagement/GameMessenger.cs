@@ -1,5 +1,5 @@
 using Business.GameService;
-using Business.Models.GameState;
+using Business.Models.Presenters;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Api.GameHubManagement
@@ -20,7 +20,7 @@ namespace Api.GameHubManagement
             await _gameHub.Clients.Client(userId).SendAsync("GameNotFound");
         }
 
-        public async Task HostConnected(string hostId, GameStatePresenter state)
+        public async Task HostConnected(string hostId, HostConnectState state)
         {
             string? hostConnectionId = _connectionManager.GetConnectionId(hostId);
             if (hostConnectionId != null)

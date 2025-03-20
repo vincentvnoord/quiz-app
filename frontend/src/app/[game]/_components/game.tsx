@@ -2,9 +2,9 @@
 
 import { useEffect } from "react";
 import { useParams } from "next/navigation";
-import { usePlayerGameStore } from "../_stores/game-store";
+import { usePlayerGameStore } from "../../../client/quiz-game/player/stores/player-game-store";
 import { ChooseNickName } from "./choose-nickname";
-import { usePlayerStore } from "../_stores/player-store";
+import { usePlayerStore } from "../../../client/quiz-game/player/stores/player-data-store";
 import { motion } from "framer-motion";
 import { PlayerLobby } from "./lobby";
 import Connecting from "@/components/connecting";

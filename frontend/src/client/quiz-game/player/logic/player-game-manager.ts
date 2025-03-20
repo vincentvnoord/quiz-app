@@ -1,13 +1,13 @@
 import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
 import { GameEventHandler } from "./game-event-handler";
-import { usePlayerGameStore } from "../_stores/game-store";
+import { usePlayerGameStore } from "../stores/player-game-store";
 
 export interface IGameManager {
     answerQuestion: (answer: number) => void;
     connectToGame: (code: string, playerId: string) => Promise<void>;
 }
 
-export class GameManager implements IGameManager {
+export class PlayerGameManager implements IGameManager {
     private gameCode: string | null = null;
     private connection: HubConnection | null = null;
     private gameEventHandler: GameEventHandler | null = null;

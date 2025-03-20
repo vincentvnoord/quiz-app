@@ -1,15 +1,15 @@
 "use client";
 
-import useGameStore, { GameStore } from "../_stores/game-store";
+import useHostStore, { HostStore } from "../stores/host-store";
 import { GameEventHandler } from "./game-event-handler";
 import { IGameManager } from "./game-manager";
 
 export class GameManagerMock implements IGameManager {
-    protected gameStore: GameStore;
+    protected gameStore: HostStore;
     private readonly gameEventHandler: GameEventHandler;
     private currentQuestionIndex: number = 0;
 
-    constructor(store: typeof useGameStore) {
+    constructor(store: typeof useHostStore) {
         this.gameStore = store.getState();
         this.gameEventHandler = new GameEventHandler(store);
         store.subscribe((state) => {

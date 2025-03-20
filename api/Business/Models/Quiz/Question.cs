@@ -13,5 +13,17 @@ namespace Business.Models
             Text = text;
             Answers = answers;
         }
+
+        public int CorrectAnswer()
+        {
+            for (int i = 0; i < Answers.Length; i++)
+            {
+                if (Answers[i].IsCorrect)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
     }
 }

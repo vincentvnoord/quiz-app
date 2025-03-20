@@ -1,15 +1,7 @@
-import { IGameManager } from "../_logic/game-manager";
-
-type GameState = "connecting" | "lobby" | "starting" | "question" | "reveal-answer" | "results" | "not-found";
 
 export interface GameSlice {
-    gameManager: IGameManager | null;
-
     gameCode: string;
     setGameCode: (gameCode: string) => void;
-
-    gameState: GameState;
-    setGameState: (state: GameState) => void;
 
     title: string;
     setTitle: (title: string) => void;
@@ -22,13 +14,8 @@ export interface GameSlice {
 }
 
 export const createGameSlice = (set: any): GameSlice => ({
-    gameManager: null,
-
     gameCode: "",
     setGameCode: (gameCode) => set({ gameCode }),
-
-    setGameState: (gameState) => set({ gameState }),
-    gameState: "connecting",
 
     title: "",
     setTitle: (title) => set({ title }),

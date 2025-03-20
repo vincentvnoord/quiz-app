@@ -1,11 +1,11 @@
-import useGameStore from "../_stores/game-store";
-import { Player } from "../_stores/players-slice";
-import { Question } from "../_stores/question-slice";
+import useHostStore from "../stores/host-store";
+import { Question } from "@/client/quiz-game/shared/stores/question-slice";
+import { Player } from "../stores/players-slice";
 
 export class GameEventHandler {
-    private readonly gameStore: typeof useGameStore;
+    private readonly gameStore: typeof useHostStore;
 
-    constructor(store: typeof useGameStore) {
+    constructor(store: typeof useHostStore) {
         this.gameStore = store;
     }
 
@@ -23,10 +23,7 @@ export class GameEventHandler {
 
     onHostConnected(gameState: { title: string, questionCount: number, players: Player[] }) {
         const state = this.gameStore.getState();
-        state.setTitle(gameState.title);
-        state.setQuestionCount(gameState.questionCount);
-        state.setPlayers(gameState.players);
-        state.setGameState("lobby");
+        state.initializeGame(gameState);
     }
 
     onGameNotFound() {

@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Api.Models;
 using Business.GameService;
 using Business.Models;
@@ -8,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Api.GameHubManagement;
 using System.Security.Claims;
+using Business.Models.Game;
 
 namespace Api.Controllers
 {
@@ -83,7 +83,7 @@ namespace Api.Controllers
             {
                 return NotFound("Game not found.");
             }
-            if (game.State != GameState.Lobby)
+            if (game.State.State != GameStateType.Lobby)
             {
                 return BadRequest("Game is not open for joining.");
             }

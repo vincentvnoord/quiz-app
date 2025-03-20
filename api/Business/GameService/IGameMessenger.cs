@@ -1,10 +1,10 @@
-using Business.Models.GameState;
+using Business.Models.Presenters;
 
 namespace Business.GameService
 {
     public interface IGameMessenger
     {
-        Task HostConnected(string hostId, GameStatePresenter state);
+        Task HostConnected(string hostId, HostConnectState state);
         Task GameNotFound(string userId);
         Task UnAuthorized(string userId);
         Task NonRegisteredPlayer(string connectionId);

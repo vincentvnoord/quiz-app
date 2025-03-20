@@ -1,7 +1,6 @@
 import { Ban, Undo2 } from "lucide-react"
 import Link from "next/link"
 
-
 export const GameNotFound = () => {
 
     return (

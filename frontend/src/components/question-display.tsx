@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { barriecieto } from "@/lib/fonts";
 import { motion } from "framer-motion";
-import { Question } from "@/app/dashboard/game/[code]/_stores/question-slice";
+import { Question } from "@/client/quiz-game/shared/stores/question-slice";
 
 type GameState = "question" | "reveal-answer";
 
@@ -16,6 +16,7 @@ export const QuestionDisplay = ({ currentQuestion, gameState, correctAnswer }: Q
     const [timeLeft, setTimeLeft] = useState(timeToAnswer);
 
     useEffect(() => {
+        if (gameState !== "question") return;
         setTimeLeft(timeToAnswer);
 
         let remainingTime = timeToAnswer;
@@ -36,8 +37,8 @@ export const QuestionDisplay = ({ currentQuestion, gameState, correctAnswer }: Q
     return (
         <div className="w-full h-full flex flex-col items-center justify-center gap-4">
             <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: [0.9, 1] }}
+                initial={gameState !== "question" && { scale: 0 }}
+                animate={(gameState === "question" && timeLeft > 0) ? { scale: [0.9, 1] } : { scale: 0 }}
                 className="rounded-full bg-black/20 aspect-square flex-shrink-0 text-center p-4 text-4xl md:text-6xl">
                 <h2 className={`${barriecieto.className} w-full text-white`}>{timeLeft}</h2>
             </motion.div>
@@ -54,7 +55,7 @@ export const QuestionDisplay = ({ currentQuestion, gameState, correctAnswer }: Q
                         gameState={gameState}
                     />)}
             </div>
-        </div>
+        </div >
     )
 }
 
