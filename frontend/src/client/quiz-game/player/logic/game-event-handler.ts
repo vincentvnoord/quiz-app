@@ -1,5 +1,5 @@
 import { Question } from "@/client/quiz-game/shared/stores/question-slice";
-import { usePlayerGameStore } from "../stores/player-game-store";
+import { PlayerGameStore, usePlayerGameStore } from "../stores/player-game-store";
 
 export class GameEventHandler {
     private readonly gameStore: typeof usePlayerGameStore;
@@ -8,10 +8,19 @@ export class GameEventHandler {
         this.gameStore = store;
     }
 
-    onConnected(player: string) {
-        const gameStore = this.gameStore.getState();
+    onConnected(newState: Partial<PlayerGameStore>) {
+        const state = this.gameStore.getState();
 
-        gameStore.setGameState("lobby");
+        const updates = {
+            gameState: newState.gameState ?? state.gameState,
+            title: newState.title ?? state.title,
+            questionCount: newState.questionCount ?? state.questionCount,
+            correctAnswer: newState.correctAnswer ?? -1,
+            currentQuestion: newState.currentQuestion ?? state.currentQuestion,
+            timer: newState.timer ?? 5,
+        }
+
+        this.gameStore.setState(updates);
     }
 
     onQuestion(question: Question) {

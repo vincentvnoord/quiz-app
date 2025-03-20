@@ -31,7 +31,7 @@ export const UserList = () => {
                     </div>
                     :
                     <div className="grid min-h-0 pb-4 overflow-y-auto sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                        {players.map((player, i) => <Player key={player.id} name={player.name} />)}
+                        {players.map((player, i) => <Player key={player.id + i} name={player.name} />)}
                     </div>
             }
         </div>

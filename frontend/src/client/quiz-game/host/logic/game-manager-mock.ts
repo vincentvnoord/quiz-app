@@ -25,9 +25,7 @@ export class GameManagerMock implements IGameManager {
         this.gameStore.setGameState("connecting");
 
         setTimeout(() => {
-            this.gameEventHandler.onHostConnected({
-                ...mockQuiz
-            })
+            // Set complete state of the game store
         }, 100);
 
 

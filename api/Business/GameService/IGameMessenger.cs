@@ -15,7 +15,7 @@ namespace Business.GameService
         /// <param name="connectionId"></param>
         /// <param name="playerName"></param>
         /// <returns></returns>
-        Task NotifyPlayerConnected(string playerId, string playerName);
+        Task NotifyPlayerConnected(PlayerConnectState state);
 
         /// <summary>
         /// Use this method to notify only the host of the player that connected

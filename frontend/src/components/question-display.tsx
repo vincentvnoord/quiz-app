@@ -32,7 +32,7 @@ export const QuestionDisplay = ({ currentQuestion, gameState, correctAnswer }: Q
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [currentQuestion]);
+    }, [currentQuestion, gameState, timeToAnswer]);
 
     return (
         <div className="w-full h-full flex flex-col items-center justify-center gap-4">

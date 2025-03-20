@@ -1,3 +1,4 @@
+import { StateCreator } from "zustand";
 
 export interface GameSlice {
     gameCode: string;
@@ -13,7 +14,7 @@ export interface GameSlice {
     setTimer: (timer: number) => void;
 }
 
-export const createGameSlice = (set: any): GameSlice => ({
+export const createGameSlice: StateCreator<GameSlice> = (set): GameSlice => ({
     gameCode: "",
     setGameCode: (gameCode) => set({ gameCode }),
 

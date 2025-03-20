@@ -64,11 +64,11 @@ namespace Api.GameHubManagement
             await _gameHub.Clients.Client(connectionId).SendAsync("NonRegisteredPlayer");
         }
 
-        public async Task NotifyPlayerConnected(string playerId, string playerName)
+        public async Task NotifyPlayerConnected(PlayerConnectState state)
         {
-            string? connectionId = _connectionManager.GetConnectionId(playerId);
+            string? connectionId = _connectionManager.GetConnectionId(state.PlayerId);
             if (connectionId != null)
-                await _gameHub.Clients.Client(connectionId).SendAsync("Connected", playerName);
+                await _gameHub.Clients.Client(connectionId).SendAsync("Connected", state);
         }
 
         public async Task NotifyHostPlayerConnected(string hostId, PlayerStatePresenter player)

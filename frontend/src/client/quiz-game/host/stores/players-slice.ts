@@ -1,3 +1,4 @@
+import { StateCreator } from "zustand";
 
 export type Player = {
     id: string;
@@ -11,7 +12,7 @@ export interface PlayerSlice {
     removePlayer: (playerId: string) => void;
 }
 
-export const createPlayerSlice = (set: any): PlayerSlice => ({
+export const createPlayerSlice: StateCreator<PlayerSlice> = (set): PlayerSlice => ({
     players: [],
     setPlayers: (players) => set({ players }),
     addPlayer: (player) => set((state: PlayerSlice) => {

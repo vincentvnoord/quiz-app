@@ -1,4 +1,4 @@
-import useHostStore from "../stores/host-store";
+import useHostStore, { HostStore } from "../stores/host-store";
 import { Question } from "@/client/quiz-game/shared/stores/question-slice";
 import { Player } from "../stores/players-slice";
 
@@ -21,9 +21,20 @@ export class GameEventHandler {
         state.setCorrectAnswer(correctAnswer);
     }
 
-    onHostConnected(gameState: { title: string, questionCount: number, players: Player[] }) {
+    onHostConnected(gameState: Partial<HostStore>) {
         const state = this.gameStore.getState();
-        state.initializeGame(gameState);
+
+        const updates = {
+            gameState: gameState.gameState ?? state.gameState,
+            title: gameState.title ?? state.title,
+            questionCount: gameState.questionCount ?? state.questionCount,
+            correctAnswer: gameState.correctAnswer ?? -1,
+            currentQuestion: gameState.currentQuestion ?? state.currentQuestion,
+            timer: gameState.timer ?? 5,
+            players: gameState.players ?? state.players,
+        }
+
+        this.gameStore.setState(updates);
     }
 
     onGameNotFound() {

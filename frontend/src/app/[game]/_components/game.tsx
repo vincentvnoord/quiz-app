@@ -41,7 +41,7 @@ export const PlayerGame = () => {
 
         gameManager.connectToGame(gameCode, playerId);
 
-    }, [params.game, playerId, gameManager]);
+    }, [params.game, playerId, gameManager, forGame, setGameCode, setGameState, setPlayerId]);
 
     return (
         <motion.div animate={{ opacity: 1, scale: 1 }} initial={{ opacity: 0, scale: 0 }} transition={{ delay: 0.1 }} className="w-full h-full">

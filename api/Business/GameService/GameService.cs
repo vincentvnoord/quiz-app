@@ -51,7 +51,7 @@ namespace Business.GameService
                     QuestionCount = game.Quiz.Questions.Length,
                     Players = connectedPlayers,
                     CurrentQuestion = currentQuestion,
-                    CorrectAnswer = game.GetCurrentQuestion().CorrectAnswer(),
+                    CorrectAnswer = game.State.State == GameStateType.RevealAnswer ? game.GetCurrentQuestion().CorrectAnswer() : null,
                 };
 
                 Console.WriteLine("Sending back game state: " + message);
@@ -66,8 +66,24 @@ namespace Business.GameService
 
         public async Task OnPlayerConnected(Player player, Game game)
         {
+            var currentQuestion = new QuestionPresenter
+            {
+                Index = game.CurrentQuestionIndex,
+                Text = game.GetCurrentQuestion().Text,
+                Answers = game.GetCurrentQuestion().Answers.Select(a => a.Text).ToArray(),
+                TimeToAnswer = game.GetCurrentQuestion().TimeToAnswer,
+            };
+
             // TO DO Needs to send complete current game state to the player
-            await _gameMessenger.NotifyPlayerConnected(player.Id, player.Name);
+            var message = new PlayerConnectState
+            {
+                PlayerId = player.Id,
+                GameState = game.State.ToString(),
+                CurrentQuestion = currentQuestion,
+                CorrectAnswer = game.State.State == GameStateType.RevealAnswer ? game.GetCurrentQuestion().CorrectAnswer() : null,
+            };
+
+            await _gameMessenger.NotifyPlayerConnected(message);
 
             var payload = new PlayerStatePresenter
             {
