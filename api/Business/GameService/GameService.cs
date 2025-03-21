@@ -7,7 +7,7 @@ namespace Business.GameService
 {
     public class GameService
     {
-        public const int START_TIMER = 1;
+        public const int START_TIMER = 5;
 
         private static readonly ConcurrentDictionary<string, Game> ActiveGames = [];
 

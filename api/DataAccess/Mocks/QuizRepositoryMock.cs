@@ -26,7 +26,7 @@ namespace DataAccess.Mocks
                 new Answer(3, "Home Tool Markup Language", false),
                 new Answer(4, "Hyperlink and Text Management Language", false)
             },
-            60
+            30
         ),
         new Question(
             id: 2,
@@ -37,7 +37,8 @@ namespace DataAccess.Mocks
                 new Answer(2, "Python", true),
                 new Answer(3, "C++", false),
                 new Answer(4, "Ruby", false)
-            }
+            },
+            10
         ),
         new Question(
             id: 3,
