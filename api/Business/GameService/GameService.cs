@@ -1,16 +1,125 @@
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using Business.Models;
+using Business.Models.Presenters;
 
 namespace Business.GameService
 {
     public class GameService
     {
-        private readonly ConcurrentDictionary<string, Game> ActiveGames = [];
+        public const int START_TIMER = 5;
+
+        private static readonly ConcurrentDictionary<string, Game> ActiveGames = [];
 
         // Saves the game code to the user id of host: <hostId, gameId>
-        private readonly ConcurrentDictionary<string, string> GameHosts = [];
+        private static readonly ConcurrentDictionary<string, string> GameHosts = [];
 
-        public Game? GetGame(string gameId)
+        private readonly IConnectionManager _connectionManager;
+        private readonly IGameMessenger _gameMessenger;
+
+        public GameService(IConnectionManager connectionManager, IGameMessenger gameMessenger)
+        {
+            _connectionManager = connectionManager;
+            _gameMessenger = gameMessenger;
+        }
+
+        public async Task AssignHost(string gameCode, string hostId)
+        {
+            Game? game = GetGame(gameCode);
+
+            if (game != null)
+            {
+                var connectedPlayers = _connectionManager.getConnectedPlayers(game).Select(p => new PlayerStatePresenter
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                }).ToArray();
+
+                var gameState = new HostConnectState(game, connectedPlayers);
+
+                await _gameMessenger.HostConnected(hostId, gameState);
+            }
+            else
+            {
+                await _gameMessenger.GameNotFound(hostId);
+            }
+        }
+
+        public async Task OnPlayerConnected(Player player, Game game)
+        {
+            var gameState = new PlayerConnectState(game, player.Id);
+            await _gameMessenger.NotifyPlayerConnected(gameState);
+
+            var newPlayerState = new PlayerStatePresenter
+            {
+                Id = player.Id,
+                Name = player.Name,
+            };
+
+            await _gameMessenger.NotifyHostPlayerConnected(game.HostId, newPlayerState);
+        }
+
+        public async Task StartGame(string gameCode, string userId)
+        {
+            Game? game = GetGame(gameCode);
+            if (game == null)
+            {
+                await _gameMessenger.GameNotFound(userId);
+                return;
+            }
+
+            if (game.HostId != userId)
+            {
+                await _gameMessenger.UnAuthorized(userId);
+                return;
+            }
+
+            game.StartGame();
+            await _gameMessenger.GameStarted(game.Id, (int)game.StartTimer.TotalMilliseconds);
+
+            await Task.Delay((int)game.StartTimer.TotalMilliseconds);
+            await ShowQuestion(game);
+        }
+
+        public async Task Continue(string gameCode)
+        {
+            Game? game = GetGame(gameCode);
+            if (game?.State.State != GameStateType.RevealAnswer || game == null)
+                return;
+
+            if (game.NoMoreQuestions())
+            {
+                game.State.SetState(GameStateType.Results);
+                await _gameMessenger.GameEnd(game.Id);
+                return;
+            }
+
+            var state = game.Next();
+            if (state.State == GameStateType.Results)
+            {
+                return;
+            }
+
+            await ShowQuestion(game);
+        }
+
+        private async Task ShowQuestion(Game game)
+        {
+            Question currentQuestion = game.StartQuestion();
+            var question = new QuestionPresenter(currentQuestion, game.CurrentQuestionIndex);
+
+            await _gameMessenger.Question(game.Id, question);
+            await Task.Delay(currentQuestion.TimeToAnswer * 1000);
+            await RevealAnswer(game, currentQuestion);
+        }
+
+        private async Task RevealAnswer(Game game, Question question)
+        {
+            game.RevealAnswer();
+            await _gameMessenger.RevealAnswer(game.Id, question.Answers.Select(a => a.IsCorrect).ToList().IndexOf(true));
+        }
+
+        public static Game? GetGame(string gameId)
         {
             if (ActiveGames.TryGetValue(gameId, out Game? value))
             {
@@ -20,13 +129,30 @@ namespace Business.GameService
             return null;
         }
 
+        public static bool IsHost(string gameId, string? hostId, [NotNullWhen(true)] out Game? game)
+        {
+            game = null;
+            if (hostId == null)
+                return false;
+
+            Game? g = GetGame(gameId);
+            if (g == null)
+                return false;
+
+            if (g.HostId != hostId)
+                return false;
+
+            game = g;
+            return true;
+        }
+
         /// <summary>
         /// Validate if game exists and player is registered
         /// </summary>
         /// <param name="gameId"></param>
         /// <param name="playerId"></param>
         /// <returns>Validation object which has the validation status. When succesful, also returns the player and the game object</returns>
-        public PlayerConnectionValidation ValidatePlayerConnection(string gameId, string playerId)
+        public static PlayerConnectionValidation ValidatePlayerConnection(string gameId, string playerId)
         {
             Game? game = GetGame(gameId);
             if (game == null)
@@ -42,7 +168,7 @@ namespace Business.GameService
             return PlayerConnectionValidation.Success(player, game);
         }
 
-        public Game? GetGameByPlayerId(string playerId)
+        public static Game? GetGameByPlayerId(string playerId)
         {
             foreach (Game game in ActiveGames.Values)
             {
@@ -55,10 +181,10 @@ namespace Business.GameService
             return null;
         }
 
-        public Game CreateGame(Quiz quiz, string hostId)
+        public static Game CreateGame(Quiz quiz, string hostId)
         {
             string gameId = GenerateGameId();
-            Game game = new(gameId, quiz);
+            Game game = new(gameId, hostId, quiz, START_TIMER);
 
             ActiveGames[gameId] = game;
             GameHosts[hostId] = gameId;
@@ -66,19 +192,28 @@ namespace Business.GameService
             return game;
         }
 
-        public void CloseGame(string gameId, string hostId)
+        public async Task CloseGame(string gameCode, string userId)
         {
-            ActiveGames.TryRemove(gameId, out _);
-            GameHosts.TryRemove(hostId, out _);
+            if (IsHost(gameCode, userId, out Game? game))
+            {
+                ActiveGames.TryRemove(gameCode, out _);
+                GameHosts.TryRemove(userId, out _);
+                await _gameMessenger.GameClosed(gameCode);
+
+                foreach (Player player in game.Players)
+                {
+                    await _connectionManager.Disconnect(player.Id, gameCode);
+                }
+            }
         }
 
-        public string? GetGameIdByHostId(string hostId)
+        public static string? GetGameIdByHostId(string hostId)
         {
             GameHosts.TryGetValue(hostId, out string? gameId);
             return gameId;
         }
 
-        private string GenerateGameId()
+        private static string GenerateGameId()
         {
             Random random = new();
             string gameId;

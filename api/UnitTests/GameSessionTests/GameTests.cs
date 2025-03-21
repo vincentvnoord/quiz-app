@@ -15,7 +15,7 @@ namespace UnitTests.GameSessionTests
             {
                 Title = "Test Quiz",
                 Questions = [
-                    new Question(1, "Test Question 1"),
+                    new Question(1, "Test Question 1", []),
                 ]
             };
         }
@@ -23,8 +23,7 @@ namespace UnitTests.GameSessionTests
         [Test]
         public void TryAddPlayer_Returns_False_WhenGameIsFull()
         {
-            var gameService = new GameService();
-            Game game = gameService.CreateGame(_quiz, "host");
+            Game game = GameService.CreateGame(_quiz, "host");
 
             for (int i = 0; i < Game.MAX_PLAYERS; i++)
             {
@@ -37,8 +36,7 @@ namespace UnitTests.GameSessionTests
         [Test]
         public void TryAddPlayer_Returns_True_WhenPlayerIsAdded()
         {
-            var gameService = new GameService();
-            Game game = gameService.CreateGame(_quiz, "host");
+            Game game = GameService.CreateGame(_quiz, "host");
 
             Assert.That(game.TryAddPlayer(new Player("player", game.Id)), Is.True);
         }

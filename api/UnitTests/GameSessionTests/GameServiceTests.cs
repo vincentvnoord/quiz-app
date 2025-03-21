@@ -1,5 +1,7 @@
+using System.Threading.Tasks;
 using Business.GameService;
 using Business.Models;
+using Moq;
 
 namespace UnitTests.GameSessionTests
 {
@@ -15,7 +17,7 @@ namespace UnitTests.GameSessionTests
             {
                 Title = "Test Quiz",
                 Questions = [
-                    new Question(1, "Test Question 1"),
+                    new Question(1, "Test Question 1", []),
                 ]
             };
         }
@@ -25,12 +27,11 @@ namespace UnitTests.GameSessionTests
         {
 
             HashSet<string> gameIds = [];
-            var gameService = new GameService();
             int numberOfGames = 100000;
 
             for (int i = 0; i < numberOfGames; i++)
             {
-                Game game = gameService.CreateGame(_quiz, "host");
+                Game game = GameService.CreateGame(_quiz, "host");
                 string gameId = game.Id;
                 Assert.Multiple(() =>
                 {
@@ -41,29 +42,28 @@ namespace UnitTests.GameSessionTests
         }
 
         [Test]
-        public void CloseGame_RemovesGameFromActiveGames()
+        public async Task CloseGame_RemovesGameFromActiveGames()
         {
-            var gameService = new GameService();
-            Game game = gameService.CreateGame(_quiz, "host");
+            var gameService = new GameService(new Mock<IConnectionManager>().Object, new Mock<IGameMessenger>().Object);
+            Game game = GameService.CreateGame(_quiz, "host");
             string gameId = game.Id;
 
-            Assert.That(gameService.GetGame(gameId), Is.Not.Null);
+            Assert.That(GameService.GetGame(gameId), Is.Not.Null);
 
-            gameService.CloseGame(gameId, "host");
+            await gameService.CloseGame(gameId, "host");
 
-            Assert.That(gameService.GetGame(gameId), Is.Null);
+            Assert.That(GameService.GetGame(gameId), Is.Null);
         }
 
         [Test]
         public void ValidatePlayerConnection_Returns_Success_WhenValid()
         {
-            var gameService = new GameService();
-            Game game = gameService.CreateGame(_quiz, "host");
+            Game game = GameService.CreateGame(_quiz, "host");
 
             Player player = new("player", game.Id);
             game.TryAddPlayer(player);
 
-            var validationResult = gameService.ValidatePlayerConnection(game.Id, player.Id);
+            var validationResult = GameService.ValidatePlayerConnection(game.Id, player.Id);
 
             Assert.That(validationResult.Status, Is.EqualTo(PlayerConnectionValidationResult.Success));
         }
@@ -71,11 +71,10 @@ namespace UnitTests.GameSessionTests
         [Test]
         public void ValidatePlayerConnection_Returns_GameNotFound_WhenGameIdNotRegistered()
         {
-            var gameService = new GameService();
             string gameId = "nonexistent";
             string playerId = "player";
 
-            PlayerConnectionValidation result = gameService.ValidatePlayerConnection(gameId, playerId);
+            PlayerConnectionValidation result = GameService.ValidatePlayerConnection(gameId, playerId);
 
             Assert.That(result.Status, Is.EqualTo(PlayerConnectionValidationResult.GameNotFound));
         }
@@ -83,11 +82,10 @@ namespace UnitTests.GameSessionTests
         [Test]
         public void ConnectPlayer_Returns_NonRegisteredPlayer_WhenPlayerIsNotRegistered()
         {
-            var gameService = new GameService();
-            Game game = gameService.CreateGame(_quiz, "host");
+            Game game = GameService.CreateGame(_quiz, "host");
             string playerId = "player";
 
-            PlayerConnectionValidation result = gameService.ValidatePlayerConnection(game.Id, playerId);
+            PlayerConnectionValidation result = GameService.ValidatePlayerConnection(game.Id, playerId);
 
             Assert.That(result.Status, Is.EqualTo(PlayerConnectionValidationResult.NonRegisteredPlayer));
         }

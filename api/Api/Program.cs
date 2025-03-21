@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using System.Text;
+using Api.Authorization;
 using Api.GameHubManagement;
 using Business.GameService;
 using Business.QuizService;
@@ -7,6 +9,7 @@ using DataAccess;
 using DataAccess.Mocks;
 using DataAccess.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -17,6 +20,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
+
+builder.Services.AddLogging();
 
 builder.Services.AddDbContext<QuizDbContext>(options =>
 {
@@ -58,7 +63,6 @@ builder.Services.AddAuthentication(options =>
             return Task.CompletedTask;
         }
     };
-
 });
 
 // Register production services
@@ -71,8 +75,9 @@ builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<QuizService>();
 builder.Services.AddScoped<IQuizRepository, QuizRepositoryMock>();
 
-builder.Services.AddSingleton<GameService>();
-builder.Services.AddScoped<ConnectionManager>();
+builder.Services.AddScoped<IConnectionManager, ConnectionManager>();
+builder.Services.AddScoped<IGameMessenger, GameMessenger>();
+builder.Services.AddScoped<GameService>();
 builder.Services.AddSignalR();
 
 if (builder.Environment.IsDevelopment())

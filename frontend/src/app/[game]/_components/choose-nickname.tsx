@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { usePlayerGameStore } from "../_stores/game-store";
+import { usePlayerGameStore } from "../../../client/quiz-game/player/stores/player-game-store";
 import { joinGame } from "../_actions";
 import { motion } from "framer-motion";
 import { barriecieto } from "@/lib/fonts";
-import { usePlayerStore } from "../_stores/player-store";
+import { usePlayerStore } from "../../../client/quiz-game/player/stores/player-data-store";
 
 export const ChooseNickName = () => {
     const [name, setName] = useState<string>("");
