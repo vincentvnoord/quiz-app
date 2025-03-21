@@ -11,7 +11,7 @@ export const ChooseNickName = () => {
     const [error, setError] = useState<string | null>(null);
 
     const { setPlayerId, setPlayerName, setForGame } = usePlayerStore();
-    const { gameCode } = usePlayerGameStore();
+    const { state: { gameCode } } = usePlayerGameStore();
 
     const handleSubmit = async () => {
         if (name.length === 0) {

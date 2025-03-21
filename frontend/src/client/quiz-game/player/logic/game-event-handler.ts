@@ -1,6 +1,5 @@
-import { CorrectAnswer, Question } from "@/client/quiz-game/shared/stores/question-slice";
-import { PlayerGameStore, usePlayerGameStore } from "../stores/player-game-store";
-import { startTimer } from "@/lib/timer";
+import { PlayerGameStateDto, usePlayerGameStore } from "../stores/player-game-store";
+import { CorrectAnswerDto, QuestionStateDto } from "../../shared/stores/game-state";
 
 export class GameEventHandler {
     private readonly gameStore: typeof usePlayerGameStore;
@@ -9,36 +8,23 @@ export class GameEventHandler {
         this.gameStore = store;
     }
 
-    onConnected(newState: Partial<PlayerGameStore>) {
+    onConnected(newState: PlayerGameStateDto) {
         const state = this.gameStore.getState();
         console.log("Connected to game with state: ", newState);
 
-        const updates = {
-            gameState: newState.gameState ?? state.gameState,
-            title: newState.title ?? state.title,
-            questionCount: newState.questionCount ?? state.questionCount,
-            correctAnswer: newState.correctAnswer,
-            currentQuestion: newState.currentQuestion ?? state.currentQuestion,
-        }
-
-        if (newState.gameState === "starting") {
-            startTimer(newState.timer ?? 5, (currentTime: number) => state.setTimer(currentTime));
-        }
-
-        this.gameStore.setState(updates);
+        state.setState(newState);
     }
 
-    onQuestion(question: Question) {
+    onQuestion(question: QuestionStateDto) {
         const state = this.gameStore.getState();
         console.log("Showing question", question);
-        state.setGameState("question");
-        state.setCurrentQuestion(question);
+        state.setState({ gameState: "question", currentQuestion: question, correctAnswer: null });
     }
 
-    onRevealAnswer(correctAnswer: CorrectAnswer) {
+    onRevealAnswer(correctAnswer: CorrectAnswerDto) {
+        console.log(correctAnswer);
         const state = this.gameStore.getState();
-        state.setGameState("reveal-answer");
-        state.setCorrectAnswer(correctAnswer);
+        state.setState({ gameState: "reveal-answer", correctAnswer: correctAnswer });
     }
 
     onGameClosed() {
@@ -48,12 +34,11 @@ export class GameEventHandler {
 
     onGameEnd() {
         const state = this.gameStore.getState();
-        state.setGameState("results");
+        state.setState({ gameState: "results" });
     }
 
     onGameStarted(timer: number) {
         const state = this.gameStore.getState();
-        state.setGameState("starting");
-        startTimer(timer, (currentTime: number) => state.setTimer(currentTime));
+        state.setState({ gameState: "starting", timer });
     };
 }

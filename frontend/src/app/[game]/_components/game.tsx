@@ -9,39 +9,32 @@ import { motion } from "framer-motion";
 import { PlayerLobby } from "./lobby";
 import Connecting from "@/components/connecting";
 import { Question } from "./question";
-import { StartingDisplay } from "@/components/starting-display";
+import { StartTimer } from "./start-timer";
 
 export const PlayerGame = () => {
-    const { setGameCode, gameState, setGameState, gameManager, timer } = usePlayerGameStore();
+    const { gameManager, setState, state: { gameState } } = usePlayerGameStore();
     const { playerId, setPlayerId, forGame } = usePlayerStore();
     const params = useParams();
 
     useEffect(() => {
-        //       // Test
-        //       setGameState("question");
-        //       gameManager?.connectToGame("blaa", "player");
-
-
-        //       if (gameState === "question")
-        //           return;
-        //       // End test
-
         if (!params.game) {
             console.error("No game code provided");
             return;
         }
 
         const gameCode = params.game as string;
-        setGameCode(gameCode);
+        const updates = {
+            gameCode,
+        }
 
         if (!playerId) {
-            setGameState("choose-name");
+            setState({ ...updates, gameState: "choose-name" });
             return;
         }
 
         if (forGame !== gameCode) {
             setPlayerId(null);
-            setGameState("choose-name");
+            setState({ ...updates, gameState: "choose-name" });
             return;
         }
 
@@ -49,14 +42,13 @@ export const PlayerGame = () => {
             return;
 
         gameManager.connectToGame(gameCode, playerId);
-
-    }, [params.game, playerId, gameManager, forGame, setGameCode, setGameState, setPlayerId]);
+    }, [params.game, playerId, gameManager, forGame, setPlayerId]);
 
     return (
         <motion.div animate={{ opacity: 1, scale: 1 }} initial={{ opacity: 0, scale: 0 }} transition={{ delay: 0.1 }} className="w-full h-full">
             {gameState === "choose-name" && <ChooseNickName />}
             {gameState === "lobby" && <PlayerLobby />}
-            {gameState === "starting" && <StartingDisplay timer={timer} />}
+            {gameState === "starting" && <StartTimer />}
             {gameState === "connecting" && <Connecting />}
             {(gameState === "question" || gameState === "reveal-answer") && <Question />}
             {gameState === "results" && <div className="w-full h-dvh flex justify-center items-center text-5xl font-bold overflow-hidden">Results</div>}

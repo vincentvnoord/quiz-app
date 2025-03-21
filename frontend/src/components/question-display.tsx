@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { barriecieto } from "@/lib/fonts";
 import { motion } from "framer-motion";
-import { CorrectAnswer, Question } from "@/client/quiz-game/shared/stores/question-slice";
 import { startTimer } from "@/lib/timer";
+import { CorrectAnswerDto, QuestionStateDto } from "@/client/quiz-game/shared/stores/game-state";
 
 type GameState = "question" | "reveal-answer";
 
 type QuestionDisplayProps = {
-    currentQuestion: Question;
+    currentQuestion: QuestionStateDto;
     gameState: GameState;
-    correctAnswer: CorrectAnswer | null;
+    correctAnswer: CorrectAnswerDto | null;
     onAnswerPressed?: (index: number) => void;
 }
 
@@ -38,7 +38,7 @@ export const QuestionDisplay = ({ currentQuestion, gameState, correctAnswer, onA
                 {currentQuestion.answers.map((answer, index) =>
                     <AnswerButton
                         index={index}
-                        key={answer}
+                        key={index}
                         answer={answer}
                         highlight={correctAnswer?.index}
                         gameState={gameState}

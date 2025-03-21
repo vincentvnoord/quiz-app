@@ -43,12 +43,18 @@ namespace Api.GameHubManagement
 
         public async Task Question(string gameCode, Question question)
         {
-            await _gameHub.Clients.Group(gameCode).SendAsync("Question", question);
+            var questionDto = new QuestionStateDto(question, question.Id);
+            await _gameHub.Clients.Group(gameCode).SendAsync("Question", questionDto);
         }
 
-        public async Task RevealAnswer(string gameCode, int answer)
+        public async Task RevealAnswer(string userId, int answer)
         {
-            await _gameHub.Clients.Group(gameCode).SendAsync("RevealAnswer", answer);
+            var connectionId = _connectionManager.GetConnectionId(userId);
+            if (connectionId == null)
+                return;
+
+            var answerDto = new CorrectAnswerDto(answer);
+            await _gameHub.Clients.Client(connectionId).SendAsync("RevealAnswer", answerDto);
         }
 
         public async Task UnAuthorized(string userId)

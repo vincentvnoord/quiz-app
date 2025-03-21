@@ -4,6 +4,7 @@ import { GameManagerMock } from "../logic/game-manager-mock";
 import { createGameSlice, GameSlice } from "../../shared/stores/game-slice";
 import { createPlayerSlice, PlayerSlice } from "./players-slice";
 import { QuestionSlice, createQuestionSlice } from "@/client/quiz-game/shared/stores/question-slice";
+import { BaseGameState, GameStateDto, PlayerDto } from "../../shared/stores/game-state";
 
 const UI_DEBUG = false;
 
@@ -24,6 +25,13 @@ const createGeneralSlice: StateCreator<GeneralSlice> = (set): GeneralSlice => ({
 });
 
 export type HostStore = GeneralSlice & GameSlice & PlayerSlice & QuestionSlice;
+
+interface HostGameStateDto extends GameStateDto {
+    gameState: BaseGameState;
+    title: string;
+    questionCount: number;
+    players: PlayerDto[];
+}
 
 const useHostStore = create<HostStore>()((...a) => ({
     ...createGeneralSlice(...a),

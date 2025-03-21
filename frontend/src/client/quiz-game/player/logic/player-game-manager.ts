@@ -19,13 +19,13 @@ export class PlayerGameManager implements IGameManager {
     }
 
     answerQuestion(answer: number) {
-        const store = this.gameStore.getState();
-        const currentQuestion = store.currentQuestion;
-        if (!currentQuestion || currentQuestion.pickedAnswer !== undefined) {
-            return;
-        }
+        //       const store = this.gameStore.getState();
+        //       const currentQuestion = store.state.currentQuestion;
+        //       if (!currentQuestion || currentQuestion !== undefined) {
+        //           return;
+        //       }
 
-        store.setCurrentQuestion({ ...currentQuestion, pickedAnswer: answer });
+        //       store.setCurrentQuestion({ ...currentQuestion, pickedAnswer: answer });
     };
 
     async connectToGame(code: string, playerId: string) {

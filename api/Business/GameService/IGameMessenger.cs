@@ -32,6 +32,6 @@ namespace Business.GameService
         Task GameClosed(string gameCode);
 
         Task Question(string gameCode, Question question);
-        Task RevealAnswer(string gameCode, int answer);
+        Task RevealAnswer(string userId, int answer);
     }
 }

@@ -1,5 +1,6 @@
 import { StateCreator } from "zustand";
 
+
 export type CorrectAnswer = {
     playerAnswer?: "correct" | "incorrect" | "no-answer";
     index: number;

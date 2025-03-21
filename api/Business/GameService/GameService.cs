@@ -97,7 +97,15 @@ namespace Business.GameService
         private async Task RevealAnswer(Game game, Question question)
         {
             game.RevealAnswer();
-            await _gameMessenger.RevealAnswer(game.Id, question.Answers.Select(a => a.IsCorrect).ToList().IndexOf(true));
+            int correctAnswerIndex = question.Answers.Select(a => a.IsCorrect).ToList().IndexOf(true);
+
+            var tasks = game.Players.Select(player =>
+                _gameMessenger.RevealAnswer(player.Id, correctAnswerIndex)
+            ).ToList();
+
+            tasks.Add(_gameMessenger.RevealAnswer(game.HostId, correctAnswerIndex));
+
+            await Task.WhenAll(tasks);
         }
 
         public static Game? GetGame(string gameId)
