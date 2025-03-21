@@ -78,7 +78,7 @@ namespace Api.GameHubManagement
                 return;
             }
 
-            GameService.AnswerQuestion(gameCode, playerId, answerIndex);
+            await _gameService.AnswerQuestion(gameCode, playerId, answerIndex);
         }
 
         public async Task ConnectPlayer(string gameCode, string playerId)

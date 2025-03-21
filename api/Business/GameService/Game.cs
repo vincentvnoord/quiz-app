@@ -19,6 +19,7 @@ namespace Business.GameService
         public int CurrentQuestionIndex { get; private set; } = 0;
 
         public ConcurrentBag<Player> Players { get; private set; } = [];
+        private Dictionary<int, HashSet<string>> _playerAnswersPerQuestion = new();
 
         public Game(string id, string hostId, Quiz quiz, int startTimer = 5)
         {
@@ -28,11 +29,32 @@ namespace Business.GameService
             StartTimer = TimeSpan.FromSeconds(startTimer);
         }
 
-        public void StartGame()
+        private int GetAnsweredCount(int questionIndex)
+        {
+            return _playerAnswersPerQuestion.TryGetValue(questionIndex, out var answers) ? answers.Count : 0;
+        }
+
+        public bool AllPlayersAnswered(int questionIndex)
+        {
+            return GetAnsweredCount(questionIndex) >= Players.Count;
+        }
+
+        public void RegisterAnswer(string playerId, int questionIndex)
+        {
+            if (!_playerAnswersPerQuestion.ContainsKey(questionIndex))
+            {
+                _playerAnswersPerQuestion[questionIndex] = new HashSet<string>();
+            }
+
+            _playerAnswersPerQuestion[questionIndex].Add(playerId);
+        }
+
+        public void StartGame(Player[] connectedPlayers)
         {
             State.SetState(GameStateType.Starting);
             CurrentQuestionIndex = 0;
             StartedAt = DateTime.UtcNow;
+            Players = new(connectedPlayers);
         }
 
         /// <summary>

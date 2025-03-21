@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 using Business.Models;
 
 namespace Business.GameService
@@ -57,7 +58,8 @@ namespace Business.GameService
                 return;
             }
 
-            game.StartGame();
+            Player[] connectedPlayers = _connectionManager.getConnectedPlayers(game);
+            game.StartGame(connectedPlayers);
             await _gameMessenger.GameStarted(game.Id, (int)game.StartTimer.TotalMilliseconds);
 
             await Task.Delay((int)game.StartTimer.TotalMilliseconds);
@@ -137,7 +139,7 @@ namespace Business.GameService
             return true;
         }
 
-        public static void AnswerQuestion(string gameId, string playerId, int answerIndex)
+        public async Task AnswerQuestion(string gameId, string playerId, int answerIndex)
         {
             Game? game = GetGame(gameId);
             if (game == null)
@@ -156,7 +158,19 @@ namespace Business.GameService
             }
 
             int currentQuestion = game.CurrentQuestionIndex;
+
+            if (player.HasAnsweredQuestion(currentQuestion))
+            {
+                return;
+            }
+
             player.AnswerQuestion(currentQuestion, answerIndex);
+            game.RegisterAnswer(player.Id, currentQuestion);
+
+            if (game.AllPlayersAnswered(currentQuestion))
+            {
+                await RevealAnswer(game, game.GetCurrentQuestion());
+            }
         }
 
         /// <summary>
