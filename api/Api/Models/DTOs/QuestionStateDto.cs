@@ -9,6 +9,7 @@ namespace Api.Models.DTOs
         public string Text { get; private set; } = default!;
         public string[] Answers { get; private set; } = [];
         public double TimeToAnswer { get; set; }
+        public bool HasAnswered { get; set; } = false;
 
         public QuestionStateDto(Question question, int questionIndex)
         {

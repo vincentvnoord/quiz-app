@@ -13,7 +13,7 @@ export const Question = () => {
     }
 
     return (
-        <div className="h-dvh w-full flex flex-col pt-6">
+        <div className="h-dvh w-full flex flex-col">
             <QuestionDisplay
                 currentQuestion={currentQuestion}
                 gameState={gameState === "question" || gameState === "reveal-answer" ? gameState : "question"}

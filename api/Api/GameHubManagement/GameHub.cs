@@ -67,6 +67,20 @@ namespace Api.GameHubManagement
             await _gameService.CloseGame(gameCode, userId);
         }
 
+        public async Task AnswerQuestion(string gameCode, string playerId, int answerIndex)
+        {
+            string connectionId = Context.ConnectionId;
+            string? currentUserId = _connectionManager.GetPlayerId(connectionId);
+            if (currentUserId != playerId)
+            {
+                await _gameMessenger.UnAuthorized(connectionId);
+                Context.Abort();
+                return;
+            }
+
+            GameService.AnswerQuestion(gameCode, playerId, answerIndex);
+        }
+
         public async Task ConnectPlayer(string gameCode, string playerId)
         {
             PlayerConnectionValidation result = GameService.ValidatePlayerConnection(gameCode, playerId);

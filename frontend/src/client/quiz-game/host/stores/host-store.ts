@@ -24,20 +24,37 @@ const createGeneralSlice: StateCreator<GeneralSlice> = (set): GeneralSlice => ({
     gameState: "connecting",
 });
 
-export type HostStore = GeneralSlice & GameSlice & PlayerSlice & QuestionSlice;
-
-interface HostGameStateDto extends GameStateDto {
+export interface HostGameStateDto extends GameStateDto {
     gameState: BaseGameState;
     title: string;
     questionCount: number;
     players: PlayerDto[];
 }
 
-const useHostStore = create<HostStore>()((...a) => ({
-    ...createGeneralSlice(...a),
-    ...createGameSlice(...a),
-    ...createPlayerSlice(...a),
-    ...createQuestionSlice(...a),
+export type HostGameStore = {
+    gameManager: IGameManager | null;
+
+    state: HostGameStateDto;
+    setState: (state: Partial<HostGameStateDto>) => void;
+}
+
+const useHostStore = create<HostGameStore>()((set) => ({
+    gameManager: null,
+    state: {
+        gameState: "connecting",
+        timer: 0,
+        currentQuestion: null,
+        correctAnswer: null,
+        title: "",
+        questionCount: 0,
+        players: [],
+    },
+    setState: (state) => set((currentState) => ({
+        state: {
+            ...currentState.state,
+            ...state
+        }
+    }))
 }));
 
 useHostStore.setState(() => ({

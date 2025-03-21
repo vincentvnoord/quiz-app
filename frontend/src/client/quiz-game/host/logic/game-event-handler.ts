@@ -1,7 +1,8 @@
-import useHostStore, { HostStore } from "../stores/host-store";
+import useHostStore, { HostGameStateDto, HostGameStore } from "../stores/host-store";
 import { CorrectAnswer, Question } from "@/client/quiz-game/shared/stores/question-slice";
 import { Player } from "../stores/players-slice";
 import { startTimer } from "@/lib/timer";
+import { QuestionStateDto } from "../../shared/stores/game-state";
 
 export class GameEventHandler {
     private readonly gameStore: typeof useHostStore;
@@ -10,41 +11,24 @@ export class GameEventHandler {
         this.gameStore = store;
     }
 
-    onQuestion(question: Question) {
+    onQuestion(question: QuestionStateDto) {
         const state = this.gameStore.getState();
-        state.setGameState("question");
-        state.setCurrentQuestion(question);
+        state.setState({ gameState: "question", currentQuestion: question, correctAnswer: null });
     }
 
     onRevealAnswer(correctAnswer: CorrectAnswer) {
         const state = this.gameStore.getState();
-        state.setGameState("reveal-answer");
-        state.setCorrectAnswer(correctAnswer);
+        state.setState({ gameState: "reveal-answer", correctAnswer });
     }
 
-    onHostConnected(gameState: Partial<HostStore>) {
+    onHostConnected(gameState: Partial<HostGameStateDto>) {
         const state = this.gameStore.getState();
-
-        const updates = {
-            gameState: gameState.gameState ?? state.gameState,
-            title: gameState.title ?? state.title,
-            questionCount: gameState.questionCount ?? state.questionCount,
-            correctAnswer: gameState.correctAnswer,
-            currentQuestion: gameState.currentQuestion ?? state.currentQuestion,
-            timer: gameState.timer ?? 5,
-            players: gameState.players ?? state.players,
-        }
-
-        if (gameState.gameState === "starting") {
-            startTimer(gameState.timer ?? 5, (currentTime: number) => state.setTimer(currentTime));
-        }
-
-        this.gameStore.setState(updates);
+        state.setState(gameState);
     }
 
     onGameNotFound() {
         const state = this.gameStore.getState();
-        state.setGameState("not-found");
+        state.setState({ gameState: "not-found" });
     }
 
     onGameClosed() {
@@ -54,23 +38,21 @@ export class GameEventHandler {
 
     onPlayerJoined(player: Player) {
         const state = this.gameStore.getState();
-        state.addPlayer(player);
+        state.setState({ players: [...state.state.players, player] });
     }
 
     onPlayerDisconnected(playerId: string) {
         const state = this.gameStore.getState();
-        state.removePlayer(playerId);
+        state.setState({ players: state.state.players.filter(p => p.id !== playerId) });
     }
 
     onGameStarted(timer: number) {
         const state = this.gameStore.getState();
-        state.setGameState("starting");
-
-        startTimer(timer, (currentTime: number) => state.setTimer(currentTime));
+        state.setState({ gameState: "starting", timer });
     };
 
     onGameEnd() {
         const state = this.gameStore.getState();
-        state.setGameState("results");
+        state.setState({ gameState: "results" });
     }
 }

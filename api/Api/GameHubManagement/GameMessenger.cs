@@ -47,13 +47,13 @@ namespace Api.GameHubManagement
             await _gameHub.Clients.Group(gameCode).SendAsync("Question", questionDto);
         }
 
-        public async Task RevealAnswer(string userId, int answer)
+        public async Task RevealAnswer(string userId, int answer, PlayerAnswerResultType? playerAnswer = null)
         {
             var connectionId = _connectionManager.GetConnectionId(userId);
             if (connectionId == null)
                 return;
 
-            var answerDto = new CorrectAnswerDto(answer);
+            var answerDto = new CorrectAnswerDto(answer, playerAnswer);
             await _gameHub.Clients.Client(connectionId).SendAsync("RevealAnswer", answerDto);
         }
 

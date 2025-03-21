@@ -1,4 +1,5 @@
-import { usePlayerGameStore } from "../stores/player-game-store";
+import { QuestionStateDto } from "../../shared/stores/game-state";
+import { PlayerGameStateDto, usePlayerGameStore } from "../stores/player-game-store";
 import { GameEventHandler } from "./game-event-handler";
 import { IGameManager } from "./player-game-manager";
 
@@ -14,23 +15,46 @@ export class PlayerGameManagerMock implements IGameManager {
 
     answerQuestion(answer: number) {
         const store = this.gameStore.getState();
-        const currentQuestion = store.currentQuestion;
-        if (!currentQuestion || currentQuestion.pickedAnswer !== undefined) {
+        const question = store.state.currentQuestion;
+        if (question === null) {
             return;
         }
 
-        store.setCurrentQuestion({ ...currentQuestion, pickedAnswer: answer });
+        this.gameStore.getState().setState({ currentQuestion: { ...question, hasAnswered: true } });
+        this.gameEventHandler?.onRevealAnswer({
+            index: 0,
+            playerAnswerResult: "no-answer",
+        })
     }
 
     connectToGame(code: string, playerId: string): Promise<void> {
         this.gameEventHandler = new GameEventHandler(this.gameStore);
-        this.gameEventHandler.onQuestion({
-            index: 0,
-            text: "What is the capital of France?",
-            answers: ["Paris", "London", "Berlin", "Madrid"],
-            timeToAnswer: 10,
-        });
+
+        this.gameEventHandler.onConnected(initialState);
 
         return Promise.resolve();
     };
+}
+
+const questions: QuestionStateDto[] = [
+    {
+        index: 0,
+        text: "What is the capital of France?",
+        answers: ["London", "Paris", "Berlin", "Madrid"],
+        timeToAnswer: 10,
+        hasAnswered: false,
+    },
+]
+
+const initialState: PlayerGameStateDto = {
+    gameCode: "",
+    gameState: "question",
+    timer: 0,
+    currentQuestion: questions[0],
+    correctAnswer: null,
+
+    player: {
+        id: "player-id",
+        name: "Bart",
+    },
 }

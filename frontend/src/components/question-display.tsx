@@ -3,6 +3,7 @@ import { barriecieto } from "@/lib/fonts";
 import { motion } from "framer-motion";
 import { startTimer } from "@/lib/timer";
 import { CorrectAnswerDto, QuestionStateDto } from "@/client/quiz-game/shared/stores/game-state";
+import { AnswerResults } from "@/app/[game]/_components/answer-results";
 
 type GameState = "question" | "reveal-answer";
 
@@ -22,29 +23,42 @@ export const QuestionDisplay = ({ currentQuestion, gameState, correctAnswer, onA
 
         startTimer(timeToAnswer, (currentTime: number) => setTimeLeft(currentTime));
     }, [currentQuestion, gameState, timeToAnswer]);
+    
+    if (correctAnswer?.playerAnswerResult)
+        return <AnswerResults result={correctAnswer.playerAnswerResult} />
 
     return (
-        <div className="w-full h-full flex flex-col items-center justify-center gap-4">
+        <div className="w-full h-full flex flex-col items-center justify-center gap-4 pt-6">
             <motion.div
                 initial={gameState !== "question" && { scale: 0 }}
                 animate={(gameState === "question" && timeLeft > 0) ? { scale: [0.9, 1] } : { scale: 0 }}
                 className="rounded-full bg-black/20 aspect-square flex-shrink-0 text-center p-4 text-4xl md:text-6xl">
                 <h2 className={`${barriecieto.className} w-full text-white`}>{timeLeft}</h2>
             </motion.div>
-            <div className="w-full bg-white flex items-center justify-center p-2 md:p-5">
-                <h1 className={`text-2xl md:text-5xl font-semibold`}>{currentQuestion.text}</h1>
-            </div>
-            <div className={`w-full p-2 md:p-12 md:pt-6 h-full gap-2 font-extrabold grid grid-cols-2`}>
-                {currentQuestion.answers.map((answer, index) =>
-                    <AnswerButton
-                        index={index}
-                        key={index}
-                        answer={answer}
-                        highlight={correctAnswer?.index}
-                        gameState={gameState}
-                        onAnswerPressed={onAnswerPressed}
-                    />)}
-            </div>
+            {
+                currentQuestion.hasAnswered ?
+                    <div className={`h-full items-center gap-5 text-center w-full flex flex-col pt-32`}>
+                        <h1 className="text-3xl font-bold">Did you get it right? :o</h1>
+                        <p className="opacity-50">Waiting for players to answer...</p>
+                    </div>
+                    :
+                    <>
+                        <div className="w-full bg-white flex items-center justify-center p-2 md:p-5">
+                            <h1 className={`text-2xl md:text-5xl font-semibold`}>{currentQuestion.text}</h1>
+                        </div>
+                        <div className={`w-full p-2 md:p-12 md:pt-6 h-full gap-2 font-extrabold grid grid-cols-2`}>
+                            {currentQuestion.answers.map((answer, index) =>
+                                <AnswerButton
+                                    index={index}
+                                    key={index}
+                                    answer={answer}
+                                    highlight={correctAnswer?.index}
+                                    gameState={gameState}
+                                    onAnswerPressed={onAnswerPressed}
+                                />)}
+                        </div>
+                    </>
+            }
         </div >
     )
 }

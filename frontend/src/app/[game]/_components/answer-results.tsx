@@ -1,11 +1,10 @@
 import { barriecieto } from "@/lib/fonts"
 import { div } from "framer-motion/client"
-import { Check, XIcon } from "lucide-react"
+import { Check, ThumbsUp, ThumbsUpIcon, XIcon } from "lucide-react"
 
 type AnswerResult = "correct" | "incorrect" | "no-answer";
 
-export const AnswerResults = () => {
-    const result: AnswerResult = "no-answer" as AnswerResult;
+export const AnswerResults = ({ result }: { result: AnswerResult }) => {
     const colors = {
         "correct": "bg-green-400",
         "incorrect": "bg-red-400",
@@ -45,8 +44,9 @@ const AnsweredInCorrectly = () => {
 
 const NoAnswer = () => {
     return (
-        <div className="flex flex-col">
+        <div className="flex flex-col items-center gap-4">
             <h1 className={`text-6xl font-bold ${barriecieto.className}`}>Too slow!</h1>
+            <p className="opacity-50">You know you have to answer to win right?</p>
         </div>
     );
 }

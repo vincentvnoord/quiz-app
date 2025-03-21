@@ -1,11 +1,11 @@
 "use client";
 
-import useHostStore, { HostStore } from "../stores/host-store";
+import useHostStore, { HostGameStore } from "../stores/host-store";
 import { GameEventHandler } from "./game-event-handler";
 import { IGameManager } from "./game-manager";
 
 export class GameManagerMock implements IGameManager {
-    protected gameStore: HostStore;
+    protected gameStore: HostGameStore;
     private readonly gameEventHandler: GameEventHandler;
     private currentQuestionIndex: number = 0;
 

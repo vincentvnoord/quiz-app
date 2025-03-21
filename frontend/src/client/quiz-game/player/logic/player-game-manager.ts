@@ -9,6 +9,7 @@ export interface IGameManager {
 
 export class PlayerGameManager implements IGameManager {
     private gameCode: string | null = null;
+    private playerId: string | null = null;
     private connection: HubConnection | null = null;
     private gameEventHandler: GameEventHandler | null = null;
 
@@ -19,19 +20,26 @@ export class PlayerGameManager implements IGameManager {
     }
 
     answerQuestion(answer: number) {
-        //       const store = this.gameStore.getState();
-        //       const currentQuestion = store.state.currentQuestion;
-        //       if (!currentQuestion || currentQuestion !== undefined) {
-        //           return;
-        //       }
+        const store = this.gameStore.getState();
+        const question = store.state.currentQuestion;
+        if (question === null) {
+            return;
+        }
 
-        //       store.setCurrentQuestion({ ...currentQuestion, pickedAnswer: answer });
+        this.gameStore.getState().setState({ currentQuestion: { ...question, hasAnswered: true } });
+
+        try {
+            this.connection?.invoke("AnswerQuestion", this.gameCode, this.playerId, answer);
+        } catch (error) {
+            console.error("Failed to answer question", error);
+        }
     };
 
     async connectToGame(code: string, playerId: string) {
         try {
             console.log("Connecting to game", code);
             this.gameCode = code;
+            this.playerId = playerId;
             const apiUrl = process.env.NEXT_PUBLIC_API_URL;
             if (!apiUrl) {
                 console.error("API_URL is not set");

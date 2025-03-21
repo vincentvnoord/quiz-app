@@ -23,25 +23,27 @@ export const PlayerGame = () => {
         }
 
         const gameCode = params.game as string;
-        const updates = {
-            gameCode,
-        }
+        setState({ gameCode });
 
         if (!playerId) {
-            setState({ ...updates, gameState: "choose-name" });
+            setState({ gameState: "choose-name" });
             return;
         }
 
         if (forGame !== gameCode) {
             setPlayerId(null);
-            setState({ ...updates, gameState: "choose-name" });
+            setState({ gameState: "choose-name" });
             return;
         }
 
         if (gameManager == null)
             return;
 
-        gameManager.connectToGame(gameCode, playerId);
+        if (!playerId) {
+            return;
+        }
+
+        gameManager.connectToGame(gameCode, playerId ?? "");
     }, [params.game, playerId, gameManager, forGame, setPlayerId]);
 
     return (

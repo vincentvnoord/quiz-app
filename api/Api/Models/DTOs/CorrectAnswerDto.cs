@@ -1,13 +1,9 @@
 
+using Business.GameService;
+using Microsoft.SqlServer.Server;
+
 namespace Api.Models.DTOs
 {
-    public enum PlayerAnswerResultType
-    {
-        Correct,
-        Incorrect,
-        NoAnswer
-    }
-
     public class CorrectAnswerDto
     {
         public int Index { get; private set; }
@@ -16,7 +12,17 @@ namespace Api.Models.DTOs
         public CorrectAnswerDto(int index, PlayerAnswerResultType? playerAnswer = null)
         {
             Index = index;
-            PlayerAnswerResult = playerAnswer switch
+            PlayerAnswerResult = FormatPlayerAnswerResult(playerAnswer);
+        }
+
+        public void SetPlayerAnswerResult(PlayerAnswerResultType? playerAnswer)
+        {
+            PlayerAnswerResult = FormatPlayerAnswerResult(playerAnswer);
+        }
+
+        private static string? FormatPlayerAnswerResult(PlayerAnswerResultType? playerAnswer)
+        {
+            return playerAnswer switch
             {
                 PlayerAnswerResultType.Correct => "correct",
                 PlayerAnswerResultType.Incorrect => "incorrect",

@@ -97,11 +97,13 @@ namespace Business.GameService
         private async Task RevealAnswer(Game game, Question question)
         {
             game.RevealAnswer();
-            int correctAnswerIndex = question.Answers.Select(a => a.IsCorrect).ToList().IndexOf(true);
+            int correctAnswerIndex = question.CorrectAnswer();
 
-            var tasks = game.Players.Select(player =>
-                _gameMessenger.RevealAnswer(player.Id, correctAnswerIndex)
-            ).ToList();
+            var tasks = game.Players.Select((player) =>
+            {
+                var playerAnswerResult = player.GetAnswerResult(game.CurrentQuestionIndex, correctAnswerIndex);
+                return _gameMessenger.RevealAnswer(player.Id, correctAnswerIndex, playerAnswerResult);
+            }).ToList();
 
             tasks.Add(_gameMessenger.RevealAnswer(game.HostId, correctAnswerIndex));
 
@@ -133,6 +135,28 @@ namespace Business.GameService
 
             game = g;
             return true;
+        }
+
+        public static void AnswerQuestion(string gameId, string playerId, int answerIndex)
+        {
+            Game? game = GetGame(gameId);
+            if (game == null)
+            {
+                return;
+            }
+
+            if (game.State.State != GameStateType.Question)
+            {
+                return;
+            }
+
+            if (!game.TryGetPlayer(playerId, out Player? player))
+            {
+                return;
+            }
+
+            int currentQuestion = game.CurrentQuestionIndex;
+            player.AnswerQuestion(currentQuestion, answerIndex);
         }
 
         /// <summary>
