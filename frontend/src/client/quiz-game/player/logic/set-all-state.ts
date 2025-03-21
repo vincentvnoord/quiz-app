@@ -7,7 +7,7 @@ export const setAllPlayerState = (newState: Partial<PlayerGameStore>, store: typ
     state.setTitle(state.title ?? state.title);
 
     state.setQuestionCount(state.questionCount ?? state.questionCount);
-    state.setCorrectAnswer(state.correctAnswer ?? -1);
+    state.setCorrectAnswer(state.correctAnswer);
     state.setCurrentQuestion(state.currentQuestion ?? null);
 
     state.setTimer(state.timer ?? 5);

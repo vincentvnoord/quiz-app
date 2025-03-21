@@ -71,7 +71,7 @@ export class GameManagerMock implements IGameManager {
 
         setTimeout(() => {
             this.currentQuestionIndex++;
-            this.gameEventHandler.onRevealAnswer(question.correctAnswer);
+            this.gameEventHandler.onRevealAnswer({ index: question.correctAnswer });
         }, question.timeToAnswer * 1000);
     }
 }

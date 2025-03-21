@@ -17,6 +17,15 @@ export const PlayerGame = () => {
     const params = useParams();
 
     useEffect(() => {
+        //       // Test
+        //       setGameState("question");
+        //       gameManager?.connectToGame("blaa", "player");
+
+
+        //       if (gameState === "question")
+        //           return;
+        //       // End test
+
         if (!params.game) {
             console.error("No game code provided");
             return;

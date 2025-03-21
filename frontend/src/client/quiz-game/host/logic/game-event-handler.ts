@@ -1,5 +1,5 @@
 import useHostStore, { HostStore } from "../stores/host-store";
-import { Question } from "@/client/quiz-game/shared/stores/question-slice";
+import { CorrectAnswer, Question } from "@/client/quiz-game/shared/stores/question-slice";
 import { Player } from "../stores/players-slice";
 import { startTimer } from "@/lib/timer";
 
@@ -16,7 +16,7 @@ export class GameEventHandler {
         state.setCurrentQuestion(question);
     }
 
-    onRevealAnswer(correctAnswer: number) {
+    onRevealAnswer(correctAnswer: CorrectAnswer) {
         const state = this.gameStore.getState();
         state.setGameState("reveal-answer");
         state.setCorrectAnswer(correctAnswer);
@@ -29,7 +29,7 @@ export class GameEventHandler {
             gameState: gameState.gameState ?? state.gameState,
             title: gameState.title ?? state.title,
             questionCount: gameState.questionCount ?? state.questionCount,
-            correctAnswer: gameState.correctAnswer ?? -1,
+            correctAnswer: gameState.correctAnswer,
             currentQuestion: gameState.currentQuestion ?? state.currentQuestion,
             timer: gameState.timer ?? 5,
             players: gameState.players ?? state.players,

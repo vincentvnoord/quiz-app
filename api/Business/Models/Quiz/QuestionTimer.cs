@@ -1,18 +1,19 @@
-using Business.Models;
-
-namespace Business.GameService
+namespace Business.Models
 {
     public class QuestionTimer
     {
         private TimeSpan _timeToAnswer;
-        private readonly DateTime _startedAt;
-        public Question Question { get; private set; }
+        private DateTime _startedAt;
 
-        public QuestionTimer(Question question)
+        public QuestionTimer(int timeInSeconds)
         {
-            Question = question;
             _startedAt = DateTime.UtcNow;
-            _timeToAnswer = TimeSpan.FromSeconds(question.TimeToAnswer);
+            _timeToAnswer = TimeSpan.FromSeconds(timeInSeconds);
+        }
+
+        public void Start()
+        {
+            _startedAt = DateTime.UtcNow;
         }
 
         public double RemainingTime()

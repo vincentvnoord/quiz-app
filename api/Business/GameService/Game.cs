@@ -10,7 +10,6 @@ namespace Business.GameService
     {
         public TimeSpan StartTimer { get; private set; }
         public DateTime StartedAt { get; private set; }
-        public QuestionTimer? QuestionTimer { get; private set; }
 
         public GameState State { get; private set; } = new();
         public const int MAX_PLAYERS = 50;
@@ -62,8 +61,8 @@ namespace Business.GameService
         public Question StartQuestion()
         {
             var question = GetCurrentQuestion();
+            question.Timer.Start();
             State.SetState(GameStateType.Question);
-            QuestionTimer = new(question);
             return question;
         }
 
@@ -81,7 +80,6 @@ namespace Business.GameService
         public void RevealAnswer()
         {
             State.SetState(GameStateType.RevealAnswer);
-            QuestionTimer = null;
         }
 
         public bool TryAddPlayer(Player player)

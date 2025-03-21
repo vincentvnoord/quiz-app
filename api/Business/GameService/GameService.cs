@@ -1,7 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using Business.Models;
-using Business.Models.Presenters;
 
 namespace Business.GameService
 {
@@ -29,15 +28,7 @@ namespace Business.GameService
 
             if (game != null)
             {
-                var connectedPlayers = _connectionManager.getConnectedPlayers(game).Select(p => new PlayerStatePresenter
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                }).ToArray();
-
-                var gameState = new HostConnectState(game, connectedPlayers);
-
-                await _gameMessenger.HostConnected(hostId, gameState);
+                await _gameMessenger.HostConnected(hostId, game);
             }
             else
             {
@@ -47,16 +38,8 @@ namespace Business.GameService
 
         public async Task OnPlayerConnected(Player player, Game game)
         {
-            var gameState = new PlayerConnectState(game, player.Id);
-            await _gameMessenger.NotifyPlayerConnected(gameState);
-
-            var newPlayerState = new PlayerStatePresenter
-            {
-                Id = player.Id,
-                Name = player.Name,
-            };
-
-            await _gameMessenger.NotifyHostPlayerConnected(game.HostId, newPlayerState);
+            await _gameMessenger.NotifyPlayerConnected(game, player);
+            await _gameMessenger.NotifyHostPlayerConnected(game.HostId, player);
         }
 
         public async Task StartGame(string gameCode, string userId)
@@ -106,9 +89,7 @@ namespace Business.GameService
         private async Task ShowQuestion(Game game)
         {
             Question currentQuestion = game.StartQuestion();
-            var question = new QuestionPresenter(currentQuestion, game.CurrentQuestionIndex);
-
-            await _gameMessenger.Question(game.Id, question);
+            await _gameMessenger.Question(game.Id, currentQuestion);
             await Task.Delay(currentQuestion.TimeToAnswer * 1000);
             await RevealAnswer(game, currentQuestion);
         }

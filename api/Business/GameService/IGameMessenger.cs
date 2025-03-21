@@ -1,21 +1,22 @@
-using Business.Models.Presenters;
+
+using Business.Models;
 
 namespace Business.GameService
 {
     public interface IGameMessenger
     {
-        Task HostConnected(string hostId, HostConnectState state);
+        Task HostConnected(string hostId, Game state);
         Task GameNotFound(string userId);
         Task UnAuthorized(string userId);
         Task NonRegisteredPlayer(string connectionId);
 
         /// <summary>
-        /// Use this method to notify only the connecting player with their own name
+        /// Use this method to notify only the connected player
         /// </summary>
-        /// <param name="connectionId"></param>
-        /// <param name="playerName"></param>
+        /// <param name="state"></param>
+        /// <param name="player"></param>
         /// <returns></returns>
-        Task NotifyPlayerConnected(PlayerConnectState state);
+        Task NotifyPlayerConnected(Game state, Player player);
 
         /// <summary>
         /// Use this method to notify only the host of the player that connected
@@ -23,14 +24,14 @@ namespace Business.GameService
         /// <param name="hostConnectionId"></param>
         /// <param name="player"></param>
         /// <returns></returns>
-        Task NotifyHostPlayerConnected(string hostId, PlayerStatePresenter player);
+        Task NotifyHostPlayerConnected(string hostId, Player player);
         Task NotifyHostPlayerDisconnected(string hostId, string playerId);
 
         Task GameStarted(string gameCode, int timer);
         Task GameEnd(string gameCode);
         Task GameClosed(string gameCode);
 
-        Task Question(string gameCode, QuestionPresenter question);
+        Task Question(string gameCode, Question question);
         Task RevealAnswer(string gameCode, int answer);
     }
 }

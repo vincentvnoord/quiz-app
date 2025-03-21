@@ -1,17 +1,24 @@
 import { StateCreator } from "zustand";
 
+export type CorrectAnswer = {
+    playerAnswer?: "correct" | "incorrect" | "no-answer";
+    index: number;
+}
+
 export type Question = {
     index: number;
     text: string;
     answers: string[];
     timeToAnswer: number;
+    pickedAnswer?: number;
 }
 
 export interface QuestionSlice {
     currentQuestion: Question | null;
     setCurrentQuestion: (question: Question | null) => void;
-    correctAnswer: number | null;
-    setCorrectAnswer: (correctAnswer: number) => void;
+
+    correctAnswer: CorrectAnswer | null;
+    setCorrectAnswer: (correctAnswer: CorrectAnswer | null) => void;
 }
 
 export const createQuestionSlice: StateCreator<QuestionSlice> = (set): QuestionSlice => ({

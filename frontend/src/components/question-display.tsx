@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { barriecieto } from "@/lib/fonts";
 import { motion } from "framer-motion";
-import { Question } from "@/client/quiz-game/shared/stores/question-slice";
+import { CorrectAnswer, Question } from "@/client/quiz-game/shared/stores/question-slice";
 import { startTimer } from "@/lib/timer";
 
 type GameState = "question" | "reveal-answer";
@@ -9,13 +9,14 @@ type GameState = "question" | "reveal-answer";
 type QuestionDisplayProps = {
     currentQuestion: Question;
     gameState: GameState;
-    correctAnswer: number | null;
+    correctAnswer: CorrectAnswer | null;
+    onAnswerPressed?: (index: number) => void;
 }
 
-export const QuestionDisplay = ({ currentQuestion, gameState, correctAnswer }: QuestionDisplayProps) => {
+export const QuestionDisplay = ({ currentQuestion, gameState, correctAnswer, onAnswerPressed }: QuestionDisplayProps) => {
     const timeToAnswer = currentQuestion.timeToAnswer;
     const [timeLeft, setTimeLeft] = useState(Math.ceil(timeToAnswer / 1000));
-        
+
     useEffect(() => {
         if (gameState !== "question") return;
 
@@ -39,15 +40,24 @@ export const QuestionDisplay = ({ currentQuestion, gameState, correctAnswer }: Q
                         index={index}
                         key={answer}
                         answer={answer}
-                        correctAnswer={correctAnswer}
+                        highlight={correctAnswer?.index}
                         gameState={gameState}
+                        onAnswerPressed={onAnswerPressed}
                     />)}
             </div>
         </div >
     )
 }
 
-const AnswerButton = ({ answer, index, correctAnswer, gameState }: { answer: string, index: number, correctAnswer: number | null, gameState: GameState }) => {
+type AnswerButtonProps = {
+    answer: string;
+    index: number;
+    highlight?: number;
+    gameState: GameState;
+    onAnswerPressed?: (index: number) => void;
+}
+
+const AnswerButton = ({ answer, index, highlight, gameState, onAnswerPressed }: AnswerButtonProps) => {
     const colorClass = [
         "bg-blue-900",
         "bg-green-900",
@@ -56,16 +66,12 @@ const AnswerButton = ({ answer, index, correctAnswer, gameState }: { answer: str
     ][index];
 
     const variants = {
-        correct: { scale: 1 },
-        wrong: { scale: 0.99, opacity: 0.4 },
-        default: { scale: 1, opacity: 1 }
+        default: { scale: 1, opacity: 1 },
+        fade: { scale: 0.99, opacity: 0.4 },
     }
 
-    const correctAndShow = gameState === "reveal-answer" && correctAnswer !== null && index === correctAnswer;
-    const incorrectAndShow = gameState === "reveal-answer" && correctAnswer !== null && index !== correctAnswer;
-
-    const wrongOrDefault = incorrectAndShow ? "wrong" : "default";
-    const currentVariant = correctAndShow ? "correct" : wrongOrDefault;
+    const waitingForAnswer = highlight === undefined || highlight === null;
+    const currentVariant = (highlight == index || waitingForAnswer) ? "default" : "fade";
 
     return (
         <motion.div
@@ -74,7 +80,7 @@ const AnswerButton = ({ answer, index, correctAnswer, gameState }: { answer: str
             animate={currentVariant}
             initial={{ opacity: 1, scale: 1 }}
         >
-            <button className={`${colorClass} text-white text-xl md:text-2xl w-full h-full p-2 rounded-lg`} key={answer}>
+            <button onClick={() => { if (onAnswerPressed) onAnswerPressed(index) }} className={`${colorClass} text-white text-xl md:text-2xl w-full h-full p-2 rounded-lg`} key={answer}>
                 {answer}
             </button>
         </motion.div>

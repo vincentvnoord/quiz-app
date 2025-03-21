@@ -1,5 +1,6 @@
+using Api.Models.DTOs;
 using Business.GameService;
-using Business.Models.Presenters;
+using Business.Models;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Api.GameHubManagement
@@ -20,11 +21,14 @@ namespace Api.GameHubManagement
             await _gameHub.Clients.Client(userId).SendAsync("GameNotFound");
         }
 
-        public async Task HostConnected(string hostId, HostConnectState state)
+        public async Task HostConnected(string hostId, Game state)
         {
             string? hostConnectionId = _connectionManager.GetConnectionId(hostId);
-            if (hostConnectionId != null)
-                await _gameHub.Clients.Client(hostConnectionId).SendAsync("HostConnected", state);
+            if (hostConnectionId == null)
+                return;
+
+            var gameState = new HostGameStateDto(state, [.. state.Players.Select(p => new PlayerDto(p))]);
+            await _gameHub.Clients.Client(hostConnectionId).SendAsync("HostConnected", gameState);
         }
 
         public async Task GameStarted(string gameCode, int timer)
@@ -37,7 +41,7 @@ namespace Api.GameHubManagement
             await _gameHub.Clients.Group(gameCode).SendAsync("GameEnd");
         }
 
-        public async Task Question(string gameCode, QuestionPresenter question)
+        public async Task Question(string gameCode, Question question)
         {
             await _gameHub.Clients.Group(gameCode).SendAsync("Question", question);
         }
@@ -64,18 +68,24 @@ namespace Api.GameHubManagement
             await _gameHub.Clients.Client(connectionId).SendAsync("NonRegisteredPlayer");
         }
 
-        public async Task NotifyPlayerConnected(PlayerConnectState state)
+        public async Task NotifyPlayerConnected(Game state, Player player)
         {
-            string? connectionId = _connectionManager.GetConnectionId(state.PlayerId);
-            if (connectionId != null)
-                await _gameHub.Clients.Client(connectionId).SendAsync("Connected", state);
+            string? connectionId = _connectionManager.GetConnectionId(player.Id);
+            if (connectionId == null)
+                return;
+
+            var gameState = new PlayerGameStateDto(state, player);
+            await _gameHub.Clients.Client(connectionId).SendAsync("Connected", gameState);
         }
 
-        public async Task NotifyHostPlayerConnected(string hostId, PlayerStatePresenter player)
+        public async Task NotifyHostPlayerConnected(string hostId, Player player)
         {
             string? connectionId = _connectionManager.GetConnectionId(hostId);
-            if (connectionId != null)
-                await _gameHub.Clients.Client(connectionId).SendAsync("PlayerConnected", player);
+            if (connectionId == null)
+                return;
+
+            var playerDto = new PlayerDto(player);
+            await _gameHub.Clients.Client(connectionId).SendAsync("PlayerConnected", playerDto);
         }
 
         public async Task NotifyHostPlayerDisconnected(string hostId, string playerId)
