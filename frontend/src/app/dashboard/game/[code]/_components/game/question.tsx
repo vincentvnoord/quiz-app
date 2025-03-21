@@ -12,6 +12,8 @@ export const Question = () => {
         console.log(gameManager);
     }
 
+    if (!currentQuestion) return null;
+
     return (
         <div className="h-dvh flex flex-col overflow-hidden items-center justify-center">
             <div className="flex p-4 justify-end items-center w-full">
