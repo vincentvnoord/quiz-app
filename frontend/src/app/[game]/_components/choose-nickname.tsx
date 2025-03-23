@@ -10,16 +10,24 @@ export const ChooseNickName = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    const { setPlayerId, setPlayerName, setForGame } = usePlayerStore();
+    const { setPlayerId, setPlayerName, setForGame, playerId, forGame } = usePlayerStore();
     const { state: { gameCode } } = usePlayerGameStore();
 
     const handleSubmit = async () => {
+        if (loading) return;
+
         if (name.length === 0) {
             return;
         }
 
+        if (playerId && forGame) {
+            if (forGame === gameCode)
+                return;
+        }
+
         setLoading(true);
         try {
+            await new Promise(r => setTimeout(r, 1000));
             const res = await joinGame(gameCode, name);
             if (res.success) {
                 if (!res.playerId) {
