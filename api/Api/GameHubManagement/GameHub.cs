@@ -117,11 +117,10 @@ namespace Api.GameHubManagement
                 var game = GameService.GetGameByPlayerId(playerId);
                 if (game != null)
                 {
+                    _connectionManager.TryRemoveConnection(connectionId);
                     await _gameMessenger.NotifyHostPlayerDisconnected(game.HostId, playerId);
                 }
             }
-
-            _connectionManager.TryRemoveConnection(connectionId);
 
             return base.OnDisconnectedAsync(exception);
         }

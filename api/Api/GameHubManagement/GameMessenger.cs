@@ -27,7 +27,9 @@ namespace Api.GameHubManagement
             if (hostConnectionId == null)
                 return;
 
-            var gameState = new HostGameStateDto(state, [.. state.Players.Select(p => new PlayerDto(p))]);
+            // Only show the connected players to the host, not all players that are registered
+            Player[] players = _connectionManager.getConnectedPlayers(state);
+            var gameState = new HostGameStateDto(state, [.. players.Select(p => new PlayerDto(p))]);
             await _gameHub.Clients.Client(hostConnectionId).SendAsync("HostConnected", gameState);
         }
 
