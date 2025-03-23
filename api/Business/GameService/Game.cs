@@ -20,7 +20,7 @@ namespace Business.GameService
         public int CurrentQuestionIndex { get; private set; } = 0;
 
         public ConcurrentBag<Player> Players { get; private set; } = [];
-        private ConcurrentDictionary<int, HashSet<string>> _playerAnswersPerQuestion = new();
+        private readonly ConcurrentDictionary<int, HashSet<string>> _playerAnswersPerQuestion = new();
 
         private QuestionTimerManager? _questionTimerManager;
 

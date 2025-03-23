@@ -21,8 +21,7 @@ export class GameManagerMock implements IGameManager {
     getMinimumPlayers = () => 0;
 
     connectToGame(code: string): Promise<void> {
-        this.gameStore.setGameCode(code);
-        this.gameStore.setGameState("connecting");
+        console.log("Connected to game", code);
 
         setTimeout(() => {
             // Set complete state of the game store
@@ -49,7 +48,7 @@ export class GameManagerMock implements IGameManager {
 
     continue(): Promise<void> {
         console.log(this.gameStore);
-        if (this.gameStore.gameState !== "reveal-answer")
+        if (this.gameStore.state.gameState !== "reveal-answer")
             return Promise.resolve();
 
         this.showQuestion();
@@ -58,7 +57,7 @@ export class GameManagerMock implements IGameManager {
     };
 
     showQuestion() {
-        if (this.currentQuestionIndex >= this.gameStore.questionCount) {
+        if (this.currentQuestionIndex >= this.gameStore.state.questionCount) {
             this.gameEventHandler.onGameEnd();
             return;
         }
@@ -66,7 +65,10 @@ export class GameManagerMock implements IGameManager {
         const question = mockQuiz.questions[this.currentQuestionIndex];
         console.log("Showing question", question);
         this.gameEventHandler.onQuestion(
-            { index: this.currentQuestionIndex, ...question }
+            {
+                index: this.currentQuestionIndex, ...question,
+                hasAnswered: false
+            }
         );
 
         setTimeout(() => {

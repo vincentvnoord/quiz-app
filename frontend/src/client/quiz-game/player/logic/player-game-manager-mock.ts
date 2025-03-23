@@ -14,6 +14,8 @@ export class PlayerGameManagerMock implements IGameManager {
     }
 
     answerQuestion(answer: number) {
+        console.log("Answering question", answer);
+
         const store = this.gameStore.getState();
         const question = store.state.currentQuestion;
         if (question === null) {
@@ -29,6 +31,8 @@ export class PlayerGameManagerMock implements IGameManager {
 
     connectToGame(code: string, playerId: string): Promise<void> {
         this.gameEventHandler = new GameEventHandler(this.gameStore);
+
+        console.log("Connected to game", code, playerId);
 
         this.gameEventHandler.onConnected(initialState);
 

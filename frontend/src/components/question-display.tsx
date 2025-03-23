@@ -55,10 +55,9 @@ export const QuestionDisplay = ({ currentQuestion, gameState, correctAnswer, onA
                             {currentQuestion.answers.map((answer, index) =>
                                 <AnswerButton
                                     index={index}
-                                    key={index}
+                                    key={answer + index}
                                     answer={answer}
                                     highlight={correctAnswer?.index}
-                                    gameState={gameState}
                                     onAnswerPressed={onAnswerPressed}
                                 />)}
                         </div>
@@ -72,11 +71,10 @@ type AnswerButtonProps = {
     answer: string;
     index: number;
     highlight?: number;
-    gameState: GameState;
     onAnswerPressed?: (index: number) => void;
 }
 
-const AnswerButton = ({ answer, index, highlight, gameState, onAnswerPressed }: AnswerButtonProps) => {
+const AnswerButton = ({ answer, index, highlight, onAnswerPressed }: AnswerButtonProps) => {
     const colorClass = [
         "bg-blue-900",
         "bg-green-900",

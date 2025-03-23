@@ -1,6 +1,5 @@
 import { barriecieto } from "@/lib/fonts"
-import { div } from "framer-motion/client"
-import { Check, ThumbsUp, ThumbsUpIcon, XIcon } from "lucide-react"
+import { Check, XIcon } from "lucide-react"
 
 type AnswerResult = "correct" | "incorrect" | "no-answer";
 

@@ -27,7 +27,6 @@ export const ChooseNickName = () => {
 
         setLoading(true);
         try {
-            await new Promise(r => setTimeout(r, 1000));
             const res = await joinGame(gameCode, name);
             if (res.success) {
                 if (!res.playerId) {
