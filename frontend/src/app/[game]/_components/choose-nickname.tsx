@@ -10,12 +10,19 @@ export const ChooseNickName = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    const { setPlayerId, setPlayerName, setForGame } = usePlayerStore();
-    const { gameCode } = usePlayerGameStore();
+    const { setPlayerId, setPlayerName, setForGame, playerId, forGame } = usePlayerStore();
+    const { state: { gameCode } } = usePlayerGameStore();
 
     const handleSubmit = async () => {
+        if (loading) return;
+
         if (name.length === 0) {
             return;
+        }
+
+        if (playerId && forGame) {
+            if (forGame === gameCode)
+                return;
         }
 
         setLoading(true);

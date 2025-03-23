@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using Business.Models;
+using Businessn.GameService;
 
 namespace Business.GameService
 {
@@ -10,7 +11,6 @@ namespace Business.GameService
     {
         public TimeSpan StartTimer { get; private set; }
         public DateTime StartedAt { get; private set; }
-        public QuestionTimer? QuestionTimer { get; private set; }
 
         public GameState State { get; private set; } = new();
         public const int MAX_PLAYERS = 50;
@@ -20,6 +20,9 @@ namespace Business.GameService
         public int CurrentQuestionIndex { get; private set; } = 0;
 
         public ConcurrentBag<Player> Players { get; private set; } = [];
+        private readonly ConcurrentDictionary<int, HashSet<string>> _playerAnswersPerQuestion = new();
+
+        private QuestionTimerManager? _questionTimerManager;
 
         public Game(string id, string hostId, Quiz quiz, int startTimer = 5)
         {
@@ -29,11 +32,33 @@ namespace Business.GameService
             StartTimer = TimeSpan.FromSeconds(startTimer);
         }
 
-        public void StartGame()
+        private int GetAnsweredCount(int questionIndex)
+        {
+            return _playerAnswersPerQuestion.TryGetValue(questionIndex, out var answers) ? answers.Count : 0;
+        }
+
+        public bool AllPlayersAnswered()
+        {
+            return GetAnsweredCount(CurrentQuestionIndex) >= Players.Count;
+        }
+
+        public void RegisterAnswer(string playerId, int questionIndex)
+        {
+            var questionSet = _playerAnswersPerQuestion.GetOrAdd(questionIndex, []);
+            questionSet.Add(playerId);
+
+            if (AllPlayersAnswered())
+            {
+                _questionTimerManager?.CancelTimer();
+            }
+        }
+
+        public void StartGame(Player[] connectedPlayers)
         {
             State.SetState(GameStateType.Starting);
             CurrentQuestionIndex = 0;
             StartedAt = DateTime.UtcNow;
+            Players = new(connectedPlayers);
         }
 
         /// <summary>
@@ -59,11 +84,19 @@ namespace Business.GameService
             return CurrentQuestionIndex >= Quiz.Questions.Length - 1;
         }
 
-        public Question StartQuestion()
+        public Question StartQuestion(Func<Task> revealAnswer)
         {
             var question = GetCurrentQuestion();
+            _questionTimerManager = new QuestionTimerManager(question);
+            _questionTimerManager.TimeRunOut += async () =>
+            {
+                await revealAnswer();
+            };
+
+            question.Timer.Start();
+            _questionTimerManager.StartTimer();
+
             State.SetState(GameStateType.Question);
-            QuestionTimer = new(question);
             return question;
         }
 
@@ -81,7 +114,6 @@ namespace Business.GameService
         public void RevealAnswer()
         {
             State.SetState(GameStateType.RevealAnswer);
-            QuestionTimer = null;
         }
 
         public bool TryAddPlayer(Player player)

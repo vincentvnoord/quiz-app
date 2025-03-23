@@ -1,7 +1,8 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 using Business.Models;
-using Business.Models.Presenters;
+using Businessn.GameService;
 
 namespace Business.GameService
 {
@@ -29,15 +30,7 @@ namespace Business.GameService
 
             if (game != null)
             {
-                var connectedPlayers = _connectionManager.getConnectedPlayers(game).Select(p => new PlayerStatePresenter
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                }).ToArray();
-
-                var gameState = new HostConnectState(game, connectedPlayers);
-
-                await _gameMessenger.HostConnected(hostId, gameState);
+                await _gameMessenger.HostConnected(hostId, game);
             }
             else
             {
@@ -47,16 +40,8 @@ namespace Business.GameService
 
         public async Task OnPlayerConnected(Player player, Game game)
         {
-            var gameState = new PlayerConnectState(game, player.Id);
-            await _gameMessenger.NotifyPlayerConnected(gameState);
-
-            var newPlayerState = new PlayerStatePresenter
-            {
-                Id = player.Id,
-                Name = player.Name,
-            };
-
-            await _gameMessenger.NotifyHostPlayerConnected(game.HostId, newPlayerState);
+            await _gameMessenger.NotifyPlayerConnected(game, player);
+            await _gameMessenger.NotifyHostPlayerConnected(game.HostId, player);
         }
 
         public async Task StartGame(string gameCode, string userId)
@@ -74,7 +59,8 @@ namespace Business.GameService
                 return;
             }
 
-            game.StartGame();
+            Player[] connectedPlayers = _connectionManager.getConnectedPlayers(game);
+            game.StartGame(connectedPlayers);
             await _gameMessenger.GameStarted(game.Id, (int)game.StartTimer.TotalMilliseconds);
 
             await Task.Delay((int)game.StartTimer.TotalMilliseconds);
@@ -84,6 +70,7 @@ namespace Business.GameService
         public async Task Continue(string gameCode)
         {
             Game? game = GetGame(gameCode);
+
             if (game?.State.State != GameStateType.RevealAnswer || game == null)
                 return;
 
@@ -105,18 +92,28 @@ namespace Business.GameService
 
         private async Task ShowQuestion(Game game)
         {
-            Question currentQuestion = game.StartQuestion();
-            var question = new QuestionPresenter(currentQuestion, game.CurrentQuestionIndex);
+            Question question = game.StartQuestion(async () =>
+            {
+                await RevealAnswer(game, game.GetCurrentQuestion());
+            });
 
             await _gameMessenger.Question(game.Id, question);
-            await Task.Delay(currentQuestion.TimeToAnswer * 1000);
-            await RevealAnswer(game, currentQuestion);
         }
 
         private async Task RevealAnswer(Game game, Question question)
         {
             game.RevealAnswer();
-            await _gameMessenger.RevealAnswer(game.Id, question.Answers.Select(a => a.IsCorrect).ToList().IndexOf(true));
+            int correctAnswerIndex = question.CorrectAnswer();
+
+            var tasks = game.Players.Select((player) =>
+            {
+                var playerAnswerResult = player.GetAnswerResult(game.CurrentQuestionIndex, correctAnswerIndex);
+                return _gameMessenger.RevealAnswer(player.Id, correctAnswerIndex, playerAnswerResult);
+            }).ToList();
+
+            tasks.Add(_gameMessenger.RevealAnswer(game.HostId, correctAnswerIndex));
+
+            await Task.WhenAll(tasks);
         }
 
         public static Game? GetGame(string gameId)
@@ -144,6 +141,40 @@ namespace Business.GameService
 
             game = g;
             return true;
+        }
+
+        public async Task AnswerQuestion(string gameId, string playerId, int answerIndex)
+        {
+            Game? game = GetGame(gameId);
+            if (game == null)
+            {
+                return;
+            }
+
+            if (game.State.State != GameStateType.Question)
+            {
+                return;
+            }
+
+            if (!game.TryGetPlayer(playerId, out Player? player))
+            {
+                return;
+            }
+
+            int currentQuestion = game.CurrentQuestionIndex;
+
+            if (player.HasAnsweredQuestion(currentQuestion))
+            {
+                return;
+            }
+
+            player.AnswerQuestion(currentQuestion, answerIndex);
+            game.RegisterAnswer(player.Id, currentQuestion);
+
+            if (game.AllPlayersAnswered())
+            {
+                await RevealAnswer(game, game.GetCurrentQuestion());
+            }
         }
 
         /// <summary>

@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using Business.GameService;
 using Business.Models;
-using Business.Models.Presenters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
@@ -68,6 +67,20 @@ namespace Api.GameHubManagement
             await _gameService.CloseGame(gameCode, userId);
         }
 
+        public async Task AnswerQuestion(string gameCode, string playerId, int answerIndex)
+        {
+            string connectionId = Context.ConnectionId;
+            string? currentUserId = _connectionManager.GetPlayerId(connectionId);
+            if (currentUserId != playerId)
+            {
+                await _gameMessenger.UnAuthorized(connectionId);
+                Context.Abort();
+                return;
+            }
+
+            await _gameService.AnswerQuestion(gameCode, playerId, answerIndex);
+        }
+
         public async Task ConnectPlayer(string gameCode, string playerId)
         {
             PlayerConnectionValidation result = GameService.ValidatePlayerConnection(gameCode, playerId);
@@ -104,11 +117,10 @@ namespace Api.GameHubManagement
                 var game = GameService.GetGameByPlayerId(playerId);
                 if (game != null)
                 {
+                    _connectionManager.TryRemoveConnection(connectionId);
                     await _gameMessenger.NotifyHostPlayerDisconnected(game.HostId, playerId);
                 }
             }
-
-            _connectionManager.TryRemoveConnection(connectionId);
 
             return base.OnDisconnectedAsync(exception);
         }

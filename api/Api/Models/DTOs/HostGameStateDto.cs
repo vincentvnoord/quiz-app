@@ -1,14 +1,14 @@
 using Business.GameService;
 
-namespace Business.Models.Presenters
+namespace Api.Models.DTOs
 {
-    public record HostConnectState : GameStatePresenter
+    public record HostGameStateDto : GameStateDto
     {
         public string Title { get; init; } = default!;
         public int QuestionCount { get; init; }
-        public PlayerStatePresenter[] Players { get; init; } = [];
+        public PlayerDto[] Players { get; init; } = [];
 
-        public HostConnectState(Game game, PlayerStatePresenter[] players) : base(game)
+        public HostGameStateDto(Game game, PlayerDto[] players) : base(game)
         {
             Title = game.Quiz.Title;
             QuestionCount = game.Quiz.Questions.Length;
