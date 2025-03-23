@@ -1,16 +1,17 @@
 using Business.GameService;
+using Business.Models;
 
-namespace Business.Models.Presenters
+namespace Api.Models.DTOs
 {
-    public record GameStatePresenter
+    public record GameStateDto
     {
         public string GameState { get; init; }
         public double Timer { get; set; }
 
-        public QuestionPresenter? CurrentQuestion { get; init; }
-        public int? CorrectAnswer { get; init; }
+        public QuestionStateDto? CurrentQuestion { get; init; }
+        public CorrectAnswerDto? CorrectAnswer { get; init; }
 
-        public GameStatePresenter(Game game)
+        public GameStateDto(Game game)
         {
             GameState = game.State.ToString();
 
@@ -22,16 +23,16 @@ namespace Business.Models.Presenters
             if (game.State.State == GameStateType.Question || game.State.State == GameStateType.RevealAnswer)
             {
                 int currentQuestionIndex = game.CurrentQuestionIndex;
-                CurrentQuestion = new QuestionPresenter(game.GetCurrentQuestion(), currentQuestionIndex);
-                if (game.QuestionTimer != null)
+                var question = game.GetCurrentQuestion();
+                CurrentQuestion = new QuestionStateDto(question, currentQuestionIndex)
                 {
-                    CurrentQuestion.TimeToAnswer = game.QuestionTimer.RemainingTime();
-                }
+                    TimeToAnswer = question.Timer.RemainingTime()
+                };
             }
 
             if (game.State.State == GameStateType.RevealAnswer)
             {
-                CorrectAnswer = game.GetCurrentQuestion().CorrectAnswer();
+                CorrectAnswer = new CorrectAnswerDto(game.GetCurrentQuestion().CorrectAnswer());
             }
         }
     }

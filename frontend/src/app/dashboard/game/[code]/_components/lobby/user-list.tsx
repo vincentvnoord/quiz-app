@@ -5,7 +5,7 @@ import useHostStore from "@/client/quiz-game/host/stores/host-store";
 import { motion } from "framer-motion";
 
 export const UserList = () => {
-    const { players, title, questionCount } = useHostStore();
+    const { state: { players, title, questionCount } } = useHostStore();
 
     return (
         <div className="flex min-h-0 flex-col gap-3 flex-grow">

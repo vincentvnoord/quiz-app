@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { QuestionDisplay } from "@/components/question-display";
 
 export const Question = () => {
-    const { currentQuestion, gameState, gameManager, correctAnswer } = useHostStore();
+    const { gameManager, state: { currentQuestion, gameState, correctAnswer } } = useHostStore();
 
     const nextQuestion = () => {
         console.log("Next question");
@@ -28,7 +28,11 @@ export const Question = () => {
                     </button>
                 </motion.div>
             </div>
-            <QuestionDisplay currentQuestion={currentQuestion} gameState={gameState === "question" || gameState === "reveal-answer" ? gameState : "question"} correctAnswer={correctAnswer} />
+            <QuestionDisplay
+                currentQuestion={currentQuestion}
+                gameState={gameState === "question" || gameState === "reveal-answer" ? gameState : "question"}
+                correctAnswer={correctAnswer}
+            />
         </div>
     )
 }

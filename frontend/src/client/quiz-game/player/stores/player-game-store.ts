@@ -1,33 +1,47 @@
-import { QuestionSlice, createQuestionSlice } from "@/client/quiz-game/shared/stores/question-slice";
-import { create, StateCreator } from "zustand";
-import { PlayerGameManager } from "../logic/player-game-manager";
-import { createGameSlice, GameSlice } from "../../shared/stores/game-slice";
+import { create } from "zustand";
+import { IGameManager, PlayerGameManager } from "../logic/player-game-manager";
+import { PlayerGameManagerMock } from "../logic/player-game-manager-mock";
+import { BaseGameState, GameStateDto, PlayerDto } from "../../shared/stores/game-state";
 
-type GameState = "choose-name" | "connecting" | "lobby" | "starting" | "question" | "reveal-answer" | "results";
+const UI_DEBUG = false;
 
-interface GeneralSlice {
-    gameManager: PlayerGameManager | null;
-    setGameManager: (manager: PlayerGameManager) => void;
-    gameState: GameState;
-    setGameState: (state: GameState) => void;
+export interface PlayerGameStateDto extends GameStateDto {
+    gameCode: string;
+    gameState: BaseGameState | "choose-name";
+    player: PlayerDto;
 }
 
-const createGeneralSlice: StateCreator<GeneralSlice> = (set) => ({
+export interface PlayerGameStore {
+    gameManager: IGameManager | null;
+    setGameManager: (manager: IGameManager) => void;
+    state: PlayerGameStateDto;
+    setState: (state: Partial<PlayerGameStateDto>) => void;
+}
+
+export const usePlayerGameStore = create<PlayerGameStore>()((set) => ({
     gameManager: null,
-    setGameManager: (gameManager) => set({ gameManager }),
+    setGameManager: (manager) => set({ gameManager: manager }),
+    state: {
+        gameCode: "",
+        gameState: "connecting",
+        timer: 0,
+        currentQuestion: null,
+        correctAnswer: null,
 
-    gameState: "choose-name",
-    setGameState: (gameState) => set({ gameState }),
-});
-
-export type PlayerGameStore = GeneralSlice & GameSlice & QuestionSlice;
-
-export const usePlayerGameStore = create<PlayerGameStore>()((...a) => ({
-    ...createGeneralSlice(...a),
-    ...createQuestionSlice(...a),
-    ...createGameSlice(...a),
+        player: {
+            id: "",
+            name: "",
+        },
+    },
+    setState: (state) => set((currentState) => ({
+        state: {
+            ...currentState.state,
+            ...state
+        }
+    }))
 }));
 
-usePlayerGameStore.setState(() => ({
-    gameManager: new PlayerGameManager(usePlayerGameStore)
+usePlayerGameStore.setState((state) => ({
+    ...state.state,
+    gameManager: UI_DEBUG ? new PlayerGameManagerMock(usePlayerGameStore) : new PlayerGameManager(usePlayerGameStore)
 }))

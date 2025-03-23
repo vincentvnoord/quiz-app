@@ -6,7 +6,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 
 export const StartQuiz = () => {
-    const { gameManager, players } = useHostStore();
+    const { gameManager, state: { players } } = useHostStore();
     const [showError, setShowError] = useState(false);
     const enoughPlayers = gameManager ? players.length >= gameManager?.getMinimumPlayers() : 2;
 

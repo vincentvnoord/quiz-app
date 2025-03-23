@@ -1,15 +1,17 @@
 using System.Diagnostics.Contracts;
+using Business.Models;
 
-namespace Business.Models.Presenters
+namespace Api.Models.DTOs
 {
-    public record QuestionPresenter
+    public record QuestionStateDto
     {
         public int Index { get; private set; }
         public string Text { get; private set; } = default!;
         public string[] Answers { get; private set; } = [];
         public double TimeToAnswer { get; set; }
+        public bool HasAnswered { get; set; } = false;
 
-        public QuestionPresenter(Question question, int questionIndex)
+        public QuestionStateDto(Question question, int questionIndex)
         {
             Index = questionIndex;
             Text = question.Text;

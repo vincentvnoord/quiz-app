@@ -6,12 +6,12 @@ import { useEffect } from "react";
 import useHostStore from "@/client/quiz-game/host/stores/host-store";
 import { Lobby } from "./lobby/lobby";
 import Connecting from "@/components/connecting";
-import { StartingDisplay } from "@/components/starting-display";
 import { GameNotFound } from "./game-not-found";
 import { Question } from "./game/question";
+import { StartTimer } from "./game/start-timer";
 
 export default function GameState() {
-    const { gameState, gameManager, timer } = useHostStore();
+    const { gameManager, state: { gameState } } = useHostStore();
 
     const params = useParams();
 
@@ -38,7 +38,7 @@ export default function GameState() {
                     <Lobby />
                 </motion.div>
             }
-            {gameState === "starting" && <StartingDisplay timer={timer} />}
+            {gameState === "starting" && <StartTimer />}
             {(gameState === "question" || gameState === "reveal-answer") && <Question />}
             {gameState === "results" && <div className="w-full h-dvh flex justify-center items-center text-5xl font-bold overflow-hidden">Results</div>}
         </>
