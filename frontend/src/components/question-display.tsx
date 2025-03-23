@@ -26,8 +26,10 @@ export const QuestionDisplay = ({ currentQuestion, gameState, correctAnswer, onA
             setTimeLeft(currentTime);
         });
 
+        console.log("rerendering with timer: ", timeLeft);
+
         return () => stopTimer();
-    }, [currentQuestion, gameState, timeToAnswer]);
+    }, [currentQuestion.index, gameState]);
 
     if (correctAnswer?.playerAnswerResult)
         return <AnswerResults result={correctAnswer.playerAnswerResult} />
