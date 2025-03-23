@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Business.Models;
+using Businessn.GameService;
 
 namespace Business.GameService
 {
@@ -69,6 +70,7 @@ namespace Business.GameService
         public async Task Continue(string gameCode)
         {
             Game? game = GetGame(gameCode);
+
             if (game?.State.State != GameStateType.RevealAnswer || game == null)
                 return;
 
@@ -90,10 +92,12 @@ namespace Business.GameService
 
         private async Task ShowQuestion(Game game)
         {
-            Question currentQuestion = game.StartQuestion();
-            await _gameMessenger.Question(game.Id, currentQuestion);
-            await Task.Delay(currentQuestion.TimeToAnswer * 1000);
-            await RevealAnswer(game, currentQuestion);
+            Question question = game.StartQuestion(async () =>
+            {
+                await RevealAnswer(game, game.GetCurrentQuestion());
+            });
+
+            await _gameMessenger.Question(game.Id, question);
         }
 
         private async Task RevealAnswer(Game game, Question question)
@@ -167,7 +171,7 @@ namespace Business.GameService
             player.AnswerQuestion(currentQuestion, answerIndex);
             game.RegisterAnswer(player.Id, currentQuestion);
 
-            if (game.AllPlayersAnswered(currentQuestion))
+            if (game.AllPlayersAnswered())
             {
                 await RevealAnswer(game, game.GetCurrentQuestion());
             }

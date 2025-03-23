@@ -2,6 +2,7 @@
 export const startTimer = (timeInMilliseconds: number, onSecond?: (timeInSeconds: number) => void) => {
     const startTime = performance.now();
     const endTime = startTime + timeInMilliseconds;
+    let animationFrameId: number;
     let lastSecond = Math.ceil(timeInMilliseconds / 1000);
     if (onSecond) {
         onSecond(lastSecond);
@@ -19,9 +20,11 @@ export const startTimer = (timeInMilliseconds: number, onSecond?: (timeInSeconds
         }
 
         if (remainingTime > 0) {
-            requestAnimationFrame(updateTimer);
+            animationFrameId = requestAnimationFrame(updateTimer);
         }
     };
 
     updateTimer();
+
+    return () => cancelAnimationFrame(animationFrameId);
 }

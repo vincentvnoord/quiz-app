@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using Business.Models;
+using Businessn.GameService;
 
 namespace Business.GameService
 {
@@ -19,7 +20,9 @@ namespace Business.GameService
         public int CurrentQuestionIndex { get; private set; } = 0;
 
         public ConcurrentBag<Player> Players { get; private set; } = [];
-        private Dictionary<int, HashSet<string>> _playerAnswersPerQuestion = new();
+        private ConcurrentDictionary<int, HashSet<string>> _playerAnswersPerQuestion = new();
+
+        private QuestionTimerManager? _questionTimerManager;
 
         public Game(string id, string hostId, Quiz quiz, int startTimer = 5)
         {
@@ -34,19 +37,20 @@ namespace Business.GameService
             return _playerAnswersPerQuestion.TryGetValue(questionIndex, out var answers) ? answers.Count : 0;
         }
 
-        public bool AllPlayersAnswered(int questionIndex)
+        public bool AllPlayersAnswered()
         {
-            return GetAnsweredCount(questionIndex) >= Players.Count;
+            return GetAnsweredCount(CurrentQuestionIndex) >= Players.Count;
         }
 
         public void RegisterAnswer(string playerId, int questionIndex)
         {
-            if (!_playerAnswersPerQuestion.ContainsKey(questionIndex))
-            {
-                _playerAnswersPerQuestion[questionIndex] = new HashSet<string>();
-            }
+            var questionSet = _playerAnswersPerQuestion.GetOrAdd(questionIndex, []);
+            questionSet.Add(playerId);
 
-            _playerAnswersPerQuestion[questionIndex].Add(playerId);
+            if (AllPlayersAnswered())
+            {
+                _questionTimerManager?.CancelTimer();
+            }
         }
 
         public void StartGame(Player[] connectedPlayers)
@@ -80,10 +84,18 @@ namespace Business.GameService
             return CurrentQuestionIndex >= Quiz.Questions.Length - 1;
         }
 
-        public Question StartQuestion()
+        public Question StartQuestion(Func<Task> revealAnswer)
         {
             var question = GetCurrentQuestion();
+            _questionTimerManager = new QuestionTimerManager(question);
+            _questionTimerManager.TimeRunOut += async () =>
+            {
+                await revealAnswer();
+            };
+
             question.Timer.Start();
+            _questionTimerManager.StartTimer();
+
             State.SetState(GameStateType.Question);
             return question;
         }

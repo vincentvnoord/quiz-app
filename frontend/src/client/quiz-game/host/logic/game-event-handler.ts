@@ -1,8 +1,5 @@
-import useHostStore, { HostGameStateDto, HostGameStore } from "../stores/host-store";
-import { CorrectAnswer, Question } from "@/client/quiz-game/shared/stores/question-slice";
-import { Player } from "../stores/players-slice";
-import { startTimer } from "@/lib/timer";
-import { QuestionStateDto } from "../../shared/stores/game-state";
+import useHostStore, { HostGameStateDto } from "../stores/host-store";
+import { CorrectAnswerDto, PlayerDto, QuestionStateDto } from "../../shared/stores/game-state";
 
 export class GameEventHandler {
     private readonly gameStore: typeof useHostStore;
@@ -16,7 +13,7 @@ export class GameEventHandler {
         state.setState({ gameState: "question", currentQuestion: question, correctAnswer: null });
     }
 
-    onRevealAnswer(correctAnswer: CorrectAnswer) {
+    onRevealAnswer(correctAnswer: CorrectAnswerDto) {
         const state = this.gameStore.getState();
         state.setState({ gameState: "reveal-answer", correctAnswer });
     }
@@ -36,7 +33,7 @@ export class GameEventHandler {
         window.location.href = "/dashboard";
     }
 
-    onPlayerJoined(player: Player) {
+    onPlayerJoined(player: PlayerDto) {
         const state = this.gameStore.getState();
         state.setState({ players: [...state.state.players, player] });
     }

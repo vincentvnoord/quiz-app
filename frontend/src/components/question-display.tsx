@@ -16,14 +16,19 @@ type QuestionDisplayProps = {
 
 export const QuestionDisplay = ({ currentQuestion, gameState, correctAnswer, onAnswerPressed }: QuestionDisplayProps) => {
     const timeToAnswer = currentQuestion.timeToAnswer;
-    const [timeLeft, setTimeLeft] = useState(Math.ceil(timeToAnswer / 1000));
+    const [timeLeft, setTimeLeft] = useState(timeToAnswer);
 
     useEffect(() => {
         if (gameState !== "question") return;
+        if (currentQuestion.hasAnswered) return;
 
-        startTimer(timeToAnswer, (currentTime: number) => setTimeLeft(currentTime));
+        const stopTimer = startTimer(timeToAnswer, (currentTime: number) => {
+            setTimeLeft(currentTime);
+        });
+
+        return () => stopTimer();
     }, [currentQuestion, gameState, timeToAnswer]);
-    
+
     if (correctAnswer?.playerAnswerResult)
         return <AnswerResults result={correctAnswer.playerAnswerResult} />
 
