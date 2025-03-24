@@ -1,4 +1,4 @@
-using Business.GameService;
+using Business.GameSessions;
 using Business.Models;
 using NUnit.Framework;
 

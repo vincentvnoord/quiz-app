@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using Business.GameService;
+using Business.GameSessions;
 using Business.Models;
 using Moq;
 

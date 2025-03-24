@@ -1,5 +1,5 @@
 
-using Business.GameService;
+using Business.GameSessions;
 using Microsoft.SqlServer.Server;
 
 namespace Api.Models.DTOs

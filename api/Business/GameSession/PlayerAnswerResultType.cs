@@ -1,5 +1,5 @@
 
-namespace Business.GameService
+namespace Business.GameSessions
 {
     public enum PlayerAnswerResultType
     {

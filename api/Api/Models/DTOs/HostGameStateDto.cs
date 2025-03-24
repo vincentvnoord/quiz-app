@@ -1,4 +1,5 @@
-using Business.GameService;
+using Business.GameSessions;
+using Business.GameSessions;
 
 namespace Api.Models.DTOs
 {
@@ -8,8 +9,9 @@ namespace Api.Models.DTOs
         public int QuestionCount { get; init; }
         public PlayerDto[] Players { get; init; } = [];
 
-        public HostGameStateDto(Game game, PlayerDto[] players) : base(game)
+        public HostGameStateDto(GameSession session, PlayerDto[] players) : base(session)
         {
+            Game game = session.Game;
             Title = game.Quiz.Title;
             QuestionCount = game.Quiz.Questions.Length;
             Players = players;

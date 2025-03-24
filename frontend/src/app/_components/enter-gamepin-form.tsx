@@ -35,7 +35,7 @@ export const EnterGamePinForm = () => {
             <Input onChange={handlePinChange} value={gamePin} placeholder="Game PIN" className="justify-center font-semibold" error={false} valid={false} />
             <motion.div animate={loading ? { scale: 0.9, opacity: 0.7 } : { scale: 1 }} className="w-full">
                 <button className={`bg-primary text-white ${barriecieto.className} text-4xl w-full p-2 rounded-xl`}>
-                    {loading ? "LOADING" : "ENTER"}
+                    {loading ? "LOADING" : "JOIN"}
                 </button>
             </motion.div>
         </form>
