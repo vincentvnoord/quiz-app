@@ -28,7 +28,7 @@ export class GameManager implements IGameManager {
         }
     }
 
-    getMinimumPlayers = () => 1;
+    getMinimumPlayers = () => 2;
 
     async startGame() {
         if (this.connection) {
