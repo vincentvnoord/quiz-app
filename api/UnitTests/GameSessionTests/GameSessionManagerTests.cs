@@ -1,11 +1,10 @@
-using System.Threading.Tasks;
 using Business.GameSessions;
 using Business.Models;
 using Moq;
 
 namespace UnitTests.GameSessionTests
 {
-    public class GameServiceTests
+    public class GameSessionManagerTests
     {
 
         private Quiz _quiz;
@@ -25,14 +24,14 @@ namespace UnitTests.GameSessionTests
         [Test]
         public void NewGame_CreatesUniqueCodes()
         {
-
+            var sessionManager = new GameSessionManager(new Mock<IGameMessenger>().Object, new Mock<IConnectionManager>().Object);
             HashSet<string> gameIds = [];
             int numberOfGames = 100000;
 
             for (int i = 0; i < numberOfGames; i++)
             {
-                Game game = GameService.CreateGame(_quiz, "host");
-                string gameId = game.Id;
+                GameSession session = sessionManager.CreateGameSession(_quiz, "host");
+                string gameId = session.Game.Id;
                 Assert.Multiple(() =>
                 {
                     Assert.That(gameId, Has.Length.EqualTo(6), $"Game code length is not 6: {gameId}");
@@ -44,26 +43,27 @@ namespace UnitTests.GameSessionTests
         [Test]
         public async Task CloseGame_RemovesGameFromActiveGames()
         {
-            var gameService = new GameService(new Mock<IConnectionManager>().Object, new Mock<IGameMessenger>().Object);
-            Game game = GameService.CreateGame(_quiz, "host");
-            string gameId = game.Id;
+            var sessionManager = new GameSessionManager(new Mock<IGameMessenger>().Object, new Mock<IConnectionManager>().Object);
+            GameSession game = sessionManager.CreateGameSession(_quiz, "host");
+            string gameId = game.Game.Id;
 
-            Assert.That(GameService.GetGame(gameId), Is.Not.Null);
+            Assert.That(GameSessionManager.GetGameSession(gameId), Is.Not.Null);
 
-            await gameService.CloseGame(gameId, "host");
+            await sessionManager.CloseGame(gameId, "host");
 
-            Assert.That(GameService.GetGame(gameId), Is.Null);
+            Assert.That(GameSessionManager.GetGameSession(gameId), Is.Null);
         }
 
         [Test]
         public void ValidatePlayerConnection_Returns_Success_WhenValid()
         {
-            Game game = GameService.CreateGame(_quiz, "host");
+            var sessionManager = new GameSessionManager(new Mock<IGameMessenger>().Object, new Mock<IConnectionManager>().Object);
+            GameSession session = sessionManager.CreateGameSession(_quiz, "host");
 
-            Player player = new("player", game.Id);
-            game.TryAddPlayer(player);
+            Player player = new("player", session.Game.Id);
+            session.Game.TryAddPlayer(player);
 
-            var validationResult = GameService.ValidatePlayerConnection(game.Id, player.Id);
+            var validationResult = GameSessionManager.ValidatePlayerConnection(session.Game.Id, player.Id);
 
             Assert.That(validationResult.Status, Is.EqualTo(PlayerConnectionValidationResult.Success));
         }
@@ -74,7 +74,7 @@ namespace UnitTests.GameSessionTests
             string gameId = "nonexistent";
             string playerId = "player";
 
-            PlayerConnectionValidation result = GameService.ValidatePlayerConnection(gameId, playerId);
+            PlayerConnectionValidation result = GameSessionManager.ValidatePlayerConnection(gameId, playerId);
 
             Assert.That(result.Status, Is.EqualTo(PlayerConnectionValidationResult.GameNotFound));
         }
@@ -82,10 +82,11 @@ namespace UnitTests.GameSessionTests
         [Test]
         public void ConnectPlayer_Returns_NonRegisteredPlayer_WhenPlayerIsNotRegistered()
         {
-            Game game = GameService.CreateGame(_quiz, "host");
+            var sessionManager = new GameSessionManager(new Mock<IGameMessenger>().Object, new Mock<IConnectionManager>().Object);
+            GameSession session = sessionManager.CreateGameSession(_quiz, "host");
             string playerId = "player";
 
-            PlayerConnectionValidation result = GameService.ValidatePlayerConnection(game.Id, playerId);
+            PlayerConnectionValidation result = GameSessionManager.ValidatePlayerConnection(session.Game.Id, playerId);
 
             Assert.That(result.Status, Is.EqualTo(PlayerConnectionValidationResult.NonRegisteredPlayer));
         }
