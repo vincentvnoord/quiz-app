@@ -1,4 +1,4 @@
-using Business.GameService;
+using Business.GameSessions;
 
 namespace Business.Models
 {
@@ -13,15 +13,12 @@ namespace Business.Models
         /// </summary>
         public int TimeToAnswer { get; set; }
 
-        public QuestionTimer Timer { get; private set; }
-
         public Question(int id, string text, Answer[] answers, int timeToAnswer = 3)
         {
             Id = id;
             Text = text;
             Answers = answers;
             TimeToAnswer = timeToAnswer;
-            Timer = new(timeToAnswer);
         }
 
         public int CorrectAnswer()

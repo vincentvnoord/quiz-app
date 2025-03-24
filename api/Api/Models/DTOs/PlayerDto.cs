@@ -1,4 +1,4 @@
-using Business.GameService;
+using Business.GameSessions;
 
 namespace Api.Models.DTOs
 {

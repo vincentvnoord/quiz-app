@@ -15,5 +15,10 @@ namespace Business.QuizService
         {
             return await _quizRepository.GetQuiz(id);
         }
+
+        public async Task<IEnumerable<Quiz>> GetList()
+        {
+            return await _quizRepository.GetList();
+        }
     }
 }

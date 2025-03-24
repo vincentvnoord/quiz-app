@@ -1,4 +1,5 @@
-using Business.GameService;
+using Business.GameSessions;
+using Business.GameSessions;
 
 namespace Api.Models.DTOs
 {
@@ -7,8 +8,9 @@ namespace Api.Models.DTOs
         public PlayerDto Player { get; init; }
         public int Score { get; init; } = 0;
 
-        public PlayerGameStateDto(Game game, Player player) : base(game)
+        public PlayerGameStateDto(GameSession session, Player player) : base(session)
         {
+            Game game = session.Game;
             Player = new PlayerDto(player);
             if (CurrentQuestion != null)
             {

@@ -1,11 +1,11 @@
 
 using Business.Models;
 
-namespace Business.GameService
+namespace Business.GameSessions
 {
     public interface IGameMessenger
     {
-        Task HostConnected(string hostId, Game state);
+        Task HostConnected(string hostId, GameSession session);
         Task GameNotFound(string userId);
         Task UnAuthorized(string userId);
         Task NonRegisteredPlayer(string connectionId);
@@ -16,7 +16,7 @@ namespace Business.GameService
         /// <param name="state"></param>
         /// <param name="player"></param>
         /// <returns></returns>
-        Task NotifyPlayerConnected(Game state, Player player);
+        Task NotifyPlayerConnected(GameSession session, Player player);
 
         /// <summary>
         /// Use this method to notify only the host of the player that connected

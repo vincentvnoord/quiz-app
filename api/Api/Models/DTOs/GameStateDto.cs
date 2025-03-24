@@ -1,4 +1,5 @@
-using Business.GameService;
+using Business.GameSessions;
+using Business.GameSessions;
 using Business.Models;
 
 namespace Api.Models.DTOs
@@ -11,8 +12,9 @@ namespace Api.Models.DTOs
         public QuestionStateDto? CurrentQuestion { get; init; }
         public CorrectAnswerDto? CorrectAnswer { get; init; }
 
-        public GameStateDto(Game game)
+        public GameStateDto(GameSession session)
         {
+            Game game = session.Game;
             GameState = game.State.ToString();
 
             if (game.State.State == GameStateType.Starting)
@@ -26,7 +28,7 @@ namespace Api.Models.DTOs
                 var question = game.GetCurrentQuestion();
                 CurrentQuestion = new QuestionStateDto(question, currentQuestionIndex)
                 {
-                    TimeToAnswer = question.Timer.RemainingTime()
+                    TimeToAnswer = session.QuestionTimerManager != null ? session.QuestionTimerManager.RemainingTime() : question.TimeToAnswer
                 };
             }
 

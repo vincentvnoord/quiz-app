@@ -1,17 +1,16 @@
 using System.Security.Claims;
-using Business.GameService;
-using Business.Models;
+using Business.GameSessions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Api.GameHubManagement
 {
-    public class GameHub(GameService gameService, IConnectionManager connectionManager, IGameMessenger gameMessenger) : Hub
+    public class GameHub(GameSessionManager sessionManager, IConnectionManager connectionManager, IGameMessenger gameMessenger) : Hub
     {
         private readonly IConnectionManager _connectionManager = connectionManager;
         private readonly IGameMessenger _gameMessenger = gameMessenger;
 
-        private readonly GameService _gameService = gameService;
+        private readonly GameSessionManager _sessionManager = sessionManager;
 
         [Authorize]
         public async Task ConnectHost(string gameCode)
@@ -22,10 +21,17 @@ namespace Api.GameHubManagement
                 return;
             }
 
-            // Order is essential as .AssignHost sends message to the host with current game state (after connection step)
             _connectionManager.Connect(userId, gameCode, Context.ConnectionId);
+            GameSession? session = GameSessionManager.GetGameSession(gameCode);
 
-            await _gameService.AssignHost(gameCode, userId);
+            if (session != null)
+            {
+                await _gameMessenger.HostConnected(userId, session);
+            }
+            else
+            {
+                await _gameMessenger.GameNotFound(userId);
+            }
         }
 
         [Authorize]
@@ -38,7 +44,15 @@ namespace Api.GameHubManagement
                 return;
             }
 
-            await _gameService.StartGame(gameCode, userId);
+            GameSession? session = GameSessionManager.GetGameSession(gameCode);
+            if (session == null)
+            {
+                await _gameMessenger.GameNotFound(Context.ConnectionId);
+                Context.Abort();
+                return;
+            }
+
+            await session.Start();
         }
 
         [Authorize]
@@ -51,7 +65,15 @@ namespace Api.GameHubManagement
                 return;
             }
 
-            await _gameService.Continue(gameCode);
+            GameSession? session = GameSessionManager.GetGameSession(gameCode);
+            if (session == null)
+            {
+                await _gameMessenger.GameNotFound(Context.ConnectionId);
+                Context.Abort();
+                return;
+            }
+
+            await session.Continue();
         }
 
         [Authorize]
@@ -64,7 +86,7 @@ namespace Api.GameHubManagement
                 return;
             }
 
-            await _gameService.CloseGame(gameCode, userId);
+            await _sessionManager.CloseGame(gameCode, userId);
         }
 
         public async Task AnswerQuestion(string gameCode, string playerId, int answerIndex)
@@ -78,12 +100,20 @@ namespace Api.GameHubManagement
                 return;
             }
 
-            await _gameService.AnswerQuestion(gameCode, playerId, answerIndex);
+            GameSession? session = GameSessionManager.GetGameSession(gameCode);
+            if (session == null)
+            {
+                await _gameMessenger.GameNotFound(connectionId);
+                Context.Abort();
+                return;
+            }
+
+            await session.AnswerQuestion(playerId, answerIndex);
         }
 
         public async Task ConnectPlayer(string gameCode, string playerId)
         {
-            PlayerConnectionValidation result = GameService.ValidatePlayerConnection(gameCode, playerId);
+            PlayerConnectionValidation result = GameSessionManager.ValidatePlayerConnection(gameCode, playerId);
             if (result.Status == PlayerConnectionValidationResult.GameNotFound)
             {
                 await _gameMessenger.GameNotFound(Context.ConnectionId);
@@ -102,10 +132,10 @@ namespace Api.GameHubManagement
             string connectionId = Context.ConnectionId;
             _connectionManager.Connect(playerId, gameCode, connectionId);
 
-            // Send over to game service which notifies necessary players
+            // Notify the game session
             Player player = result.Player!;
-            Game game = result.Game!;
-            await _gameService.OnPlayerConnected(player, game);
+            GameSession session = result.Session!;
+            await session.OnPlayerJoined(player);
         }
 
         public override async Task<Task> OnDisconnectedAsync(Exception? exception)
@@ -114,11 +144,11 @@ namespace Api.GameHubManagement
             string? playerId = _connectionManager.GetPlayerId(connectionId);
             if (playerId != null)
             {
-                var game = GameService.GetGameByPlayerId(playerId);
-                if (game != null)
+                var session = GameSessionManager.GetGameSessionByPlayerId(playerId);
+                if (session != null)
                 {
                     _connectionManager.TryRemoveConnection(connectionId);
-                    await _gameMessenger.NotifyHostPlayerDisconnected(game.HostId, playerId);
+                    await _gameMessenger.NotifyHostPlayerDisconnected(session.Game.HostId, playerId);
                 }
             }
 

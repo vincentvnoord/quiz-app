@@ -1,6 +1,5 @@
-using System.Diagnostics.Contracts;
 
-namespace Business.GameService
+namespace Business.GameSessions
 {
     public enum PlayerConnectionValidationResult
     {
@@ -13,16 +12,16 @@ namespace Business.GameService
     {
         public PlayerConnectionValidationResult Status { get; }
         public Player? Player { get; }
-        public Game? Game { get; }
+        public GameSession? Session { get; }
 
-        public PlayerConnectionValidation(PlayerConnectionValidationResult status, Player? player = null, Game? game = null)
+        public PlayerConnectionValidation(PlayerConnectionValidationResult status, Player? player = null, GameSession? session = null)
         {
             Status = status;
             Player = player;
-            Game = game;
+            Session = session;
         }
 
-        public static PlayerConnectionValidation Success(Player player, Game game)
+        public static PlayerConnectionValidation Success(Player player, GameSession game)
         {
             return new PlayerConnectionValidation(PlayerConnectionValidationResult.Success, player, game);
         }
