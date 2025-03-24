@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { motion } from "framer-motion";
 
-export const CreateGame = () => {
+export const CreateGame = ({ children, quizId }: { children?: React.ReactNode, quizId: string }) => {
     const router = useRouter();
 
     const [activeGameSession, setActiveGameSession] = useState(true);
@@ -14,7 +14,7 @@ export const CreateGame = () => {
 
     const onClick = async () => {
         try {
-            const res = await createGame(false);
+            const res = await createGame(false, quizId);
             if (res?.activeGameSession) {
                 setGameId(res.code);
                 setActiveGameSession(true);
@@ -29,15 +29,15 @@ export const CreateGame = () => {
 
     return (
         <>
-            <button onClick={onClick} className="bg-primary mt-8 text-xl text-white font-bold w-fit p-3 rounded-xl">
-                Create game
+            <button onClick={onClick} className="w-full">
+                {children}
             </button>
-            <ActiveGameSessionMessage activeGameSession={activeGameSession} gameId={gameId} />
+            <ActiveGameSessionMessage activeGameSession={activeGameSession} gameId={gameId} quizId={quizId} />
         </>
     )
 }
 
-const ActiveGameSessionMessage = ({ activeGameSession, gameId }: { activeGameSession: boolean, gameId: string | null }) => {
+const ActiveGameSessionMessage = ({ activeGameSession, gameId, quizId }: { activeGameSession: boolean, gameId: string | null, quizId: string }) => {
     const router = useRouter();
     const showModal = activeGameSession && gameId !== null;
 
@@ -47,7 +47,7 @@ const ActiveGameSessionMessage = ({ activeGameSession, gameId }: { activeGameSes
 
     const terminateAndCreateNew = async () => {
         try {
-            const res = await createGame(true);
+            const res = await createGame(true, quizId);
             if (res?.code) {
                 router.push(`/dashboard/game/${res.code}`);
             }

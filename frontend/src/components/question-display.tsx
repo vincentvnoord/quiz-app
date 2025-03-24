@@ -45,7 +45,7 @@ export const QuestionDisplay = ({ currentQuestion, gameState, correctAnswer, onA
             {
                 currentQuestion.hasAnswered ?
                     <div className={`h-full items-center gap-5 text-center w-full flex flex-col pt-32`}>
-                        <h1 className="text-3xl font-bold">Did you get it right? :o</h1>
+                        <h1 className="text-3xl font-bold">Did you get it right?</h1>
                         <p className="opacity-50">Waiting for players to answer...</p>
                     </div>
                     :

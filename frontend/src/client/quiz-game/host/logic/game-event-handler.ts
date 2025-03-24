@@ -29,7 +29,6 @@ export class GameEventHandler {
     }
 
     onGameClosed() {
-        console.log("Game closed");
         window.location.href = "/dashboard";
     }
 

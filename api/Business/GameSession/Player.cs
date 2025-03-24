@@ -1,4 +1,4 @@
-namespace Business.GameService
+namespace Business.GameSessions
 {
     public class Player
     {

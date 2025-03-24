@@ -1,5 +1,5 @@
 using Api.Models.DTOs;
-using Business.GameService;
+using Business.GameSessions;
 using Business.Models;
 using Microsoft.AspNetCore.SignalR;
 
@@ -21,15 +21,15 @@ namespace Api.GameHubManagement
             await _gameHub.Clients.Client(userId).SendAsync("GameNotFound");
         }
 
-        public async Task HostConnected(string hostId, Game state)
+        public async Task HostConnected(string hostId, GameSession session)
         {
             string? hostConnectionId = _connectionManager.GetConnectionId(hostId);
             if (hostConnectionId == null)
                 return;
 
             // Only show the connected players to the host, not all players that are registered
-            Player[] players = _connectionManager.getConnectedPlayers(state);
-            var gameState = new HostGameStateDto(state, [.. players.Select(p => new PlayerDto(p))]);
+            Player[] players = _connectionManager.getConnectedPlayers(session.Game);
+            var gameState = new HostGameStateDto(session, [.. players.Select(p => new PlayerDto(p))]);
             await _gameHub.Clients.Client(hostConnectionId).SendAsync("HostConnected", gameState);
         }
 
@@ -76,13 +76,13 @@ namespace Api.GameHubManagement
             await _gameHub.Clients.Client(connectionId).SendAsync("NonRegisteredPlayer");
         }
 
-        public async Task NotifyPlayerConnected(Game state, Player player)
+        public async Task NotifyPlayerConnected(GameSession session, Player player)
         {
             string? connectionId = _connectionManager.GetConnectionId(player.Id);
             if (connectionId == null)
                 return;
 
-            var gameState = new PlayerGameStateDto(state, player);
+            var gameState = new PlayerGameStateDto(session, player);
             await _gameHub.Clients.Client(connectionId).SendAsync("Connected", gameState);
         }
 

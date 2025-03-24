@@ -1,5 +1,5 @@
 using Api.Models;
-using Business.GameService;
+using Business.GameSessions;
 using Business.Models;
 using Business.QuizService;
 using Microsoft.AspNetCore.Authorization;
@@ -14,12 +14,12 @@ namespace Api.Controllers
     [Route("/[controller]")]
     public class GameController : ControllerBase
     {
-        private readonly GameService _gameService;
+        private readonly GameSessionManager _sessionManager;
         private readonly QuizService _quizService;
 
-        public GameController(GameService gameService, QuizService quizService, IHubContext<GameHub> gameHub)
+        public GameController(GameSessionManager gameService, QuizService quizService, IHubContext<GameHub> gameHub)
         {
-            _gameService = gameService;
+            _sessionManager = gameService;
             _quizService = quizService;
         }
 
@@ -44,7 +44,7 @@ namespace Api.Controllers
             }
 
             // Check if host has an active game session
-            string? gameId = GameService.GetGameIdByHostId(userId);
+            string? gameId = GameSessionManager.GetGameIdByHostId(userId);
             if (gameId != null)
             {
                 // Return current game session if it exists and the request does not specify to terminate it
@@ -52,7 +52,7 @@ namespace Api.Controllers
                     return Ok(new { ActiveGameSession = true, Code = gameId });
 
                 // Terminate existing game session because request specifies to do so
-                await _gameService.CloseGame(gameId, userId);
+                await _sessionManager.CloseGame(gameId, userId);
             }
 
             // Create a new game session
@@ -63,8 +63,8 @@ namespace Api.Controllers
                 return NotFound("Quiz not found.");
             }
 
-            Game newGame = GameService.CreateGame(quiz, userId);
-            return Ok(new { ActiveGameSession = false, Code = newGame.Id });
+            GameSession newSession = _sessionManager.CreateGameSession(quiz, userId);
+            return Ok(new { ActiveGameSession = false, Code = newSession.Game.Id });
         }
 
         [HttpPost("join")]
@@ -77,18 +77,18 @@ namespace Api.Controllers
 
             string gameCode = request.Code;
 
-            Game? game = GameService.GetGame(gameCode);
-            if (game == null)
+            GameSession? session = GameSessionManager.GetGameSession(gameCode);
+            if (session == null)
             {
                 return NotFound("Game not found.");
             }
-            if (game.State.State != GameStateType.Lobby)
+            if (session.Game.State.State != GameStateType.Lobby)
             {
                 return BadRequest("Game is not open for joining.");
             }
 
             var player = new Player(request.PlayerName, request.Code);
-            if (game.TryAddPlayer(player))
+            if (session.Game.TryAddPlayer(player))
                 return Ok(new { PlayerId = player.Id });
 
             return StatusCode(500);

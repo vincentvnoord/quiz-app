@@ -66,7 +66,7 @@ export const ChooseNickName = () => {
                 <motion.div
                     animate={loading ? { scale: 0.9 } : { scale: 1 }}
                 >
-                    <button onClick={handleSubmit} className={`bg-primary w-full text-white p-2 text-5xl rounded-lg ${barriecieto.className}`}>JOIN GAME</button>
+                    <button onClick={handleSubmit} className={`bg-primary w-full text-white p-2 text-5xl rounded-lg ${barriecieto.className}`}>CONFIRM</button>
                 </motion.div>
                 <motion.div className="overflow-hidden" animate={error ? { opacity: 1, height: "auto" } : { opacity: 0, height: 0 }}>
                     <p className="text-red-500 text-center">{error}</p>

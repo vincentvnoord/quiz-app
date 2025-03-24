@@ -1,8 +1,7 @@
 using System.Security.Claims;
 using System.Text;
-using Api.Authorization;
 using Api.GameHubManagement;
-using Business.GameService;
+using Business.GameSessions;
 using Business.QuizService;
 using Business.UserService;
 using DataAccess;
@@ -77,7 +76,7 @@ builder.Services.AddScoped<IQuizRepository, QuizRepositoryMock>();
 
 builder.Services.AddScoped<IConnectionManager, ConnectionManager>();
 builder.Services.AddScoped<IGameMessenger, GameMessenger>();
-builder.Services.AddScoped<GameService>();
+builder.Services.AddScoped<GameSessionManager>();
 builder.Services.AddSignalR();
 
 if (builder.Environment.IsDevelopment())

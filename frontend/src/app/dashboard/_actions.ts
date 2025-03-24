@@ -16,7 +16,7 @@ export async function getUserTokenFromCookies() {
     return authToken.value;
 }
 
-export async function createGame(terminateExisting: boolean) {
+export async function createGame(terminateExisting: boolean, quizId: string) {
     try {
         const cookieStore = await cookies();
         const authToken = cookieStore.get("authToken");
@@ -24,8 +24,7 @@ export async function createGame(terminateExisting: boolean) {
             redirect("/login");
         }
 
-        // Replace "1" with the actual quiz ID in future for custom quizzes
-        const code = await createGameController(authToken.value, "1", terminateExisting);
+        const code = await createGameController(authToken.value, quizId, terminateExisting);
         return code;
     } catch (e) {
         if (e instanceof UnAuthorizedError) {
