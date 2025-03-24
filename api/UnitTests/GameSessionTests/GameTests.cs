@@ -23,7 +23,7 @@ namespace UnitTests.GameSessionTests
         [Test]
         public void TryAddPlayer_Returns_False_WhenGameIsFull()
         {
-            Game game = GameService.CreateGame(_quiz, "host");
+            Game game = new Game("1", "host", _quiz);
 
             for (int i = 0; i < Game.MAX_PLAYERS; i++)
             {
@@ -36,7 +36,7 @@ namespace UnitTests.GameSessionTests
         [Test]
         public void TryAddPlayer_Returns_True_WhenPlayerIsAdded()
         {
-            Game game = GameService.CreateGame(_quiz, "host");
+            Game game = new Game("1", "host", _quiz);
 
             Assert.That(game.TryAddPlayer(new Player("player", game.Id)), Is.True);
         }
