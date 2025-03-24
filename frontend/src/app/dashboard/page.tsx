@@ -5,6 +5,11 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { QuizDisplay } from "@/business/entities/quiz";
 
+type Question = {
+    id: string;
+    text: string;
+}
+
 export default async function DashBoardPage() {
     const authToken = (await cookies()).get("authToken");
     if (!authToken)
@@ -19,7 +24,7 @@ export default async function DashBoardPage() {
     });
 
     const data = await res.json();
-    const quizzes = data.map((q: any) => {
+    const quizzes = data.map((q: { id: string, title: string, questions: Question[] }) => {
         return {
             id: q.id,
             title: q.title,
