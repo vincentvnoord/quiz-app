@@ -23,7 +23,7 @@ export const GameCodes = () => {
                 <QRCodeSVG className="w-full h-full" value={url} />
             </div>
 
-            <h1 className="text-5xl sm:text-6xl text-nowrap rotate-6 -translate-y-2 h-fit rounded-xl font-extrabold bg-primary text-white p-5">
+            <h1 data-test="game-id" className="text-5xl sm:text-6xl text-nowrap rotate-6 -translate-y-2 h-fit rounded-xl font-extrabold bg-primary text-white p-5">
                 {formattedCode}
             </h1>
         </div>

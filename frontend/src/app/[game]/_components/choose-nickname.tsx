@@ -57,7 +57,7 @@ export const ChooseNickName = () => {
     return (
         <div className="w-full h-full flex items-center justify-center pb-12 p-6 md:p-12">
             <div className="flex flex-col gap-4">
-                <input value={name} onChange={onNameChange}
+                <input data-test="enter-name" value={name} onChange={onNameChange}
                     placeholder="Nickname"
                     className="w-full bg-white rounded-lg p-4 text-xl focus:outline-none"
                     type="text"
@@ -66,7 +66,7 @@ export const ChooseNickName = () => {
                 <motion.div
                     animate={loading ? { scale: 0.9 } : { scale: 1 }}
                 >
-                    <button onClick={handleSubmit} className={`bg-primary w-full text-white p-2 text-5xl rounded-lg ${barriecieto.className}`}>CONFIRM</button>
+                    <button data-test="join-game" onClick={handleSubmit} className={`bg-primary w-full text-white p-2 text-5xl rounded-lg ${barriecieto.className}`}>CONFIRM</button>
                 </motion.div>
                 <motion.div className="overflow-hidden" animate={error ? { opacity: 1, height: "auto" } : { opacity: 0, height: 0 }}>
                     <p className="text-red-500 text-center">{error}</p>
