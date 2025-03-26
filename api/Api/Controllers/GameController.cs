@@ -71,7 +71,6 @@ namespace Api.Controllers
         [HttpPost("join")]
         [ProducesResponseType(200, Type = typeof(JoinGameResponse))]
         [ProducesResponseType(400)]
-        [ProducesResponseType(404)]
         [ProducesResponseType(500)]
         public IActionResult Join([FromBody] JoinGameRequest request)
         {
