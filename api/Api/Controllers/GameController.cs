@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Api.GameHubManagement;
 using System.Security.Claims;
+using System.Net;
 
 namespace Api.Controllers
 {
@@ -17,7 +18,7 @@ namespace Api.Controllers
         private readonly GameSessionManager _sessionManager;
         private readonly QuizService _quizService;
 
-        public GameController(GameSessionManager gameService, QuizService quizService, IHubContext<GameHub> gameHub)
+        public GameController(GameSessionManager gameService, QuizService quizService)
         {
             _sessionManager = gameService;
             _quizService = quizService;
@@ -68,6 +69,9 @@ namespace Api.Controllers
         }
 
         [HttpPost("join")]
+        [ProducesResponseType(200, Type = typeof(JoinGameResponse))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         public IActionResult Join([FromBody] JoinGameRequest request)
         {
             if (!ModelState.IsValid)
@@ -87,9 +91,10 @@ namespace Api.Controllers
                 return BadRequest("Game is not open for joining.");
             }
 
-            var player = new Player(request.PlayerName, request.Code);
+            var encodedName = WebUtility.HtmlEncode(request.PlayerName);
+            var player = new Player(encodedName, request.Code);
             if (session.Game.TryAddPlayer(player))
-                return Ok(new { PlayerId = player.Id });
+                return Ok(new JoinGameResponse { PlayerName = player.Name, PlayerId = player.Id });
 
             return StatusCode(500);
         }
