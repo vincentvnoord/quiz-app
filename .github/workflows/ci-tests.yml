@@ -69,7 +69,7 @@ jobs:
       - name: Start API server
         run: |
           cd api/Api
-          dotnet run
+          dotnet run &
         env:
           ASPNETCORE_ENVIRONMENT: Development
           Jwt__Key: 80b02ad49622fabc960643456c15922d58e944d2977909cdce8
