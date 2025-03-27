@@ -44,6 +44,7 @@ export const EnterGamePinForm = () => {
                 setError("Too many tries, please try again later");
             }
         } catch (e) {
+            console.error(e);
             setError("Something went wrong, please try again later");
         } finally {
             setLoading(false);
