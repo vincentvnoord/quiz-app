@@ -1,0 +1,27 @@
+name: CI Tests
+
+on:
+    push:
+        branches:
+            - main
+            - dev
+
+jobs:
+  api-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: '8.0'
+
+      - name: Install dependencies
+        run: |
+          dotnet restore
+          dotnet build
+
+      - name: Run API tests
+        run: dotnet test
