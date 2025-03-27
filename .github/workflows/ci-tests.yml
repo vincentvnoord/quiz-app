@@ -83,7 +83,7 @@ jobs:
           Jwt__Key: 80b02ad49622fabc960643456c15922d58e944d2977909cdce8
           Jwt__Issuer: issuer 
           Jwt__Audience: audience
-          ConnectionStrings__DefaultConnection: Host=localhost;Port=5432;Database=testdb;Username=testuser;Password=testpass;
+          ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=testdb;Username=testuser;Password=testpass;
           FrontendOrigin: http://localhost:3000
 
       - name: Start frontend server
