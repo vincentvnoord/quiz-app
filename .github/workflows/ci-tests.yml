@@ -20,10 +20,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-          dotnet restore
-          dotnet build
+            cd api 
+            dotnet restore
+            dotnet build
 
       - name: Run API tests
         run: |
-            cd api
             dotnet test
