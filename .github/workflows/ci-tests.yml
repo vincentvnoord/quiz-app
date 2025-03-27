@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: setup-services
     if: false
-    
+
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -60,7 +60,7 @@ jobs:
 
   cypress-tests:
     runs-on: ubuntu-latest
-    needs: api-tests
+    needs: setup-services
     steps:
       - name: Check out code
         uses: actions/checkout@v2
