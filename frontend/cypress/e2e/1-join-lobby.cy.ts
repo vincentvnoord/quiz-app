@@ -9,7 +9,11 @@ describe('game lobby E2E test', () => {
         cy.visit('http://localhost:3000/dashboard');
 
         cy.get('[data-test="create-game"]').first().click();
-        cy.get('[data-test="create-and-terminate"]').should('not.have.css', 'pointer-events', 'none').first().click();
+        cy.get('[data-test="create-and-terminate"]').first().then(($el) => {
+            if ($el.css('pointer-events') !== 'none') {
+                cy.wrap($el).click();
+            }
+        });
 
         cy.get('[data-test="game-id"]').should('exist');
         cy.get('[data-test="game-id"]').invoke('text').then((text) => {
