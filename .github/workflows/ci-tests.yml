@@ -10,21 +10,6 @@ jobs:
   setup-services:
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:latest
-        ports:
-          - 5432:5432
-        env:
-            POSTGRES_USER: testuser
-            POSTGRES_PASSWORD: testpass
-            POSTGRES_DB: testdb
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 30s
-          --health-timeout 10s
-          --health-retries 3
-
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -60,10 +45,12 @@ jobs:
 
   cypress-tests:
     runs-on: ubuntu-latest
-    needs: setup-services
     steps:
       - name: Check out code
         uses: actions/checkout@v2
+
+      - name: Set up Postgres
+        uses: ./.github/actions/setup-postgres
 
       - name: Set up Node.js
         uses: actions/setup-node@v2

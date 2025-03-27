@@ -1,0 +1,14 @@
+name: 'Setup PostgreSQL'
+description: 'Starts a PostgreSQL container'
+runs:
+  using: 'docker'
+  image: 'docker://postgres:latest'
+  options: >-
+    --health-cmd pg_isready
+    --health-interval 10s
+    --health-timeout 5s
+    --health-retries 5
+  env:
+    POSTGRES_USER: testuser
+    POSTGRES_PASSWORD: testpass
+    POSTGRES_DB: testdb
