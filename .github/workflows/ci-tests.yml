@@ -83,13 +83,14 @@ jobs:
           cd frontend
           npm run dev &  # Start the frontend server in the background
         env:
-          NEXT_PUBLIC_API_URL: "http://localhost:5166"
+          NEXT_PUBLIC_API_URL: http://localhost:5166
+          API_URL: http://localhost:5166
 
       - name: Wait for servers to be ready
         run: |
           sleep 15  # Wait for API and frontend servers to be fully up
 
       - name: Run Cypress tests
-        run: npm run cypress:run
+        run: npx run cypress:run
         working-directory: frontend
 
