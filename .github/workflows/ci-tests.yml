@@ -91,6 +91,6 @@ jobs:
           sleep 15  # Wait for API and frontend servers to be fully up
 
       - name: Run Cypress tests
-        run: npx run cypress:run
+        run: npx cypress run
         working-directory: frontend
 
