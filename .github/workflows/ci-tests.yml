@@ -1,0 +1,94 @@
+name: CI Tests
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  api-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: '8.0'
+
+      - name: Install API dependencies
+        run: |
+          cd api
+          dotnet restore
+
+      - name: Build API
+        run: |
+          cd api
+          dotnet build
+
+      - name: Run API tests
+        run: |
+          cd api
+          dotnet test
+
+  cypress-tests:
+    runs-on: ubuntu-latest
+    needs: api-tests
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: testdb
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+        ports:
+            - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '22'
+
+      - name: Install frontend dependencies
+        run: npm install
+        working-directory: frontend
+
+      - name: Start API server
+        run: |
+          cd api/Api
+          dotnet run &
+        env:
+          ASPNETCORE_ENVIRONMENT: Development
+          Jwt__Key: 80b02ad49622fabc960643456c15922d58e944d2977909cdce8
+          Jwt__Issuer: issuer 
+          Jwt__Audience: audience
+          ConnectionStrings__DefaultConnection: Host=localhost;Port=5432;Database=testdb;Username=testuser;Password=testpass;
+          FrontendOrigin: http://localhost:3000
+
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v6
+        with:
+          working-directory: frontend
+          build: npm run build        
+          start: npm start            
+          browser: chrome  
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:5166
+          API_URL: http://localhost:5166

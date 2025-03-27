@@ -29,7 +29,7 @@ export const CreateGame = ({ children, quizId }: { children?: React.ReactNode, q
 
     return (
         <>
-            <button onClick={onClick} className="w-full">
+            <button data-test="create-game" onClick={onClick} className="w-full">
                 {children}
             </button>
             <ActiveGameSessionMessage activeGameSession={activeGameSession} gameId={gameId} quizId={quizId} />
@@ -70,7 +70,7 @@ const ActiveGameSessionMessage = ({ activeGameSession, gameId, quizId }: { activ
                 <p className="">There is already an active game session. Do you want to terminate it and start a new one?</p>
                 <div className="flex flex-col sm:flex-row justify-between pt-2 gap-2">
                     <button onClick={keepAndJoin} className="bg-positive p-3 rounded-lg text-white font-bold">Keep and join game</button>
-                    <button onClick={terminateAndCreateNew} className="bg-destructive p-3 rounded-lg text-white font-bold">Terminate and create new</button>
+                    <button data-test="create-and-terminate" onClick={terminateAndCreateNew} className="bg-destructive p-3 rounded-lg text-white font-bold">Terminate and create new</button>
                 </div>
             </motion.div>
             <motion.div initial={{ opacity: 0 }} animate={showModal && { opacity: 1 }} className="bg-black/50 fixed inset-0">

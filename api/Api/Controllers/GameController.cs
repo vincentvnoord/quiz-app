@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.SignalR;
 using Api.GameHubManagement;
 using System.Security.Claims;
 using System.Net;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Api.Controllers
 {
@@ -66,6 +67,28 @@ namespace Api.Controllers
 
             GameSession newSession = _sessionManager.CreateGameSession(quiz, userId);
             return Ok(new { ActiveGameSession = false, Code = newSession.Game.Id });
+        }
+
+        [HttpGet]
+        [Route("/{code}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [EnableRateLimiting("SessionLimiter")]
+        public IActionResult Index(string code)
+        {
+            if (code.Length != 6)
+            {
+                return BadRequest("Invalid game code.");
+            }
+
+            GameSession? session = GameSessionManager.GetGameSession(code);
+            if (session == null)
+            {
+                return NotFound("Game not found.");
+            }
+
+            return Ok();
         }
 
         [HttpPost("join")]
