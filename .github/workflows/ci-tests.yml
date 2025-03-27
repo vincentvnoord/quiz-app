@@ -24,4 +24,6 @@ jobs:
           dotnet build
 
       - name: Run API tests
-        run: dotnet test
+        run: |
+            cd api
+            dotnet test
