@@ -9,6 +9,7 @@ using DataAccess.Mocks;
 using DataAccess.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -79,6 +80,20 @@ builder.Services.AddScoped<IGameMessenger, GameMessenger>();
 builder.Services.AddScoped<GameSessionManager>();
 builder.Services.AddSignalR();
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("SessionLimiter", limiterOptions =>
+    {
+        limiterOptions.Window = TimeSpan.FromSeconds(10);
+        limiterOptions.PermitLimit = 5;
+    });
+});
+
+builder.Services.Configure<RateLimiterOptions>(options =>
+{
+    options.RejectionStatusCode = 429;
+});
+
 if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddCors(options =>
@@ -128,6 +143,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseHttpsRedirection();
+app.UseRateLimiter();
 
 app.MapControllers();
 app.MapHub<GameHub>("/gamehub");

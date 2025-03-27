@@ -44,3 +44,19 @@ describe('game lobby E2E test', () => {
         cy.get('[data-test="joined-message"]').should('exist');
     });
 });
+
+describe('brute force attack test', () => {
+    it('should prevent brute force attack', () => {
+        cy.visit('http://localhost:3000/');
+
+        for (let i = 0; i < 10; i++) {
+            const inputField = cy.get('[data-test="enter-game-pin"]');
+            inputField.clear();
+            const randomNumber = Math.floor(Math.random() * 1000000);
+            inputField.type(randomNumber.toString());
+            cy.get('[data-test="join-game"]').click();
+        }
+
+        cy.get('[data-test="join-game-error"]').should('have.text', 'Too many tries, please try again later');
+    });
+});
