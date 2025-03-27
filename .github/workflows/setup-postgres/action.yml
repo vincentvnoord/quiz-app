@@ -1,14 +1,17 @@
 name: 'Setup PostgreSQL'
 description: 'Starts a PostgreSQL container'
 runs:
-  using: 'docker'
-  image: 'docker://postgres:latest'
-  options: >-
-    --health-cmd pg_isready
-    --health-interval 10s
-    --health-timeout 5s
-    --health-retries 5
-  env:
-    POSTGRES_USER: testuser
-    POSTGRES_PASSWORD: testpass
-    POSTGRES_DB: testdb
+  using: 'node22'
+  steps:
+    - name: Set up PostgreSQL container
+      run: |
+        docker run -d --name postgres \
+          -e POSTGRES_USER=testuser \
+          -e POSTGRES_PASSWORD=testpass \
+          -e POSTGRES_DB=testdb \
+          -p 5432:5432 \
+          --health-cmd pg_isready \
+          --health-interval 10s \
+          --health-timeout 5s \
+          --health-retries 5 \
+          postgres:latest
