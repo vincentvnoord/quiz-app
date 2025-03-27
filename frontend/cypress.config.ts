@@ -8,7 +8,7 @@ export default defineConfig({
       // implement node event listeners here
     },
     env: {
-      NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+      API_URL: process.env.NEXT_PUBLIC_API_URL,
     }
   },
 });

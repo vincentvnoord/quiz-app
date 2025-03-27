@@ -2,22 +2,7 @@ describe('game lobby E2E test', () => {
     let gameLobbyId: string;
 
     before(() => {
-        cy.request('POST', Cypress.env("NEXT_PUBLIC_API_URL") + '/login', {
-            email: "test@test.nl",
-            password: "testtesttest",
-        }).then((response) => {
-            expect(response.status).to.eq(200);
-
-            const authToken = response.body.token;
-
-            cy.setCookie('authToken', authToken, {
-                httpOnly: true,
-                sameSite: 'strict',
-                path: '/',
-            });
-
-            cy.getCookie('authToken').should('exist');
-        });
+        cy.loginOrRegister("test@example.com", "TestPassword123");
     });
 
     it('should create game lobby as a logged-in user', () => {
@@ -45,6 +30,7 @@ describe('game lobby E2E test', () => {
     });
 });
 
+// ST-2.4
 describe('brute force attack test', () => {
     it('should prevent brute force attack', () => {
         cy.visit('http://localhost:3000/');
