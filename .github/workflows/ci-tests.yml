@@ -78,19 +78,13 @@ jobs:
           ConnectionStrings__DefaultConnection: Host=localhost;Port=5432;Database=testdb;Username=testuser;Password=testpass;
           FrontendOrigin: http://localhost:3000
 
-      - name: Start frontend server
-        run: |
-          cd frontend
-          npm run dev &  # Start the frontend server in the background
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v6
+        with:
+          working-directory: frontend
+          build: npm run build        
+          start: npm start            
+          browser: chrome  
         env:
           NEXT_PUBLIC_API_URL: http://localhost:5166
           API_URL: http://localhost:5166
-
-      - name: Wait for servers to be ready
-        run: |
-          sleep 15  # Wait for API and frontend servers to be fully up
-
-      - name: Run Cypress tests
-        run: npx cypress run
-        working-directory: frontend
-
