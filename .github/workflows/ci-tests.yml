@@ -21,10 +21,9 @@ jobs:
             POSTGRES_DB: testdb
         options: >-
           --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-          --entrypoint "docker-entrypoint.sh"
+          --health-interval 30s
+          --health-timeout 10s
+          --health-retries 3
 
     steps:
       - name: Check out code
