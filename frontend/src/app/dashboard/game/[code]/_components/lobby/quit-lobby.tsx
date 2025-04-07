@@ -29,7 +29,7 @@ export const CloseLobbyButton = () => {
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={isModalOpen ? { opacity: 1 } : { opacity: 0 }}
-                    onClick={exitModal} className="w-full absolute h-full bg-black/20 backdrop-blur-sm"></motion.div>
+                    onClick={exitModal} className="w-full absolute h-full bg-black/20 backdrop-blur-xs"></motion.div>
 
                 <motion.div
                     animate={isModalOpen ? { opacity: 1, translateY: 0 } : { opacity: 0, translateY: 100 }}

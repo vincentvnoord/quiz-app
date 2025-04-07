@@ -46,7 +46,7 @@ export const CreateQuiz = () => {
 const Buttons = ({ open, setOpen }: { open: boolean, setOpen: (open: boolean) => void }) => {
     return (
         <div className="flex justify-end items-center min-w-0 w-auto">
-            <motion.div animate={open ? { width: "auto" } : { width: 0 }} initial={{ width: 0 }} className="overflow-hidden flex-grow">
+            <motion.div animate={open ? { width: "auto" } : { width: 0 }} initial={{ width: 0 }} className="overflow-hidden grow">
                 <div className="pr-2">
                     <button className="bg-positive p-3 rounded-xl text-white font-bold text-lg w-full">
                         Create
@@ -55,7 +55,7 @@ const Buttons = ({ open, setOpen }: { open: boolean, setOpen: (open: boolean) =>
             </motion.div>
             <button
                 onClick={() => setOpen(!open)}
-                className={`transition-colors duration-100 ease-in p-3 rounded-xl shadow-lg flex-shrink-0 flex-grow-0 ${open ? "bg-destructive" : "bg-primary"}`}>
+                className={`transition-colors duration-100 ease-in p-3 rounded-xl shadow-lg shrink-0 grow-0 ${open ? "bg-destructive" : "bg-primary"}`}>
                 <motion.div initial={{ rotate: 0 }} animate={open ? { rotate: 45 } : { rotate: 0 }}>
                     <PlusIcon className="text-white" size={32} strokeWidth={1} />
                 </motion.div>

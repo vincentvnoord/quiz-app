@@ -39,7 +39,7 @@ export const QuestionDisplay = ({ currentQuestion, gameState, correctAnswer, onA
             <motion.div
                 initial={gameState !== "question" && { scale: 0 }}
                 animate={(gameState === "question" && timeLeft > 0) ? { scale: [0.9, 1] } : { scale: 0 }}
-                className="rounded-full bg-black/20 aspect-square flex-shrink-0 text-center p-4 text-4xl md:text-6xl">
+                className="rounded-full bg-black/20 aspect-square shrink-0 text-center p-4 text-4xl md:text-6xl">
                 <h2 className={`${barriecieto.className} w-full text-white`}>{timeLeft}</h2>
             </motion.div>
             {

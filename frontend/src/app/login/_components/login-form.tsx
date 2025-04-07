@@ -55,7 +55,7 @@ export const LoginForm = () => {
                     }
                 </motion.button>
                 <motion.div initial={{ opacity: 0, height: 0 }} animate={showError ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }} className="flex justify-center items-center text-destructive gap-2 overflow-hidden">
-                    <Info className="flex-grow-0 flex-shrink-0" strokeWidth={2.3} size={28} />
+                    <Info className="grow-0 shrink-0" strokeWidth={2.3} size={28} />
                     {submitError && <p className="text-destructive text-sm">{submitError}</p>}
                 </motion.div>
             </form>

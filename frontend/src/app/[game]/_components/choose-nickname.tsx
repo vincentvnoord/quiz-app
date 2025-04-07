@@ -59,7 +59,7 @@ export const ChooseNickName = () => {
             <div className="flex flex-col gap-4">
                 <input data-test="enter-name" value={name} onChange={onNameChange}
                     placeholder="Nickname"
-                    className="w-full bg-white rounded-lg p-4 text-xl focus:outline-none"
+                    className="w-full bg-white rounded-lg p-4 text-xl focus:outline-hidden"
                     type="text"
                 />
 
