@@ -3,11 +3,13 @@
 @tailwind utilities;
 
 :root {
-  --background: hsl(183, 100%, 75%);
-  --foreground: #171717;
-  --primary: hsl(0, 100%, 71%);
+  --background: #C9FDFF;
+  --foreground: #003F42;
+  --secondary: #809FA1;
+  --primary: #FF6969;
   --destructive: hsl(0, 100%, 27%);
   --positive: hsl(111, 100%, 33%);
+  --background-accent: #7DA6FF;
 }
 
 body {
