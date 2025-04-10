@@ -15,7 +15,7 @@ export const Lobby = () => {
 
             <GameCodes />
 
-            <div className="h-full overflow-hidden min-h-0 flex-shrink flex flex-col p-6 gap-4">
+            <div className="h-full overflow-hidden min-h-0 shrink flex flex-col p-6 gap-4">
                 <UserList />
 
                 <div className="flex justify-end items-center gap-2 relative z-0">

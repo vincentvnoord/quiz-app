@@ -8,7 +8,7 @@ export const UserList = () => {
     const { state: { players, title, questionCount } } = useHostStore();
 
     return (
-        <div className="flex min-h-0 flex-col gap-3 flex-grow">
+        <div className="flex min-h-0 flex-col gap-3 grow">
             <div className="flex justify-between">
                 <div className="flex flex-col">
                     <p className="text-2xl font-bold">{title}</p>

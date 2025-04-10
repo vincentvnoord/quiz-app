@@ -26,7 +26,7 @@ export const StartQuiz = () => {
         await gameManager.startGame();
     };
 
-    const classes = "flex items-center gap-2 flex-grow justify-center sm:flex-grow-0 sm:text-xl rounded-lg text-white p-3 text-lg font-bold z-0";
+    const classes = "flex items-center gap-2 grow justify-center sm:grow-0 sm:text-xl rounded-lg text-white p-3 text-lg font-bold z-0";
     const animation = "transition-color duration-100 ease-in";
 
     return (
