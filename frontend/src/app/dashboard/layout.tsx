@@ -11,7 +11,9 @@ export default async function DashboardLayout({
         <div className="flex h-dvh relative">
             <QuizList />
             <div className="w-full h-full py-4">
-                {children}
+                <div className="w-full p-6 h-full flex flex-col gap-6 bg-white rounded-l-2xl">
+                    {children}
+                </div>
             </div>
         </div>
     )

@@ -5,6 +5,8 @@ import { QuizDisplay } from "@/business/entities/quiz";
 import { useQuizStore } from "../_stores/quiz-store";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 
 export const QuizList = () => {
     const { quizList } = useQuizStore();
@@ -34,28 +36,44 @@ export const QuizList = () => {
     )
 }
 
-const ListedQuiz = ({ title, questionCount, index }: QuizDisplay & { index: number }) => {
+const ListedQuiz = ({ id, title, questionCount, index }: QuizDisplay & { index: number }) => {
     const [hovered, setHovered] = useState(false);
+    const params = useParams();
+    const quizId = params["quiz"] as string;
+    const isSelected = quizId === id;
+
+    const handleActionsClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("Actions clicked");
+    }
 
     return (
-        <motion.div
-            onMouseEnter={() => setHovered(true)}
-            onMouseLeave={() => setHovered(false)}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2, delay: index * 0.04 }}
-            className="hover:bg-white transition-colors duration-100 ease-in-out cursor-pointer rounded-xl p-2 flex justify-between items-center">
-            <div className="flex flex-col min-w-0 flex-grow items-start">
-                <p className="truncate w-full">{title}fjalksdjfadsjfkl;asdjfklajsdkl;asdjf;klasfdj;lkasfdj;laks</p>
-                <p className="text-sm opacity-50">{questionCount} question{questionCount > 1 && "s"}</p>
-            </div>
-
+        <Link href={`/dashboard/${id}`} className="w-full">
             <motion.div
-                initial={{ opacity: 0, x: 10, rotate: 90 }}
-                animate={hovered ? { opacity: 1, x: 0, rotate: 0 } : { opacity: 0, x: 10, rotate: 90 }}
-                className="flex items-center hover:bg-foreground/10 p-1 rounded-full transition-colors duration-100 ease-in-out">
-                <EllipsisVertical className="opacity-50 flex-shrink-0" size={24} />
+                onMouseEnter={() => setHovered(true)}
+                onMouseLeave={() => setHovered(false)}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2, delay: index * 0.04 }}
+            >
+                <motion.div
+                    whileTap={{ scale: 0.95 }}
+                    className={`${isSelected && "bg-white"} hover:bg-white transition-colors duration-100 ease-in-out cursor-pointer rounded-xl p-2 flex justify-between items-center`}>
+                    <div className="flex flex-col min-w-0 flex-grow items-start">
+                        <p className="truncate w-full">{title}fjalksdjfadsjfkl;asdjfklajsdkl;asdjf;klasfdj;lkasfdj;laks</p>
+                        <p className="text-sm opacity-50">{questionCount} question{questionCount > 1 && "s"}</p>
+                    </div>
+
+                    <motion.div
+                        onClick={handleActionsClick}
+                        initial={{ opacity: 0, x: 10, rotate: 90 }}
+                        animate={hovered ? { opacity: 1, x: 0, rotate: 0 } : { opacity: 0, x: 10, rotate: 90 }}
+                        className="flex items-center hover:bg-foreground/10 p-1 rounded-full transition-colors duration-100 ease-in-out">
+                        <EllipsisVertical className="opacity-50 flex-shrink-0" size={24} />
+                    </motion.div>
+                </motion.div>
             </motion.div>
-        </motion.div>
+        </Link>
     )
 }

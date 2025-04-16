@@ -14,8 +14,7 @@ export default async function DashBoardPage() {
         }
     });
 
-    const data = await res.json();
-    console.log(data);
+    console.log(res);
 
     return (
         <div className="flex h-dvh relative">
