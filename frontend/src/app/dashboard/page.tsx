@@ -1,4 +1,4 @@
-import { EllipsisVertical, FilePen, LogOut, PanelLeft, PlayIcon } from "lucide-react";
+import { EllipsisVertical, LogOut, PanelLeft, PlayIcon } from "lucide-react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { QuizDisplay } from "@/business/entities/quiz";
@@ -80,7 +80,7 @@ const SidePanel = ({ quizzes }: { quizzes: QuizDisplay[] }) => {
     )
 }
 
-const ListedQuiz = ({ id, title, questionCount }: QuizDisplay) => {
+const ListedQuiz = ({ title, questionCount }: QuizDisplay) => {
 
     return (
         <div className="hover:bg-white cursor-pointer w-full rounded-xl p-2 flex justify-between items-center">
