@@ -4,12 +4,31 @@ import { PanelLeft, LogOut, EllipsisVertical } from "lucide-react"
 import { QuizDisplay } from "@/business/entities/quiz";
 import { useQuizStore } from "../_stores/quiz-store";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { getQuizList } from "../_actions";
 
 export const QuizList = () => {
-    const { quizList } = useQuizStore();
+    const { quizList, setQuizList } = useQuizStore();
+
+    useEffect(() => {
+        const fetchQuizzes = async () => {
+            const res = await getQuizList();
+            if (res.success === false) {
+                return;
+            }
+
+            if (res.data === null)
+                return;
+
+            setQuizList(res.data);
+        };
+
+        fetchQuizzes().catch((error) => {
+            console.error("Error fetching quizzes:", error);
+        });
+    }, [setQuizList]);
 
     return (
         <div className="min-w-74 max-w-64 p-3 flex flex-col gap-4">
@@ -40,12 +59,12 @@ const ListedQuiz = ({ id, title, questionCount, index }: QuizDisplay & { index: 
     const [hovered, setHovered] = useState(false);
     const params = useParams();
     const quizId = params["quiz"] as string;
-    const isSelected = quizId === id;
+    const isSelected = quizId == id;
+    console.log(quizId, id, isSelected);
 
     const handleActionsClick = (e: React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log("Actions clicked");
     }
 
     return (
@@ -61,8 +80,8 @@ const ListedQuiz = ({ id, title, questionCount, index }: QuizDisplay & { index: 
                     whileTap={{ scale: 0.95 }}
                     className={`${isSelected && "bg-white"} hover:bg-white transition-colors duration-100 ease-in-out cursor-pointer rounded-xl p-2 flex justify-between items-center`}>
                     <div className="flex flex-col min-w-0 flex-grow items-start">
-                        <p className="truncate w-full">{title}fjalksdjfadsjfkl;asdjfklajsdkl;asdjf;klasfdj;lkasfdj;laks</p>
-                        <p className="text-sm opacity-50">{questionCount} question{questionCount > 1 && "s"}</p>
+                        <p className="text-sm truncate w-full">{title}</p>
+                        <p className="text-xs opacity-50">{questionCount} question{questionCount > 1 && "s"}</p>
                     </div>
 
                     <motion.div
@@ -70,7 +89,7 @@ const ListedQuiz = ({ id, title, questionCount, index }: QuizDisplay & { index: 
                         initial={{ opacity: 0, x: 10, rotate: 90 }}
                         animate={hovered ? { opacity: 1, x: 0, rotate: 0 } : { opacity: 0, x: 10, rotate: 90 }}
                         className="flex items-center hover:bg-foreground/10 p-1 rounded-full transition-colors duration-100 ease-in-out">
-                        <EllipsisVertical className="opacity-50 flex-shrink-0" size={24} />
+                        <EllipsisVertical className="opacity-50 flex-shrink-0" size={20} />
                     </motion.div>
                 </motion.div>
             </motion.div>
