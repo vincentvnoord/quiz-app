@@ -5,6 +5,7 @@ import { getQuizQuestions } from "../_actions";
 import { Answer, Question } from "@/business/entities/quiz";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
+import { CheckCircle } from "lucide-react";
 
 export default function QuestionEditor({ quizId }: { quizId: string }) {
     const [questions, setQuestions] = useState<Question[] | null>(null);
@@ -77,10 +78,19 @@ export default function QuestionEditor({ quizId }: { quizId: string }) {
 
 const ListedAnswer = ({ answer }: { answer: Answer }) => {
     return (
-        <div className="flex items-center border-[1px] border-foreground/50 rounded-lg p-2">
+        <div className="flex justify-between items-center border-[1px] border-foreground/50 rounded-lg p-3 py-4">
             <p className="text-lg flex items-center gap-2 text-clip overflow-hidden truncate">
                 {answer.text}
             </p>
+
+            {
+                answer.isCorrect && (
+                    <CheckCircle
+                        className="text-positive"
+                        size={20}
+                    />
+                )
+            }
         </div>
     )
 }

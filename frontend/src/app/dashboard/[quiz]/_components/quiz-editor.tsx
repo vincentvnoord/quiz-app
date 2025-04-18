@@ -6,6 +6,7 @@ import { useQuizStore } from "../../_stores/quiz-store";
 import QuestionEditor from "./question-editor"
 import { PlayIcon, SearchX } from "lucide-react"
 import { useEffect } from "react";
+import { CreateGame } from "./create-game";
 
 export const QuizEditor = () => {
     const { quizList } = useQuizStore();
@@ -32,6 +33,8 @@ export const QuizEditor = () => {
         )
     }
 
+    document.title = `${quiz.title} | Quiz Editor`;
+
     return (
         <>
             <div className="flex gap-4 items-center">
@@ -40,10 +43,7 @@ export const QuizEditor = () => {
                     animate={{ opacity: 1, y: 0 }}
                     className="text-3xl flex-grow font-bold text-shadow-sm">{quiz.title}</motion.h1>
 
-                <button className="bg-primary min-w-32 text-white font-bold rounded-xl p-3 py-2 flex justify-center items-center">
-                    <PlayIcon className="mr-2" size={26} fill="white" />
-                    Play
-                </button>
+                <CreateGame quizId={quizId} />
             </div>
 
             <QuestionEditor quizId={quizId} />
