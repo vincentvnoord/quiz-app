@@ -31,25 +31,27 @@ export const QuizList = () => {
     }, [setQuizList]);
 
     return (
-        <div className="min-w-74 max-w-64 p-3 flex flex-col gap-4">
-            <div className="flex gap-2 items-center">
-                <PanelLeft className="" size={28} />
-                <h1 className="text-2xl text-shadow-md font-bold w-full text-center">ACME</h1>
-            </div>
+        <div className="h-full w-full absolute inset-0 md:relative md:inset-auto md:w-fit z-20">
+            <div className="h-full min-w-74 bg-background sm:max-w-64 p-3 flex flex-col gap-4">
+                <div className="flex gap-2 items-center">
+                    <PanelLeft className="" size={28} />
+                    <h1 className="text-2xl text-shadow-md font-bold w-full text-center">ACME</h1>
+                </div>
 
-            <button className="bg-primary text-white font-bold w-full rounded-xl p-3 py-2 flex justify-center items-center">
-                New Quiz
-            </button>
+                <button className="bg-primary text-white font-bold w-full rounded-xl p-3 py-2 flex justify-center items-center">
+                    New Quiz
+                </button>
 
-            <div className="flex flex-col p-1 gap-1 flex-grow overflow-y-scroll overflow-x-hidden">
-                {quizList.map((quiz, index) => (
-                    <ListedQuiz key={quiz.id} {...quiz} index={index} />
-                ))}
-            </div>
+                <div className="flex flex-col p-1 gap-1 flex-grow overflow-y-scroll overflow-x-hidden">
+                    {quizList.map((quiz, index) => (
+                        <ListedQuiz key={quiz.id} {...quiz} index={index} />
+                    ))}
+                </div>
 
-            <div className="flex gap-2 items-center p-4 pb-6 px-6">
-                <LogOut size={24} />
-                <p className="">Logout</p>
+                <div className="flex gap-2 items-center p-4 pb-6 px-6">
+                    <LogOut size={24} />
+                    <p className="">Logout</p>
+                </div>
             </div>
         </div>
     )
