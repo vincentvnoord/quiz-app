@@ -36,15 +36,13 @@ export async function createGame(terminateExisting: boolean, quizId: string) {
 }
 
 export async function getQuizList() {
-    const authToken = (await cookies()).get("authToken");
-    if (!authToken)
-        redirect("/login");
+    const authToken = await getUserTokenFromCookies();
 
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/quiz/list`, {
         method: "get",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${authToken.value}`
+            "Authorization": `Bearer ${authToken}`
         }
     });
 

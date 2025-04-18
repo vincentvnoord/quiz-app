@@ -23,5 +23,31 @@ namespace Api.Controllers
             var list = await _quizService.GetList();
             return Ok(list);
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(string id)
+        {
+            try
+            {
+                int parsedId = int.Parse(id);
+                var quiz = await _quizService.GetQuiz(parsedId);
+                if (quiz == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(quiz);
+            }
+            catch (FormatException ex)
+            {
+                Console.WriteLine(ex.Message);
+                return BadRequest($"Invalid quiz ID format: {id}.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, $"Internal server error");
+            }
+        }
     }
 }

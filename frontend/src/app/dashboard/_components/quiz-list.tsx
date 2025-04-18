@@ -60,7 +60,6 @@ const ListedQuiz = ({ id, title, questionCount, index }: QuizDisplay & { index: 
     const params = useParams();
     const quizId = params["quiz"] as string;
     const isSelected = quizId == id;
-    console.log(quizId, id, isSelected);
 
     const handleActionsClick = (e: React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
@@ -78,7 +77,7 @@ const ListedQuiz = ({ id, title, questionCount, index }: QuizDisplay & { index: 
             >
                 <motion.div
                     whileTap={{ scale: 0.95 }}
-                    className={`${isSelected && "bg-white"} hover:bg-white transition-colors duration-100 ease-in-out cursor-pointer rounded-xl p-2 flex justify-between items-center`}>
+                    className={`${isSelected ? "bg-white" : "hover:bg-white/50"} transition-colors duration-100 ease-in-out cursor-pointer rounded-xl p-2 flex justify-between items-center`}>
                     <div className="flex flex-col min-w-0 flex-grow items-start">
                         <p className="text-sm truncate w-full">{title}</p>
                         <p className="text-xs opacity-50">{questionCount} question{questionCount > 1 && "s"}</p>
