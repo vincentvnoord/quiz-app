@@ -1,12 +1,12 @@
 "use client";
 
-import { AlertCircleIcon, Gamepad, Gamepad2, Loader2, PlayIcon, Trash, Trash2 } from "lucide-react";
+import { AlertCircleIcon, Gamepad2, Loader2, PlayIcon, Trash2 } from "lucide-react";
 import { createGame } from "../../_actions";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { motion } from "framer-motion";
 
-export const CreateGame = ({ children, quizId }: { children?: React.ReactNode, quizId: string }) => {
+export const CreateGame = ({ quizId }: { quizId: string }) => {
     const router = useRouter();
 
     const [loading, setLoading] = useState(false);

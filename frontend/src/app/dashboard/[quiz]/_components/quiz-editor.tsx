@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { useQuizStore } from "../../_stores/quiz-store";
 import QuestionEditor from "./question-editor"
-import { PlayIcon, SearchX } from "lucide-react"
+import { SearchX } from "lucide-react"
 import { useEffect } from "react";
 import { CreateGame } from "./create-game";
 
