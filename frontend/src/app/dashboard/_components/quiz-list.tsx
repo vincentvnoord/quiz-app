@@ -38,9 +38,9 @@ export const QuizList = () => {
                     <h1 className="text-2xl text-shadow-md font-bold w-full text-center">ACME</h1>
                 </div>
 
-                <button className="bg-primary text-white font-bold w-full rounded-xl p-3 py-2 flex justify-center items-center">
+                <Link href={"/dashboard"} className="bg-primary text-white font-bold w-full rounded-xl p-3 py-2 flex justify-center items-center">
                     New Quiz
-                </button>
+                </Link>
 
                 <div className="flex flex-col p-1 gap-1 flex-grow overflow-y-scroll overflow-x-hidden">
                     {quizList.map((quiz, index) => (

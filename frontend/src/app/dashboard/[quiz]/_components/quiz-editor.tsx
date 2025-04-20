@@ -1,12 +1,13 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useQuizStore } from "../../_stores/quiz-store";
 import QuestionEditor from "./question-editor"
-import { SearchX } from "lucide-react"
-import { useEffect } from "react";
+import { SearchX, Trash2 } from "lucide-react"
+import { useEffect, useState } from "react";
 import { CreateGame } from "./create-game";
+import { QuizDisplay } from "@/business/entities/quiz";
 
 export const QuizEditor = () => {
     const { quizList } = useQuizStore();
@@ -38,15 +39,77 @@ export const QuizEditor = () => {
     return (
         <>
             <div className="flex gap-4 items-center">
-                <motion.h1
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-3xl flex-grow font-bold text-shadow-sm">{quiz.title}</motion.h1>
+                <div className="flex items-center gap-2 flex-grow">
+                    <motion.h1
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-3xl font-bold text-shadow-sm mr-6">{quiz.title}</motion.h1>
+
+                    <DeleteQuiz quiz={quiz} />
+                </div>
 
                 <CreateGame quizId={quizId} />
             </div>
 
             <QuestionEditor quizId={quizId} />
         </>
+    )
+}
+
+const DeleteQuiz = ({ quiz }: { quiz: QuizDisplay }) => {
+    const [open, setOpen] = useState(false);
+
+    const { quizList, setQuizList } = useQuizStore();
+    const router = useRouter();
+
+    const deleteQuiz = async () => {
+        // NEEDS TO DELETE TO SERVER AS WELL
+        const filteredList = quizList.filter((q) => q.id !== quiz.id);
+        setQuizList(filteredList);
+        setOpen(false);
+        router.push("/dashboard");
+    }
+
+    return (
+        <div className="z-30">
+            <button
+                onClick={() => setOpen(true)}
+                className="cursor-pointer flex items-center justify-center p-3 rounded-full hover:bg-black/10 transition-colors duration-100 ease-in">
+                <Trash2 className="text-destructive" size={24} />
+            </button>
+
+            <div className={`${open ? "pointer-events-auto" : "pointer-events-none"} flex items-center justify-center inset-0 absolute`}>
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={open ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                    transition={{ ease: "backOut", duration: 0.1 }}
+                    className="bg-white max-w-[450px] gap-4 flex flex-col z-30 p-4 rounded-xl">
+                    <div className="flex items-center gap-2">
+                        <p className="text-xl font-bold">Are you sure you want to delete this quiz?</p>
+                    </div>
+                    <div className="w-full h-[1px] bg-black/10" />
+
+                    <div className="flex flex-col gap-1 mb-6">
+                        <p className="">{quiz.title}</p>
+                        <p>{quiz.questionCount} question{quiz.questionCount > 1 && "s"}</p>
+                    </div>
+
+                    <div className="flex justify-between w-full">
+                        <button
+                            onClick={() => setOpen(false)}
+                            className="cursor-pointer hover:underline">
+                            Cancel
+                        </button>
+                        <button
+                            onClick={deleteQuiz}
+                            className="cursor-pointer bg-destructive flex items-center text-white rounded-lg p-2 px-4 font-bold">
+                            <Trash2 className="mr-2" size={16} />
+                            Delete
+                        </button>
+                    </div>
+                </motion.div>
+                <button onClick={() => setOpen(false)} className={`absolute inset-0 transition-colors duration-100 eas-in ${open ? "bg-black/50" : "bg-transparent"}`} />
+            </div>
+        </div>
     )
 }
