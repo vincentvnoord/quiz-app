@@ -28,7 +28,6 @@ export const CreateGame = ({ quizId }: { quizId: string }) => {
             }
         } catch (e) {
             console.error("Error starting lobby: ", e);
-        } finally {
             setLoading(false);
         }
     }
