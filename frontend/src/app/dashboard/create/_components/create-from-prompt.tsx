@@ -2,28 +2,57 @@
 
 import { Paperclip, ArrowUp, ChevronDown, Check } from "lucide-react"
 import { motion } from "framer-motion"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Answer, Question } from "@/business/entities/quiz";
 
+const timeOut = (delay: number, func: () => void) => {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            func();
+            resolve(true);
+        }, delay);
+    });
+}
+
 export const CreateFromPrompt = () => {
-    const answers: Answer[] = [
-        { id: "1", text: "France", isCorrect: false },
-        { id: "2", text: "Germany", isCorrect: false },
-        { id: "3", text: "Spain", isCorrect: true },
-        { id: "4", text: "Italy", isCorrect: false },
-    ]
+    const [quizTitle, setQuizTitle] = useState<string | null>(null);
+    const [questions, setQuestions] = useState<Question[]>([]);
+
+    useEffect(() => {
+        const generate = async () => {
+            await timeOut(1000, () => {
+                setQuizTitle("Quiz Title");
+            });
+
+            await timeOut(1000, () => {
+                setQuestions((prev) => [...prev, {
+                    id: "1",
+                    text: "This is a question?",
+                    answers: [
+                        { id: "1", text: "This is an answer", isCorrect: true },
+                        { id: "2", text: "This is an answer", isCorrect: false },
+                        { id: "3", text: "This is an answer", isCorrect: false },
+                        { id: "4", text: "This is an answer", isCorrect: false },
+                    ]
+                }])
+            });
+        }
+
+        generate();
+    }, []);
 
     return (
         <div className="flex flex-col h-full relative items-center justify-center gap-8">
             <div className="flex gap-2 flex-col p-2 w-full max-w-[500px]">
-                <h1 className="text-4xl font-bold">Quiz Title</h1>
+                <motion.h1
+                    initial={{ opacity: 0, y: -100, height: 0 }}
+                    animate={quizTitle !== null ? { opacity: 1, y: 0, height: "auto" } : { opacity: 0, y: -100, height: 0 }}
+                    transition={{ ease: "anticipate", duration: 1 }}
+                    className="text-4xl font-bold">{quizTitle}</motion.h1>
                 <div className="flex flex-col gap-2 overflow-y-scroll min-h-0">
-                    <GeneratedQuestion question={{ id: "1", text: "What is the capital of the United States of America?", answers }} />
-                    <GeneratedQuestion question={{ id: "1", text: "What is the capital of the United States of America?", answers }} />
-                    <GeneratedQuestion question={{ id: "1", text: "What is the capital of the United States of America?", answers }} />
-                    <GeneratedQuestion question={{ id: "1", text: "What is the capital of the United States of America?", answers }} />
-                    <GeneratedQuestion question={{ id: "1", text: "What is the capital of the United States of America?", answers }} />
-                    <GeneratedQuestion question={{ id: "1", text: "What is the capital of the United States of America?", answers }} />
+                    {questions.map((question) => (
+                        <GeneratedQuestion key={question.id} question={question} />
+                    ))}
                 </div>
             </div>
             <PrompInput />
@@ -35,7 +64,11 @@ const GeneratedQuestion = ({ question }: { question: Question }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <div className="flex flex-col">
+        <motion.div
+            initial={{ opacity: 0, y: -50, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: "auto" }}
+            transition={{ ease: "anticipate", duration: 1 }}
+            className="flex flex-col">
             <button onClick={() => setIsOpen(!isOpen)} className="flex cursor-pointer rounded-lg hover:bg-foreground/10 transition-colors duration-100 justify-between gap-2 p-2 w-full">
                 <p>This is a question, mark?</p>
                 <motion.div
@@ -56,7 +89,7 @@ const GeneratedQuestion = ({ question }: { question: Question }) => {
                     ))}
                 </div>
             </motion.div>
-        </div>
+        </motion.div>
     )
 }
 

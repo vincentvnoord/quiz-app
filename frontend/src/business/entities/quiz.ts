@@ -1,3 +1,8 @@
+export type Quiz = {
+    id: string;
+    title: string;
+    questions: Question[];
+}
 
 export type QuizDisplay = {
     id: string;
