@@ -4,6 +4,7 @@ import { Paperclip, ArrowUp, ChevronDown, Check } from "lucide-react"
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react";
 import { Answer, Question } from "@/business/entities/quiz";
+import { generateQuiz } from "../_actions";
 
 const timeOut = (delay: number, func: () => void) => {
     return new Promise((resolve) => {
@@ -18,28 +19,15 @@ export const CreateFromPrompt = () => {
     const [quizTitle, setQuizTitle] = useState<string | null>(null);
     const [questions, setQuestions] = useState<Question[]>([]);
 
-    useEffect(() => {
-        const generate = async () => {
-            await timeOut(1000, () => {
-                setQuizTitle("Quiz Title");
-            });
-
-            await timeOut(1000, () => {
-                setQuestions((prev) => [...prev, {
-                    id: "1",
-                    text: "This is a question?",
-                    answers: [
-                        { id: "1", text: "This is an answer", isCorrect: true },
-                        { id: "2", text: "This is an answer", isCorrect: false },
-                        { id: "3", text: "This is an answer", isCorrect: false },
-                        { id: "4", text: "This is an answer", isCorrect: false },
-                    ]
-                }])
-            });
+    const handleGenerateQuiz = async (prompt: string) => {
+        try {
+            const quiz = await generateQuiz(prompt);
+            setQuizTitle(quiz.title);
+            setQuestions(quiz.questions);
+        } catch (e) {
+            console.error(e);
         }
-
-        generate();
-    }, []);
+    }
 
     return (
         <div className="flex flex-col h-full relative items-center justify-center gap-8">
@@ -51,11 +39,11 @@ export const CreateFromPrompt = () => {
                     className="text-4xl font-bold">{quizTitle}</motion.h1>
                 <div className="flex flex-col gap-2 overflow-y-scroll min-h-0">
                     {questions.map((question) => (
-                        <GeneratedQuestion key={question.id} question={question} />
+                        <GeneratedQuestion key={question.text} question={question} />
                     ))}
                 </div>
             </div>
-            <PrompInput />
+            <PrompInput handleGenerateQuiz={handleGenerateQuiz} />
         </div>
     )
 }
@@ -69,9 +57,10 @@ const GeneratedQuestion = ({ question }: { question: Question }) => {
             animate={{ opacity: 1, y: 0, height: "auto" }}
             transition={{ ease: "anticipate", duration: 1 }}
             className="flex flex-col">
-            <button onClick={() => setIsOpen(!isOpen)} className="flex cursor-pointer rounded-lg hover:bg-foreground/10 transition-colors duration-100 justify-between gap-2 p-2 w-full">
-                <p>This is a question, mark?</p>
+            <button onClick={() => setIsOpen(!isOpen)} className="flex text-left cursor-pointer rounded-lg hover:bg-foreground/10 transition-colors duration-100 justify-between gap-2 p-2 w-full">
+                <p>{question.text}</p>
                 <motion.div
+                className="h-fit"
                     initial={{ rotate: 0 }}
                     animate={isOpen ? { rotate: 180 } : { rotate: 0 }}
                 >
@@ -85,7 +74,7 @@ const GeneratedQuestion = ({ question }: { question: Question }) => {
                 className="overflow-hidden">
                 <div className="grid grid-cols-2 gap-1 p-2 px-4">
                     {question.answers.map((answer) => (
-                        <GeneratedAnswer key={answer.id} answer={answer} />
+                        <GeneratedAnswer key={answer.text} answer={answer} />
                     ))}
                 </div>
             </motion.div>
@@ -104,7 +93,16 @@ const GeneratedAnswer = ({ answer }: { answer: Answer }) => {
     )
 }
 
-const PrompInput = () => {
+const PrompInput = ({ handleGenerateQuiz }: { handleGenerateQuiz: (prompt: string) => Promise<void> }) => {
+    const [isLoading, setIsLoading] = useState(false);
+    const [prompt, setPrompt] = useState("");
+
+    const onSubmit = async () => {
+        if (prompt === "" || prompt == null) return;
+        setIsLoading(true);
+        await handleGenerateQuiz(prompt);
+        setIsLoading(false);
+    }
 
     return (
         <motion.div
@@ -115,6 +113,8 @@ const PrompInput = () => {
 
             <div className="flex h-fit">
                 <textarea
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
                     className="p-2 resize-none flex-grow focus:outline-none"
                     placeholder="Describe your quiz" />
 
@@ -123,7 +123,7 @@ const PrompInput = () => {
                         <Paperclip size={24} className="text-gray-500" />
                     </div>
 
-                    <button className="bg-primary h-fit text-white rounded-lg p-2">
+                    <button onClick={onSubmit} disabled={isLoading} className={`${isLoading && "opacity-50"} bg-primary h-fit text-white rounded-lg p-2`}>
                         <ArrowUp size={24} />
                     </button>
                 </div>
