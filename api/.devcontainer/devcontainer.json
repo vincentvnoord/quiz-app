@@ -1,0 +1,18 @@
+{
+    "service": "api",
+    "name": "API Dev",
+    "dockerComposeFile": "../../docker-compose.yml",
+    "workspaceFolder": "/app",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-dotnettools.csharp",
+                "ms-dotnettools.csdevkit"
+            ]
+        }
+    },
+    "forwardPorts": [
+        5000,
+        5001
+    ]
+}

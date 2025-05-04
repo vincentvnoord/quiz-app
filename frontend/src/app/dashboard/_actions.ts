@@ -38,7 +38,7 @@ export async function createGame(terminateExisting: boolean, quizId: string) {
 export async function getQuizList() {
     const authToken = await getUserTokenFromCookies();
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/quiz/list`, {
+    const res = await fetch(`${process.env.API_URL}/quiz/list`, {
         method: "get",
         headers: {
             "Content-Type": "application/json",
@@ -55,6 +55,8 @@ export async function getQuizList() {
     }
 
     if (res.status !== 200) {
+        console.error("Error fetching quiz list:", res.status);
+        console.error("Response:", res); 
         return { success: false, data: null };
     }
 

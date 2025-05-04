@@ -5,7 +5,7 @@ import { UnAuthorizedError } from "@/business/entities/errors/common";
 
 export class UserRepository implements IUserRepository {
     async getUser(authToken: string): Promise<User> {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user`, {
+        const res = await fetch(`${process.env.API_URL}/user`, {
             method: "get",
             headers: {
                 "Content-Type": "application/json",
@@ -30,7 +30,7 @@ export class UserRepository implements IUserRepository {
 
     async createUser(user: UserDto): Promise<void> {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/register`, {
+            const res = await fetch(`${process.env.API_URL}/register`, {
                 method: "post",
                 body: JSON.stringify(user),
                 headers: {

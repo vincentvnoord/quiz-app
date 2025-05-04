@@ -5,7 +5,7 @@ import { UnAuthorizedError } from "@/business/entities/errors/common";
 export default class AuthService implements IAuthService {
 
     async login(userData: UserLoginDto): Promise<string> {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
+        const res = await fetch(`${process.env.API_URL}/login`, {
             method: "post",
             body: JSON.stringify(userData),
             headers: {

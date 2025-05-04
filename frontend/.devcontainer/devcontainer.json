@@ -1,0 +1,23 @@
+{
+    "name": "Quiz App Development",
+    "dockerComposeFile": "../../docker-compose.yml",
+    "service": "frontend",
+    "workspaceFolder": "/app",
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "editor.formatOnSave": true
+            },
+            "extensions": [
+                "ms-vscode.remote-containers"
+            ]
+        }
+    },
+    "postCreateCommand": "npm run dev",
+    "mounts": [
+        "source=./frontend,target=/app,type=bind"
+    ],
+    "forwardPorts": [
+        3000
+    ]
+}

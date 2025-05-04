@@ -15,6 +15,7 @@ export const QuizList = () => {
     useEffect(() => {
         const fetchQuizzes = async () => {
             const res = await getQuizList();
+            console.log(res);
             if (res.success === false) {
                 return;
             }
@@ -22,6 +23,7 @@ export const QuizList = () => {
             if (res.data === null)
                 return;
 
+            console.log(res.data);
             setQuizList(res.data);
         };
 

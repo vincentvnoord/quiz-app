@@ -4,7 +4,7 @@ import { IGameService } from "./game-service-interface";
 export class GameService implements IGameService {
     async joinGame(gameId: string, playerName: string): Promise<string> {
         console.log("Joining game: ", { gameId, playerName });
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/game/join`, {
+        const res = await fetch(`${process.env.API_URL}/game/join`, {
             method: "post",
             body: JSON.stringify({
                 code: gameId,
@@ -28,7 +28,7 @@ export class GameService implements IGameService {
     }
 
     async createGame(authToken: string, quizId: string, terminateExisting: boolean): Promise<{ activeGameSession: boolean, code: string }> {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/game/create`, {
+        const res = await fetch(`${process.env.API_URL}/game/create`, {
             method: "post",
             body: JSON.stringify({
                 quizId,

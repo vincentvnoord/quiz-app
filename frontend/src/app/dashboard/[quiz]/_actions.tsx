@@ -6,7 +6,7 @@ import { Question } from "@/business/entities/quiz";
 export async function getQuizQuestions(quizId: string): Promise<Question[] | null> {
     const authToken = await getUserTokenFromCookies();
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/quiz/${quizId}`, {
+    const res = await fetch(`${process.env.API_URL}/quiz/${quizId}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
