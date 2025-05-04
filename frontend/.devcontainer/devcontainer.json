@@ -9,7 +9,8 @@
                 "editor.formatOnSave": true
             },
             "extensions": [
-                "ms-vscode.remote-containers"
+                "ms-vscode.remote-containers",
+                "bradlc.vscode-tailwindcss"
             ]
         }
     },

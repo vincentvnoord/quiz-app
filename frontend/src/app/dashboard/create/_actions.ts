@@ -3,7 +3,7 @@
 import { Quiz } from "@/business/entities/quiz";
 
 export const generateQuiz = async (prompt: string) => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/quiz/generate`, {
+    const res = await fetch(`${process.env.API_URL}/quiz/generate`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

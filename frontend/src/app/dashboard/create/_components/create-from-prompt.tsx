@@ -2,22 +2,24 @@
 
 import { Paperclip, ArrowUp, ChevronDown, Check } from "lucide-react"
 import { motion } from "framer-motion"
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Answer, Question } from "@/business/entities/quiz";
 import { generateQuiz } from "../_actions";
 
-const timeOut = (delay: number, func: () => void) => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            func();
-            resolve(true);
-        }, delay);
-    });
-}
-
 export const CreateFromPrompt = () => {
-    const [quizTitle, setQuizTitle] = useState<string | null>(null);
-    const [questions, setQuestions] = useState<Question[]>([]);
+    const [quizTitle, setQuizTitle] = useState<string | null>("Cool quiz");
+    const [questions, setQuestions] = useState<Question[]>([
+        {
+            id: "1",
+            text: "What is the capital of France?",
+            answers: [
+                { id: "1", text: "Paris", isCorrect: true },
+                { id: "2", text: "London", isCorrect: false },
+                { id: "3", text: "Berlin", isCorrect: false },
+                { id: "4", text: "Madrid", isCorrect: false }
+            ]
+        }
+    ]);
 
     const handleGenerateQuiz = async (prompt: string) => {
         try {
@@ -30,20 +32,26 @@ export const CreateFromPrompt = () => {
     }
 
     return (
-        <div className="flex flex-col h-full relative items-center justify-center gap-8">
-            <div className="flex gap-2 flex-col p-2 w-full max-w-[500px]">
-                <motion.h1
-                    initial={{ opacity: 0, y: -100, height: 0 }}
-                    animate={quizTitle !== null ? { opacity: 1, y: 0, height: "auto" } : { opacity: 0, y: -100, height: 0 }}
-                    transition={{ ease: "anticipate", duration: 1 }}
-                    className="text-4xl font-bold">{quizTitle}</motion.h1>
-                <div className="flex flex-col gap-2 overflow-y-scroll min-h-0">
+        <div className="flex flex-col h-full items-center justify-center">
+            <div className="flex flex-col h-full w-full max-w-[500px] justify-center">
+                <h1 className="text-2xl flex-shrink-0 font-bold">{quizTitle}</h1>
+
+                <div className="flex flex-col gap-1 overflow-auto">
                     {questions.map((question) => (
-                        <GeneratedQuestion key={question.text} question={question} />
+                        <GeneratedQuestion key={question.id} question={question} />
+                    ))}
+                    {questions.map((question) => (
+                        <GeneratedQuestion key={question.id} question={question} />
+                    ))}
+                    {questions.map((question) => (
+                        <GeneratedQuestion key={question.id} question={question} />
                     ))}
                 </div>
+
+                <div className="flex-shrink-0 w-full">
+                    <PrompInput handleGenerateQuiz={handleGenerateQuiz} />
+                </div>
             </div>
-            <PrompInput handleGenerateQuiz={handleGenerateQuiz} />
         </div>
     )
 }
@@ -60,7 +68,7 @@ const GeneratedQuestion = ({ question }: { question: Question }) => {
             <button onClick={() => setIsOpen(!isOpen)} className="flex text-left cursor-pointer rounded-lg hover:bg-foreground/10 transition-colors duration-100 justify-between gap-2 p-2 w-full">
                 <p>{question.text}</p>
                 <motion.div
-                className="h-fit"
+                    className="h-fit"
                     initial={{ rotate: 0 }}
                     animate={isOpen ? { rotate: 180 } : { rotate: 0 }}
                 >
