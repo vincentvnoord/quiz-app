@@ -106,7 +106,7 @@ const ListedQuiz = ({ quiz, index }: { quiz: Quiz, index: number }) => {
                         quiz.state === "generating" &&
                         <motion.div
                             initial={{ opacity: 0, x: 10, rotate: 90 }}
-                            animate={hovered ? { opacity: 1, x: 0, rotate: 0 } : { opacity: 0, x: 10, rotate: 90 }}
+                            animate={{ opacity: 1, x: 0, rotate: 0 }}
                             className="flex items-center p-1 rounded-full transition-colors duration-100 ease-in-out">
                             <Loader2 className="opacity-50 flex-shrink-0 animate-spin" size={20} />
                         </motion.div>

@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useQuizStore } from "../../_stores/quiz-store";
 import QuestionEditor from "./question-editor"
-import { SearchX, Trash2 } from "lucide-react"
+import { Loader, Loader2, LoaderPinwheel, SearchX, Trash2 } from "lucide-react"
 import { useEffect, useState } from "react";
 import { CreateGame } from "./create-game";
 import { LoadedQuiz } from "@/business/entities/quiz";
@@ -40,8 +40,7 @@ export const QuizEditor = () => {
     if (quiz.state === "generating") {
         return (
             <div className="w-full h-full flex gap-2 flex-col items-center justify-center">
-                <SearchX className="" size={64} />
-                <p className="text-2xl text-center">Generating quiz...</p>
+                <Loader2 className="animate-spin" size={64} />
                 <p className="text-secondary text-center">Please wait while we generate your quiz.</p>
             </div>
         )

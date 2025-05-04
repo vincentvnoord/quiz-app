@@ -1,31 +1,26 @@
 "use client";
 
-import { Paperclip, ArrowUp, ChevronDown, Check } from "lucide-react"
+import { Paperclip, ArrowUp, Router, Loader2 } from "lucide-react"
 import { motion } from "framer-motion"
 import { useState } from "react";
-import { Answer, Question } from "@/business/entities/quiz";
-import { generateQuiz } from "../_actions";
+import { GeneratingQuiz } from "@/business/entities/quiz";
+import { useQuizStore } from "../../_stores/quiz-store";
+import { useRouter } from "next/navigation";
 
 export const CreateFromPrompt = () => {
-    const [quizTitle, setQuizTitle] = useState<string | null>("Cool quiz");
-    const [questions, setQuestions] = useState<Question[]>([
-        {
-            id: "1",
-            text: "What is the capital of France?",
-            answers: [
-                { id: "1", text: "Paris", isCorrect: true },
-                { id: "2", text: "London", isCorrect: false },
-                { id: "3", text: "Berlin", isCorrect: false },
-                { id: "4", text: "Madrid", isCorrect: false }
-            ]
-        }
-    ]);
+    const { addQuiz } = useQuizStore();
+    const router = useRouter();
 
     const handleGenerateQuiz = async (prompt: string) => {
         try {
-            const quiz = await generateQuiz(prompt);
-            setQuizTitle(quiz.title);
-            setQuestions(quiz.questions);
+            // const quiz = await generateQuiz(prompt);
+            const generatingQuiz: GeneratingQuiz = {
+                id: "generating",
+                state: "generating",
+            }
+
+            addQuiz(generatingQuiz);
+            router.push(`/dashboard/${generatingQuiz.id}`);
         } catch (e) {
             console.error(e);
         }
@@ -33,70 +28,7 @@ export const CreateFromPrompt = () => {
 
     return (
         <div className="flex flex-col h-full items-center justify-center">
-            <div className="flex flex-col gap-2 h-full w-full max-w-[500px] justify-center">
-                <motion.h1 layout layoutId="quiz-title" className="text-2xl flex-shrink-0 font-bold">{quizTitle}</motion.h1>
-
-                <div className="flex flex-col gap-1 overflow-auto">
-                    {questions.map((question) => (
-                        <GeneratedQuestion key={question.id} question={question} />
-                    ))}
-                    {questions.map((question) => (
-                        <GeneratedQuestion key={question.id} question={question} />
-                    ))}
-                    {questions.map((question) => (
-                        <GeneratedQuestion key={question.id} question={question} />
-                    ))}
-                </div>
-
-                <div className="flex-shrink-0 w-full">
-                    <PrompInput handleGenerateQuiz={handleGenerateQuiz} />
-                </div>
-            </div>
-        </div>
-    )
-}
-
-const GeneratedQuestion = ({ question }: { question: Question }) => {
-    const [isOpen, setIsOpen] = useState(false);
-
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: -50, height: 0 }}
-            animate={{ opacity: 1, y: 0, height: "auto" }}
-            transition={{ ease: "anticipate", duration: 1 }}
-            className="flex flex-col">
-            <button onClick={() => setIsOpen(!isOpen)} className="flex text-left cursor-pointer rounded-lg hover:bg-foreground/10 transition-colors duration-100 justify-between gap-2 p-2 w-full">
-                <p>{question.text}</p>
-                <motion.div
-                    className="h-fit"
-                    initial={{ rotate: 0 }}
-                    animate={isOpen ? { rotate: 180 } : { rotate: 0 }}
-                >
-                    <ChevronDown size={24} className="text-gray-500 flex-shrink-0" />
-                </motion.div>
-            </button>
-
-            <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={isOpen ? { opacity: 1, height: "auto" } : { opacity: 0, height: 0 }}
-                className="overflow-hidden">
-                <div className="grid grid-cols-2 gap-1 p-2 px-4">
-                    {question.answers.map((answer) => (
-                        <GeneratedAnswer key={answer.text} answer={answer} />
-                    ))}
-                </div>
-            </motion.div>
-        </motion.div>
-    )
-}
-
-const GeneratedAnswer = ({ answer }: { answer: Answer }) => {
-    const { text, isCorrect } = answer;
-
-    return (
-        <div className="border p-2 rounded-lg flex items-center justify-between">
-            <p className="truncate">{text}</p>
-            <Check className={`${isCorrect ? "opacity-100" : "opacity-0"} text-foreground/50 flex-shrink-0`} size={24} />
+            <PrompInput handleGenerateQuiz={handleGenerateQuiz} />
         </div>
     )
 }
@@ -108,15 +40,17 @@ const PrompInput = ({ handleGenerateQuiz }: { handleGenerateQuiz: (prompt: strin
     const onSubmit = async () => {
         if (prompt === "" || prompt == null) return;
         setIsLoading(true);
-        await handleGenerateQuiz(prompt);
-        setIsLoading(false);
+        setTimeout(async () => {
+            await handleGenerateQuiz(prompt);
+            setIsLoading(false);
+        }, 1000);
     }
 
     return (
         <motion.div
             initial={{ opacity: 0, y: -100 }}
             animate={{ opacity: 1, y: 0 }}
-            className="border rounded-lg p-2 flex flex-col w-full max-w-[500px]"
+            className={`border rounded-lg p-2 flex flex-col w-full max-w-[500px] ${isLoading && "pointer-events-none"}`}
         >
 
             <div className="flex h-fit">
@@ -132,7 +66,13 @@ const PrompInput = ({ handleGenerateQuiz }: { handleGenerateQuiz: (prompt: strin
                     </div>
 
                     <button onClick={onSubmit} disabled={isLoading} className={`${isLoading && "opacity-50"} bg-primary h-fit text-white rounded-lg p-2`}>
-                        <ArrowUp size={24} />
+                        {
+                            isLoading
+                                ?
+                                <Loader2 className="animate-spin" size={24} />
+                                :
+                                <ArrowUp size={24} />
+                        }
                     </button>
                 </div>
             </div>
