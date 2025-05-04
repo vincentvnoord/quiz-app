@@ -1,5 +1,15 @@
-export type Quiz = {
+type BaseQuiz = {
     id: string;
+};
+
+export type Quiz = GeneratingQuiz | LoadedQuiz;
+
+export type GeneratingQuiz = BaseQuiz & {
+    state: "generating";
+}
+
+export type LoadedQuiz = BaseQuiz & {
+    state: "loaded";
     title: string;
     questions: Question[];
 }

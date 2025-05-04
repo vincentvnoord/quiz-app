@@ -1,7 +1,7 @@
 "use client";
 
-import { PanelLeft, LogOut, EllipsisVertical } from "lucide-react"
-import { QuizDisplay } from "@/business/entities/quiz";
+import { PanelLeft, LogOut, EllipsisVertical, Loader2 } from "lucide-react"
+import { Quiz, QuizDisplay } from "@/business/entities/quiz";
 import { useQuizStore } from "../_stores/quiz-store";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
@@ -46,7 +46,7 @@ export const QuizList = () => {
 
                 <div className="flex flex-col p-1 gap-1 flex-grow overflow-y-scroll overflow-x-hidden">
                     {quizList.map((quiz, index) => (
-                        <ListedQuiz key={quiz.id} {...quiz} index={index} />
+                        <ListedQuiz key={quiz.id} quiz={quiz} index={index} />
                     ))}
                 </div>
 
@@ -59,11 +59,15 @@ export const QuizList = () => {
     )
 }
 
-const ListedQuiz = ({ id, title, questionCount, index }: QuizDisplay & { index: number }) => {
+const ListedQuiz = ({ quiz, index }: { quiz: Quiz, index: number }) => {
     const [hovered, setHovered] = useState(false);
     const params = useParams();
+    const { id } = quiz;
     const quizId = params["quiz"] as string;
-    const isSelected = quizId == id;
+    const isSelected = quizId == quiz.id;
+
+    const title = quiz.state === "loaded" ? quiz.title : "Generating...";
+    const questionCount = quiz.state === "loaded" ? quiz.questions.length : 0;
 
     const handleActionsClick = (e: React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
@@ -87,13 +91,26 @@ const ListedQuiz = ({ id, title, questionCount, index }: QuizDisplay & { index: 
                         <p className="text-xs opacity-50">{questionCount} question{questionCount > 1 && "s"}</p>
                     </div>
 
-                    <motion.div
-                        onClick={handleActionsClick}
-                        initial={{ opacity: 0, x: 10, rotate: 90 }}
-                        animate={hovered ? { opacity: 1, x: 0, rotate: 0 } : { opacity: 0, x: 10, rotate: 90 }}
-                        className="flex items-center hover:bg-foreground/10 p-1 rounded-full transition-colors duration-100 ease-in-out">
-                        <EllipsisVertical className="opacity-50 flex-shrink-0" size={20} />
-                    </motion.div>
+                    {
+                        quiz.state === "loaded" &&
+                        <motion.div
+                            onClick={handleActionsClick}
+                            initial={{ opacity: 0, x: 10, rotate: 90 }}
+                            animate={hovered ? { opacity: 1, x: 0, rotate: 0 } : { opacity: 0, x: 10, rotate: 90 }}
+                            className="flex items-center hover:bg-foreground/10 p-1 rounded-full transition-colors duration-100 ease-in-out">
+                            <EllipsisVertical className="opacity-50 flex-shrink-0" size={20} />
+                        </motion.div>
+                    }
+
+                    {
+                        quiz.state === "generating" &&
+                        <motion.div
+                            initial={{ opacity: 0, x: 10, rotate: 90 }}
+                            animate={hovered ? { opacity: 1, x: 0, rotate: 0 } : { opacity: 0, x: 10, rotate: 90 }}
+                            className="flex items-center p-1 rounded-full transition-colors duration-100 ease-in-out">
+                            <Loader2 className="opacity-50 flex-shrink-0 animate-spin" size={20} />
+                        </motion.div>
+                    }
                 </motion.div>
             </motion.div>
         </Link>

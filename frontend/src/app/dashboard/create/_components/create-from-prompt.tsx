@@ -33,8 +33,8 @@ export const CreateFromPrompt = () => {
 
     return (
         <div className="flex flex-col h-full items-center justify-center">
-            <div className="flex flex-col h-full w-full max-w-[500px] justify-center">
-                <h1 className="text-2xl flex-shrink-0 font-bold">{quizTitle}</h1>
+            <div className="flex flex-col gap-2 h-full w-full max-w-[500px] justify-center">
+                <motion.h1 layout layoutId="quiz-title" className="text-2xl flex-shrink-0 font-bold">{quizTitle}</motion.h1>
 
                 <div className="flex flex-col gap-1 overflow-auto">
                     {questions.map((question) => (

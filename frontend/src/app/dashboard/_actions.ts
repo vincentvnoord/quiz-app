@@ -4,7 +4,7 @@ import { UnAuthorizedError } from "@/business/entities/errors/common";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { createGameController } from "@/controllers/game/create-game-controller";
-import { QuizDisplay } from "@/business/entities/quiz";
+import { Quiz, QuizDisplay } from "@/business/entities/quiz";
 
 export async function getUserTokenFromCookies() {
     const cookieStore = cookies();
@@ -56,16 +56,17 @@ export async function getQuizList() {
 
     if (res.status !== 200) {
         console.error("Error fetching quiz list:", res.status);
-        console.error("Response:", res); 
+        console.error("Response:", res);
         return { success: false, data: null };
     }
 
     const data = await res.json();
-    const quizList: QuizDisplay[] = data.map((quiz: { id: string, title: string, questions: string[] }) => {
+    const quizList: Quiz[] = data.map((quiz: { id: string, title: string, questions: string[] }) => {
         return {
             id: quiz.id,
+            state: "loaded",
             title: quiz.title,
-            questionCount: quiz.questions.length,
+            questions: quiz.questions,
         };
     });
 

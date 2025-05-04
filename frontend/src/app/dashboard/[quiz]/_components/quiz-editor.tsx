@@ -7,7 +7,7 @@ import QuestionEditor from "./question-editor"
 import { SearchX, Trash2 } from "lucide-react"
 import { useEffect, useState } from "react";
 import { CreateGame } from "./create-game";
-import { QuizDisplay } from "@/business/entities/quiz";
+import { LoadedQuiz } from "@/business/entities/quiz";
 
 export const QuizEditor = () => {
     const { quizList } = useQuizStore();
@@ -21,7 +21,10 @@ export const QuizEditor = () => {
             return;
         }
 
-        document.title = `${quiz.title} | Quiz Editor`;
+        if (quiz.state === "generating") {
+            document.title = `Generating | Quiz Editor`;
+            return;
+        }
     }, [quiz])
 
     if (quiz === undefined) {
@@ -30,6 +33,16 @@ export const QuizEditor = () => {
                 <SearchX className="" size={64} />
                 <p className="text-2xl text-center">Quiz not found</p>
                 <p className="text-secondary text-center">Please select a valid quiz from your library or create a new one.</p>
+            </div>
+        )
+    }
+
+    if (quiz.state === "generating") {
+        return (
+            <div className="w-full h-full flex gap-2 flex-col items-center justify-center">
+                <SearchX className="" size={64} />
+                <p className="text-2xl text-center">Generating quiz...</p>
+                <p className="text-secondary text-center">Please wait while we generate your quiz.</p>
             </div>
         )
     }
@@ -56,7 +69,7 @@ export const QuizEditor = () => {
     )
 }
 
-const DeleteQuiz = ({ quiz }: { quiz: QuizDisplay }) => {
+const DeleteQuiz = ({ quiz }: { quiz: LoadedQuiz }) => {
     const [open, setOpen] = useState(false);
 
     const { quizList, setQuizList } = useQuizStore();
@@ -91,7 +104,7 @@ const DeleteQuiz = ({ quiz }: { quiz: QuizDisplay }) => {
 
                     <div className="flex flex-col gap-1 mb-6">
                         <p className="">{quiz.title}</p>
-                        <p>{quiz.questionCount} question{quiz.questionCount > 1 && "s"}</p>
+                        <p>{quiz.questions.length} question{quiz.questions.length > 1 && "s"}</p>
                     </div>
 
                     <div className="flex justify-between w-full">
