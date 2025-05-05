@@ -1,9 +1,9 @@
-using Api.Models.DTOs;
+using Api.Models.DTOs.GameState;
 using Business.GameSessions;
 using Business.Models;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Api.GameHubManagement
+namespace Api.Hubs.GameHub
 {
     public class GameMessenger : IGameMessenger
     {

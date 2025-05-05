@@ -4,8 +4,6 @@ using Business.Models;
 using Business.QuizService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using Api.GameHubManagement;
 using System.Security.Claims;
 using System.Net;
 using Microsoft.AspNetCore.RateLimiting;

@@ -3,7 +3,7 @@ using Business.GameSessions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Api.GameHubManagement
+namespace Api.Hubs.GameHub
 {
     public class GameHub(GameSessionManager sessionManager, IConnectionManager connectionManager, IGameMessenger gameMessenger) : Hub
     {

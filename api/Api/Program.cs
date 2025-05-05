@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using System.Text;
-using Api.GameHubManagement;
+using Api.Hubs.GameHub;
 using Business.GameSessions;
 using Business.QuizService;
 using Business.UserService;
@@ -74,6 +74,7 @@ builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 
 builder.Services.AddScoped<QuizService>();
 builder.Services.AddScoped<IQuizRepository, QuizRepositoryMock>();
+builder.Services.AddScoped<IQuizGenerator, MockQuizGenerator>();
 
 builder.Services.AddScoped<IConnectionManager, ConnectionManager>();
 builder.Services.AddScoped<IGameMessenger, GameMessenger>();

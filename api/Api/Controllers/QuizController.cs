@@ -1,10 +1,11 @@
 
 using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Api.Models;
-using Api.Models.DTOs.Quiz;
+using Api.Models.DTOs.QuizData;
 using Business.QuizService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +29,13 @@ namespace Api.Controllers
         [HttpGet("list")]
         public async Task<IActionResult> List()
         {
-            var list = await _quizService.GetList();
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return Unauthorized("User ID not found in token.");
+            }
+
+            var list = await _quizService.GetList(userId);
             return Ok(list);
         }
 
@@ -58,7 +65,6 @@ namespace Api.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("test")]
         public async Task<IActionResult> Test()
         {
@@ -91,7 +97,6 @@ namespace Api.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("generate")]
         public async Task<IActionResult> Generate([FromBody] GenerateQuizRequest request)
         {

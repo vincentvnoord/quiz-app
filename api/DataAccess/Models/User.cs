@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Models
 {
@@ -10,5 +9,7 @@ namespace DataAccess.Models
 
         public required string Email { get; set; }
         public required string Password { get; set; }
+
+        public ICollection<Quiz> Quizzes { get; set; } = [];
     }
 }

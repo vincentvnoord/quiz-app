@@ -1,11 +1,12 @@
 # Dev Stage: Use SDK image with tooling
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS dev
+FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS dev
+
+ENV PATH="$PATH:/root/.dotnet/tools"
 
 # Install required tools (e.g., for hot reload)
 RUN dotnet tool install --global dotnet-watch \
+    && dotnet tool install --global dotnet-ef \
     && apk add --no-cache bash curl
-
-ENV PATH="$PATH:/root/.dotnet/tools"
 
 # Copy everything into container (ensure to copy all the necessary files)
 COPY . /app 

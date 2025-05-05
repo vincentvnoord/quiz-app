@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using Business.GameSessions;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Api.GameHubManagement
+namespace Api.Hubs.GameHub
 {
     public class ConnectionManager : IConnectionManager
     {

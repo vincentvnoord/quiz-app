@@ -1,7 +1,6 @@
 using Business.GameSessions;
-using Business.GameSessions;
 
-namespace Api.Models.DTOs
+namespace Api.Models.DTOs.GameState
 {
     public record HostGameStateDto : GameStateDto
     {

@@ -2,7 +2,7 @@
 using System.Text.Json.Serialization;
 using Business.Models;
 
-namespace Api.Models.DTOs.Quiz
+namespace Api.Models.DTOs.QuizData
 {
     public class QuestionDto
     {

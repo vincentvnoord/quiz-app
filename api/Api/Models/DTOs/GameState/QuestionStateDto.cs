@@ -1,7 +1,7 @@
 using System.Diagnostics.Contracts;
 using Business.Models;
 
-namespace Api.Models.DTOs
+namespace Api.Models.DTOs.GameState
 {
     public record QuestionStateDto
     {

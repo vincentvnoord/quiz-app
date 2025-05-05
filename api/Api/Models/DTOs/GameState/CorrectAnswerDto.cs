@@ -2,7 +2,7 @@
 using Business.GameSessions;
 using Microsoft.SqlServer.Server;
 
-namespace Api.Models.DTOs
+namespace Api.Models.DTOs.GameState
 {
     public class CorrectAnswerDto
     {

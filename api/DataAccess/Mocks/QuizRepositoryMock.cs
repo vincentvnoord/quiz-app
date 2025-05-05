@@ -21,7 +21,7 @@ namespace DataAccess.Mocks
             return Task.FromResult<Quiz?>(null);
         }
 
-        public Task<IEnumerable<Quiz>> GetList()
+        public Task<IEnumerable<Quiz>> GetList(string userId)
         {
             return Task.FromResult(_quizzes.Values.AsEnumerable());
         }
@@ -178,6 +178,21 @@ namespace DataAccess.Mocks
                     15
                 )
             };
+        }
+
+        public Task<bool> UpdateQuiz(Quiz quiz)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<Quiz>> GetList(int userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> CreateQuiz(int userId, Quiz quiz)
+        {
+            throw new NotImplementedException();
         }
     }
 }
