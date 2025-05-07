@@ -35,7 +35,12 @@ namespace Api.Controllers
                 return Unauthorized("User ID not found in token.");
             }
 
-            var list = await _quizService.GetList(userId);
+            if (!int.TryParse(userId, out var parsedId))
+            {
+                return BadRequest();
+            }
+
+            var list = await _quizService.GetList(parsedId);
             return Ok(list);
         }
 

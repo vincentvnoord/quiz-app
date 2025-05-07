@@ -51,8 +51,16 @@ namespace DataAccess.Repositories
             {
                 throw new Exception($"User with ID {userId} not found.");
             }
-            
-            return user.Quizzes;
+
+            return user.Quizzes.Select(q => new Quiz(
+                q.Id,
+                q.Title,
+                q.Questions.Select(question => new Business.Models.Question(
+                    question.Id,
+                    question.Text,
+                    question.Answers.Select(a => new Business.Models.Answer(a.Id, a.Text, a.IsCorrect)).ToArray()
+                )).ToArray()
+            ));
         }
 
         public Task<Quiz?> GetQuiz(int id)
