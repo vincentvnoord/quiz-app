@@ -1,7 +1,7 @@
 "use client";
 
 import { PanelLeft, LogOut, EllipsisVertical, Loader2 } from "lucide-react"
-import { Quiz, QuizDisplay } from "@/business/entities/quiz";
+import { Quiz } from "@/business/entities/quiz";
 import { useQuizStore } from "../_stores/quiz-store";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";

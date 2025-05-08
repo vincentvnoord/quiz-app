@@ -71,7 +71,7 @@ namespace Api.Controllers
         }
 
         [HttpPost("test")]
-        public async Task<IActionResult> Test()
+        public IActionResult Test()
         {
             try
             {

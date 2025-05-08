@@ -73,7 +73,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 
 builder.Services.AddScoped<QuizService>();
-builder.Services.AddScoped<IQuizRepository, QuizRepositoryMock>();
+builder.Services.AddScoped<IQuizRepository, QuizRepository>();
 builder.Services.AddScoped<IQuizGenerator, MockQuizGenerator>();
 
 builder.Services.AddScoped<IConnectionManager, ConnectionManager>();
