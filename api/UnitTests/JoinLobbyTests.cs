@@ -18,7 +18,7 @@ namespace UnitTests
         public void Setup()
         {
             _sessionManager = new GameSessionManager(new Mock<IGameMessenger>().Object, new Mock<IConnectionManager>().Object);
-            QuizService quizService = new QuizService(new Mock<IQuizRepository>().Object);
+            QuizService quizService = new QuizService(new Mock<IQuizRepository>().Object, new Mock<IQuizGenerator>().Object);
             _controller = new GameController(_sessionManager, quizService);
         }
 
