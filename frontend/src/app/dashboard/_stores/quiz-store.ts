@@ -1,11 +1,11 @@
 import { Quiz } from "@/business/entities/quiz";
 import { DashboardEventHandler } from "@/client/realtime/dashboard/dashboard-event-handler";
-import { RealtimeDashboardManager } from "@/client/realtime/dashboard/dashboard-manager";
+import { IRealtimeDashboardManager } from "@/client/realtime/dashboard/dashboard-manager.interface";
 import { MockDashboardManager } from "@/client/realtime/dashboard/mock-manager";
 import { create } from "zustand";
 
 export interface QuizStore {
-    realtimeManager: RealtimeDashboardManager | null;
+    realtimeManager: IRealtimeDashboardManager | null;
 
     quizList: Quiz[];
     setQuizList: (quizzes: Quiz[]) => void;
@@ -18,9 +18,13 @@ export const useQuizStore = create<QuizStore>()((set) => ({
     quizList: [],
     setQuizList: (quizzes) => set({ quizList: quizzes }),
     setQuizById: (id, quiz) => set((state) => ({
-        quizList: state.quizList.map((q) =>
-            q.id === id && q.state === "loaded" ? { ...q, ...quiz } : q
-        ),
+        quizList: state.quizList.map((q) => {
+            if (q.id !== id) return q;
+            if (q.state === "generating") {
+                return { ...q, state: "loaded", ...quiz } as Quiz;
+            }
+            return { ...q, ...quiz } as Quiz;
+        }),
     })),
     addQuiz: (quiz: Quiz) => set((state) => ({
         quizList: [quiz, ...state.quizList],

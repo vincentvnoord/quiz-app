@@ -1,4 +1,3 @@
-
 using Business.Models;
 using Business.QuizService;
 using Microsoft.EntityFrameworkCore;
@@ -63,14 +62,61 @@ namespace DataAccess.Repositories
             ));
         }
 
-        public Task<Quiz?> GetQuiz(int id)
+        public async Task<Quiz?> GetQuiz(int id)
         {
-            throw new NotImplementedException();
+            var quiz = await _context.Quizzes
+                .Include(quiz => quiz.Questions)
+                .ThenInclude(question => question.Answers)
+                .FirstOrDefaultAsync(quiz => quiz.Id == id);
+
+            if (quiz == null)
+            {
+                throw new Exception($"Quiz with ID {id} not found.");
+            }
+
+            return new Quiz(
+                quiz.Id,
+                quiz.Title,
+                quiz.Questions.Select(question => new Business.Models.Question(
+                    question.Id,
+                    question.Text,
+                    question.Answers.Select(a => new Business.Models.Answer(a.Id, a.Text, a.IsCorrect)).ToArray()
+                )).ToArray()
+            );
         }
 
-        public Task<bool> UpdateQuiz(Quiz quiz)
+        public async Task<bool> UpdateQuiz(Quiz quiz)
         {
-            throw new NotImplementedException();
+            var existingQuiz = await _context.Quizzes
+                .Include(q => q.Questions)
+                .ThenInclude(question => question.Answers)
+                .FirstOrDefaultAsync(q => q.Id == quiz.Id);
+
+            if (existingQuiz == null)
+            {
+                throw new Exception($"Quiz with ID {quiz.Id} not found.");
+            }
+
+            // Update title
+            existingQuiz.Title = quiz.Title;
+
+            // Remove all existing questions and answers
+            _context.RemoveRange(existingQuiz.Questions.SelectMany(q => q.Answers));
+            _context.RemoveRange(existingQuiz.Questions);
+
+            // Add all new questions and answers
+            existingQuiz.Questions = quiz.Questions.Select(q => new DataAccess.Models.Question
+            {
+                Text = q.Text,
+                Answers = q.Answers.Select(a => new DataAccess.Models.Answer
+                {
+                    Text = a.Text,
+                    IsCorrect = a.IsCorrect
+                }).ToList()
+            }).ToList();
+
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

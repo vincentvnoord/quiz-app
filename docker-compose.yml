@@ -9,36 +9,5 @@ services:
     env_file:
       - .env
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile.dev
-    container_name: frontend_dev
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    ports:
-      - "3000:3000"
-    command: npm run dev
-    env_file:
-      - ./frontend/.env
-    working_dir: /app
-
-  api:
-    build:
-      context: ./api
-      dockerfile: Dockerfile.dev
-    ports:
-      - "5000:5000"
-    volumes:
-      - ./api:/app
-      - ~/.nuget/packages:/root/.nuget/packages
-
-    env_file:
-      - ./api/.env
-
-    depends_on:
-      - database
-
 volumes:
   postgres_data:

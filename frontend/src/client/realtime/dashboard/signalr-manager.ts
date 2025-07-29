@@ -3,7 +3,6 @@
 import { RealtimeDashboardManager } from "./dashboard-manager";
 import { IRealtimeDashboardManager } from "./dashboard-manager.interface";
 import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
-import { DashboardEventHandler } from "./dashboard-event-handler";
 
 export class SignalrDashboardManager extends RealtimeDashboardManager implements IRealtimeDashboardManager {
     private connection: HubConnection | null = null;
@@ -21,7 +20,7 @@ export class SignalrDashboardManager extends RealtimeDashboardManager implements
                 .withAutomaticReconnect()
                 .build();
 
-            this.registerEvents(this.connection, this.eventHandler);
+            this.registerEvents();
 
             await this.connection.start();
             await this.connection.invoke("ConnectPlayer");
@@ -30,7 +29,14 @@ export class SignalrDashboardManager extends RealtimeDashboardManager implements
         }
     }
 
-    private registerEvents(connection: HubConnection, handler: DashboardEventHandler) {
-        
+    private registerEvents() {
+        if (!this.connection) {
+            console.error("Connection is not established");
+            return;
+        }
+
+        this.connection.on("QuizGenerated", (quiz) => {
+            this.eventHandler.onGeneratedQuiz(quiz);
+        });
     }
 }

@@ -4,11 +4,14 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Api.Hubs.DashboardHub;
 using Api.Models;
 using Api.Models.DTOs.QuizData;
+using Business.Models;
 using Business.QuizService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Api.Controllers
 {
@@ -17,11 +20,13 @@ namespace Api.Controllers
     [Route("/[controller]")]
     public class QuizController : ControllerBase
     {
+        private readonly IHubContext<DashboardHub> _hubContext;
         private readonly QuizService _quizService;
         private string _openaiApiKey;
 
-        public QuizController(QuizService quizService, IConfiguration configuration)
+        public QuizController(QuizService quizService, IConfiguration configuration, IHubContext<DashboardHub> hubContext)
         {
+            _hubContext = hubContext;
             _quizService = quizService;
             _openaiApiKey = configuration["OpenAI:ApiKey"] ?? throw new ArgumentNullException("OpenAI API key is not set in the configuration.");
         }
@@ -56,7 +61,19 @@ namespace Api.Controllers
                     return NotFound();
                 }
 
-                return Ok(quiz);
+                List<QuestionDto> questions = quiz.Questions.Select(q => new QuestionDto
+                {
+                    Id = q.Id,
+                    Text = q.Text,
+                    Answers = q.Answers.Select(a => new AnswerDto
+                    {
+                        Id = a.Id,
+                        Text = a.Text,
+                        IsCorrect = a.IsCorrect
+                    }).ToList()
+                }).ToList();
+
+                return Ok(new { questions });
             }
             catch (FormatException ex)
             {
@@ -105,6 +122,63 @@ namespace Api.Controllers
         [HttpPost("generate")]
         public async Task<IActionResult> Generate([FromBody] GenerateQuizRequest request)
         {
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return Unauthorized("User ID not found in token.");
+            }
+
+            if (!int.TryParse(userId, out int parsedUserId))
+            {
+                return BadRequest("Invalid user ID.");
+            }
+
+            if (string.IsNullOrEmpty(request.Prompt))
+            {
+                return BadRequest("Prompt is required.");
+            }
+
+            // Check if user has enough credits.
+
+            // Create a new quiz for the user, get the ID back.
+            var quizId = await _quizService.CreateQuiz(parsedUserId, new Quiz
+            {
+                Title = "New Quiz",
+                Questions = []
+            });
+
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+
+                    // Wait for the quiz to be generated.
+                    var generatedQuiz = await _quizService.GenerateQuiz(request.Prompt);
+
+                    if (generatedQuiz == null)
+                    {
+                        // Handle quiz generation failure
+                        return;
+                    }
+
+                    await Task.Delay(1000);
+
+                    // Update the quiz record in the database.
+                    var updateResult = await _quizService.UpdateQuiz(generatedQuiz);
+
+                    QuizDto quizDto = new QuizDto(generatedQuiz);
+                    // Tell hub context to update the quiz in the client.
+                    await _hubContext.Clients.Client(userId).SendAsync("UpdateQuiz", new { quizDto });
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    // Handle any exceptions that occur during quiz generation
+                }
+            });
+
+            return Ok(new { quizId });
+
             var _httpClient = new HttpClient();
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _openaiApiKey);
 

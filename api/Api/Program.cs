@@ -1,14 +1,12 @@
-using System.Security.Claims;
 using System.Text;
+using Api.Hubs.DashboardHub;
 using Api.Hubs.GameHub;
 using Business.GameSessions;
 using Business.QuizService;
 using Business.UserService;
 using DataAccess;
-using DataAccess.Mocks;
 using DataAccess.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -129,6 +127,7 @@ app.UseRateLimiter();
 
 app.MapControllers();
 app.MapHub<GameHub>("/gamehub");
+app.MapHub<DashboardHub>("/hubs/dashboard");
 
 // Apply migrations on startup
 using (var scope = app.Services.CreateScope())
