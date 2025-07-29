@@ -43,7 +43,7 @@ export const QuizList = () => {
             <div className="h-full min-w-74 bg-background sm:max-w-64 p-3 flex flex-col gap-4">
                 <div className="flex gap-2 items-center">
                     <PanelLeft className="" size={28} />
-                    <h1 className="text-xl pl-2 font-semibold w-full">Your Quizzes</h1>
+                    <h1 className="text-xl pl-2 font-semibold w-full">Library</h1>
                 </div>
 
                 <Link href={"/dashboard"} className="bg-primary text-white font-bold w-full rounded-xl p-3 py-2 flex justify-center items-center">
